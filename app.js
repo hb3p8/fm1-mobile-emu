@@ -114,7 +114,8 @@ BLACK_K.forEach((note,i) => {
 // Resize only geometry; the worklet and active pattern survive device rotation. The screen stays square: in
 // landscape as tall as the space (but leaving the controls on the right 40% of the width on squarish screens
 // such as tablets), in portrait as wide. It snaps down to a whole multiple of 240 device pixels when that
-// costs at most a tenth of its size: every firmware pixel then covers the same number of the display's.
+// costs at most a tenth of its size: every firmware pixel then covers the same number of the display's
+// (with Menu > Screen smoothing off, square blocks of them: screen.js samples the nearest pixel).
 const BEZEL = 3;                                          /* .screen-bezel's padding */
 const screenPanel = document.getElementById("screen-panel"), screenBezel = document.getElementById("screen-bezel");
 const mainPanel = document.querySelector(".panel-main");
@@ -133,9 +134,22 @@ function resizePanel() {
   screenBezel.style.setProperty("--screen-size", `${size}px`);
   if (landscape) device.style.setProperty("--screen-col", `${size + padX}px`);
   else device.style.removeProperty("--screen-col");
+  requestAnimationFrame(alignScreen);
+}
+// Centring can leave the canvas half a device pixel off the display's grid, and the compositor would then
+// resample it: shift it onto the grid, so its device-pixel-sized drawing buffer lands 1:1 on the display.
+const screenCanvas = document.getElementById("screen");
+function alignScreen() {
+  const dpr = window.devicePixelRatio || 1;
+  screenBezel.style.translate = "";
+  const r = screenCanvas.getBoundingClientRect();
+  const dx = Math.round(r.left * dpr) / dpr - r.left, dy = Math.round(r.top * dpr) / dpr - r.top;
+  if (Math.abs(dx) > .001 || Math.abs(dy) > .001) screenBezel.style.translate = `${dx}px ${dy}px`;
 }
 const panelObserver = new ResizeObserver(resizePanel);
 panelObserver.observe(screenPanel); panelObserver.observe(device);
+panelObserver.observe(mainPanel);                         /* (its width moves the screen: labels in a late font) */
+document.fonts?.ready.then(() => requestAnimationFrame(alignScreen));
 window.addEventListener("orientationchange",resizePanel);
 resizePanel();
 
