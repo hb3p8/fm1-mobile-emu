@@ -2,8 +2,8 @@
 // Offline cache. assemble.py fills in VERSION (a hash of every file below) and FILES, so any
 // rebuild changes this script; the browser notices on the next online launch, installs the new
 // files next to the old ones and the page switches over (see mobile.js).
-const VERSION = "897347c76c1b5eb6";
-const FILES = ["index.html", "style.css", "app.js", "manifest.webmanifest", "icon.svg", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "worklet.js", "x0x.wasm", "BarlowSemiCondensed-Medium.ttf", "BarlowSemiCondensed-SemiBold.ttf", "Barlow-OFL.txt", "LICENSE.txt", "LICENSING.md"];
+const VERSION = "157b57db093019d4";
+const FILES = ["index.html", "style.css", "app.js", "manifest.webmanifest", "icon.svg", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "fw/flash-worklet.js", "fw/x0x/x0x.wasm", "fw/x0x/worklet.js", "fw/felucca/felucca.wasm", "fw/sloop/sloop.wasm", "fw/fimba/kalimba.wasm", "fw/fimba/worklet.js", "BarlowSemiCondensed-Medium.ttf", "BarlowSemiCondensed-SemiBold.ttf", "Barlow-OFL.txt", "LICENSE.txt", "LICENSING.md"];
 const CACHE = "fm1-x0x-" + VERSION;
 
 self.addEventListener("install", (event) => {

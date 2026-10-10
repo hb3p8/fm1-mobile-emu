@@ -6,7 +6,7 @@ const ENC = { SELECT:0, ALGORITHM:1, PRESETS:2, KNOB1:3, KNOB2:4, KNOB3:5, KNOB4
 const WHITE_K = [0,2,4,6,7,9,11,12,14,16,18,19,21,23,24,26];
 const BLACK_K = [1,3,5,8,10,13,15,17,20,22,25];
 const BLACK_AFTER = [0,1,2,4,5,7,8,9,11,12,14];
-const STORE_KEY = "x0x-emu-store";
+const STORE_KEY = FW.store;
 const device = document.getElementById("device");
 const knobs = {}, buttons = {}, keys = [];
 let latchMode = false;

@@ -1,3 +1,46 @@
+const FIRMWARE_BUILDS = {"x0x": {"version": "1.0.3", "commit": "00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62", "archive": "source.tar.gz"}, "felucca": {"version": "1.5.1", "commit": "a4d7ca2e5d52a4c35e2468401f00d883cadbda03", "archive": "src/felucca.tar.gz"}, "sloop": {"version": "2.5", "commit": "fa9ce5742f4aea9484e7c129dd81079d07e7321f", "archive": "src/sloop.tar.gz"}, "fimba": {"version": "0.6.0", "commit": "b2b647b91bb3e9f0014529a468eeb6ac65f90ad9", "archive": "src/fimba.tar.gz"}};
+// SPDX-License-Identifier: GPL-3.0-only
+// The firmwares this page runs: each is that firmware's own C code built for the browser (firmware/build.sh).
+// "store" ones (X0X's lineage) keep numbered save objects in localStorage; "flash" ones (Felucca's lineage)
+// keep the sectors of a simulated NOR flash in IndexedDB. The choice is kept per browser; switching reloads.
+"use strict";
+const FIRMWARES = {
+  x0x: {
+    name: "X0X", tag: "X0X", by: "Charles Vestal", repo: "https://github.com/charlesvestal/fm1-x0x",
+    about: "Drum machine and acid bass line: 909 and 808 drums, a 303, breaks.",
+    manual: "https://charlesvestal.github.io/fm1-x0x/manual/",
+    kind: "store", wasm: "fw/x0x/x0x.wasm", worklet: "fw/x0x/worklet.js", processor: "x0x",
+    store: "x0x-emu-store", loops: true, masterMax: 4096, masterDefault: 2800,
+  },
+  felucca: {
+    name: "Felucca", tag: "FELUCCA", by: "Leo Kuroshita, Hügelton Instruments", repo: "https://github.com/hugelton/Felucca",
+    about: "Multi-engine synthesizer: thirteen engines, four tracks, a 64-step sequencer.",
+    manual: "https://github.com/hugelton/Felucca#readme",
+    kind: "flash", wasm: "fw/felucca/felucca.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "felucca", masterMax: 1023, masterDefault: 700,
+  },
+  sloop: {
+    name: "SLOOP", tag: "SLOOP", by: "isod89, after Felucca", repo: "https://github.com/isod89/sloop-fm1",
+    about: "Live groovebox: three synths and a drum machine, song mode, physical models.",
+    manual: "https://github.com/isod89/sloop-fm1/blob/main/GUIDE.md",
+    kind: "flash", wasm: "fw/sloop/sloop.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "sloop", masterMax: 1023, masterDefault: 700,
+  },
+  fimba: {
+    name: "FiMba-1", tag: "FIMBA", by: "Adam Sowers", repo: "https://github.com/jadamsowers/fm1-fimba",
+    about: "A kalimba: modelled tines on a body, thumb-roll chords, mbira patterns.",
+    manual: "https://github.com/jadamsowers/fm1-fimba#readme",
+    kind: "store", wasm: "fw/fimba/kalimba.wasm", worklet: "fw/fimba/worklet.js", processor: "kalimba",
+    store: "fimba-emu-store", masterMax: 4096, masterDefault: 2800,
+  },
+};
+for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit
+const FIRMWARE_KEY = "fm1-firmware";
+let FW_ID = "x0x";
+try { if (FIRMWARES[localStorage.getItem(FIRMWARE_KEY)]) FW_ID = localStorage.getItem(FIRMWARE_KEY); } catch {}
+const FW = FIRMWARES[FW_ID];
+const MASTER_MAX = FW.masterMax, MASTER_DEFAULT = FW.masterDefault, MASTER_STEP = FW.masterMax / 64;
+
 // SPDX-License-Identifier: GPL-3.0-only
 // DOM controls use the same FM-1 bit and encoder mappings as upstream/web/emu/index.html.
 "use strict";
@@ -6,7 +49,7 @@ const ENC = { SELECT:0, ALGORITHM:1, PRESETS:2, KNOB1:3, KNOB2:4, KNOB3:5, KNOB4
 const WHITE_K = [0,2,4,6,7,9,11,12,14,16,18,19,21,23,24,26];
 const BLACK_K = [1,3,5,8,10,13,15,17,20,22,25];
 const BLACK_AFTER = [0,1,2,4,5,7,8,9,11,12,14];
-const STORE_KEY = "x0x-emu-store";
+const STORE_KEY = FW.store;
 const device = document.getElementById("device");
 const knobs = {}, buttons = {}, keys = [];
 let latchMode = false;
@@ -272,7 +315,7 @@ const screenRenderer = (() => {
 
 let audioContext = null;
 // ---------------------------------------------------------------- state and input
-let node = null, btnMask = 0, keyMask = 0, latched = 0, master = 2800;
+let node = null, btnMask = 0, keyMask = 0, latched = 0, master = MASTER_DEFAULT;
 const btnHeldBy = new Map(), keyHeldBy = new Map();      // pointer / key id -> bit
 function send(m) { if (node) node.port.postMessage(m); }
 function syncButtons() {
@@ -323,14 +366,14 @@ document.addEventListener("lostpointercapture", pointerUp);
 
 function drawKnob(k) {
   k.ind.style.transform = `rotate(${k.angle}deg)`;
-  if (k.role === "master") k.g.style.setProperty("--level", (master / 4096).toFixed(3));
-  k.hit.setAttribute("aria-valuenow", k.role === "master" ? Math.round(master * 100 / 4096) : ((k.angle % 360 + 360) % 360));
+  if (k.role === "master") k.g.style.setProperty("--level", (master / MASTER_MAX).toFixed(3));
+  k.hit.setAttribute("aria-valuenow", k.role === "master" ? Math.round(master * 100 / MASTER_MAX) : ((k.angle % 360 + 360) % 360));
 }
 function turn(k, n) {
   if (!n) return;
   if (k.role === "master") {
-    master = Math.max(0, Math.min(4096, master + n * 64));
-    k.angle = -135 + 270 * master / 4096;
+    master = Math.max(0, Math.min(MASTER_MAX, master + n * MASTER_STEP));
+    k.angle = -135 + 270 * master / MASTER_MAX;
     send({ type: "master", value: master });
   } else {
     k.angle = (k.angle + n * 18) % 360;
@@ -339,7 +382,7 @@ function turn(k, n) {
   drawKnob(k);
 }
 for (const k of Object.values(knobs)) {
-  if (k.role === "master") { k.angle = -135 + 270 * master / 4096; drawKnob(k); }
+  if (k.role === "master") { k.angle = -135 + 270 * master / MASTER_MAX; drawKnob(k); }
   let drag = null, wheel = 0;
   k.hit.addEventListener("pointerdown", (e) => {
     e.preventDefault();
@@ -531,20 +574,76 @@ function slotDraw(k, skipped = 0) {
   slotsLoad().then(() => [0, 1, 2].forEach((k) => slotDraw(k)));
 })();
 
+
+// SPDX-License-Identifier: GPL-3.0-only
+// Switching on the chosen firmware (firmwares.js), after X0X's own switchOn: its wasm in its worklet,
+// the saved state handed back before boot, then the screen, the LEDs and new saves coming back.
+
+// ---------------------------------------------------------------- the flash of Felucca-style firmwares
+// IndexedDB "fm1-flash": key [firmware, sector offset] -> 4 KiB (too big for localStorage).
+function flashDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open("fm1-flash", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("sectors");
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+const flashRange = () => IDBKeyRange.bound([FW_ID, 0], [FW_ID, Infinity]);
+async function flashLoad() {
+  try {
+    const db = await flashDb(), out = {};
+    await new Promise((res) => {
+      const q = db.transaction("sectors").objectStore("sectors").openCursor(flashRange());
+      q.onsuccess = () => {
+        const c = q.result;
+        if (!c) return res();
+        out[c.key[1]] = c.value;
+        c.continue();
+      };
+      q.onerror = () => res();
+    });
+    return out;
+  } catch { return {}; }                                  // no IndexedDB: this session only
+}
+async function flashSave(sectors) {                      // {offset: bytes, or null once erased}
+  try {
+    const st = (await flashDb()).transaction("sectors", "readwrite").objectStore("sectors");
+    for (const [off, bytes] of Object.entries(sectors)) {
+      if (bytes) st.put(bytes, [FW_ID, +off]);
+      else st.delete([FW_ID, +off]);
+    }
+  } catch { /* this session only */ }
+}
+async function flashForget() {
+  try {
+    const st = (await flashDb()).transaction("sectors", "readwrite").objectStore("sectors");
+    await new Promise((res) => { const q = st.delete(flashRange()); q.onsuccess = q.onerror = () => res(); });
+  } catch {}
+}
+
 // ---------------------------------------------------------------- switching on
 const status = document.getElementById("status"), cpu = document.getElementById("cpu");
+const PLAY_GREEN = 14;                                   // Felucca: PLAY lit green (playing)
+function showLights(lit, keysLit, keysDim, buttonsDim = 0) {
+  if (lit & (1 << PLAY_GREEN)) lit |= 1 << BTN.PLAY;
+  drawLights(lit, keysLit, keysDim);
+  for (const b of Object.values(buttons)) b.g.classList.toggle("dim", !(lit & (1 << b.bit)) && !!(buttonsDim & (1 << b.bit)));
+}
 async function switchOn() {
   const go = document.getElementById("go");
   go.disabled = true;
-  go.textContent = "Starting...";
+  go.textContent = "Starting…";
   try {
     if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Audio needs HTTPS or localhost");
     const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
     audioContext = ac;
     await ac.resume();
-    const [wasm] = await Promise.all([fetch("x0x.wasm").then((r) => { if (!r.ok) throw new Error(`x0x.wasm: ${r.status}`); return r.arrayBuffer(); }),
-                                      ac.audioWorklet.addModule("worklet.js")]);
-    node = new AudioWorkletNode(ac, "x0x", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
+    const [wasm, saved] = await Promise.all([
+      fetch(FW.wasm).then((r) => { if (!r.ok) throw new Error(`${FW.wasm}: ${r.status}`); return r.arrayBuffer(); }),
+      FW.kind === "flash" ? flashLoad() : loadStore(),
+      ac.audioWorklet.addModule(FW.worklet)]);
+    node = new AudioWorkletNode(ac, FW.processor, { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
     node.connect(ac.destination);
     const ready = new Promise((res, reject) => {
       const timer = setTimeout(() => reject(new Error("The audio engine did not answer")), 15000);
@@ -554,16 +653,18 @@ async function switchOn() {
         else if (m.type === "error") { clearTimeout(timer); reject(new Error(m.message)); }
         else if (m.type === "frame") {
           if (m.fb) drawScreen(m.fb);
-          drawLights(m.buttons, m.keys, m.dim);
-          window.x0xLast = m;
-          if (m.load !== undefined) cpu.textContent = `Audio thread load: ${m.load}%`;
+          if (m.leds) showLights(m.leds[0], m.leds[1], m.leds[3], m.leds[2]);
+          else if (m.buttons !== undefined) showLights(m.buttons, m.keys, m.dim);
+          if (m.load !== undefined) cpu.textContent = `${FW.name} ${FW.version} · audio thread load: ${m.load}%`;
           if (m.store) saveStore(m.store);
+          if (m.sectors) flashSave(m.sectors);
         }
       };
     });
-    node.port.postMessage({ type: "load", wasm, store: loadStore(), master }, [wasm]);
+    const load = FW.kind === "flash" ? { sectors: saved } : { store: saved };
+    node.port.postMessage({ type: "load", wasm, master, ...load }, [wasm]);
     await ready;
-    [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
+    if (FW.loops) [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
     await ac.resume();
     document.getElementById("start").hidden = true;
     status.textContent = "Sound on";
@@ -580,15 +681,47 @@ async function switchOn() {
   }
 }
 document.getElementById("go").addEventListener("click", switchOn);
-document.getElementById("reset").addEventListener("click", () => {
-  if (document.getElementById("reset").dataset.armed) {
-    try { localStorage.removeItem(STORE_KEY); } catch {}
+document.getElementById("reset").addEventListener("click", async (event) => {
+  const reset = event.currentTarget;
+  if (reset.dataset.armed) {
+    if (FW.kind === "flash") await flashForget();
+    else try { localStorage.removeItem(STORE_KEY); } catch {}
     location.reload();
   } else {
-    document.getElementById("reset").dataset.armed = "1";
-    document.getElementById("reset").textContent = "Click again to forget everything";
+    reset.dataset.armed = "1";
+    reset.textContent = `Tap again to erase ${FW.name}'s saved work`;
   }
 });
+
+// ---------------------------------------------------------------- choosing the firmware (Menu)
+(function firmwareMenu() {
+  const list = document.getElementById("firmwares");
+  for (const [id, f] of Object.entries(FIRMWARES)) {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "firmware";
+    row.setAttribute("aria-pressed", String(id === FW_ID));
+    row.innerHTML = `<span class="firmware-name"></span><span class="firmware-about"></span><span class="firmware-by"></span>`;
+    row.querySelector(".firmware-name").textContent = `${f.name} ${f.version || ""}`.trim();
+    row.querySelector(".firmware-about").textContent = f.about;
+    row.querySelector(".firmware-by").textContent = f.by;
+    row.addEventListener("click", () => {
+      if (id === FW_ID) return;
+      try { localStorage.setItem(FIRMWARE_KEY, id); } catch {}
+      location.reload();
+    });
+    list.append(row);
+  }
+  for (const el of document.querySelectorAll(".fw-tag")) el.textContent = FW.tag;
+  document.querySelector(".breaks").hidden = !FW.loops;
+  const manual = document.getElementById("fw-manual"), source = document.getElementById("fw-source");
+  manual.href = FW.manual;
+  manual.textContent = `${FW.name} manual`;
+  source.href = FW.repo;
+  source.textContent = `${FW.name} on GitHub`;
+  document.getElementById("fw-archive").href = FW.archive;
+  document.getElementById("reset").textContent = `Erase ${FW.name}'s saved work`;
+})();
 
 // SPDX-License-Identifier: GPL-3.0-only
 const settings = document.getElementById("settings");

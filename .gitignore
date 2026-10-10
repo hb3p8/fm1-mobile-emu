@@ -2,4 +2,6 @@
 .openai/local/
 *.tar.gz
 !dist/source.tar.gz
+!dist/src/*.tar.gz
 __pycache__/
+firmware/out/

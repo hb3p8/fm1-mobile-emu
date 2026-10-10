@@ -27,7 +27,7 @@
         <div class="screen-bezel" id="screen-bezel"><canvas id="screen" width="240" height="240" aria-label="FM-1 screen"></canvas></div>
       </section>
       <div class="bar">
-        <div class="brand" aria-label="FM-1 X0X">FM-1<span>X0X</span></div>
+        <div class="brand">FM-1<span class="fw-tag">X0X</span></div>
         <button id="hold-toggle" class="tool" type="button" aria-pressed="false" title="Latch buttons for one-finger combinations">Hold</button>
         <button id="settings-open" class="tool" type="button" aria-label="Menu: sound, screen, loops and help">Menu</button>
       </div>
@@ -42,15 +42,15 @@
       <div class="keyboard" id="keyboard" aria-label="FM-1 keyboard"></div>
       <div class="start" id="start">
         <div class="start-card">
-          <div class="start-brand">FM-1<span>X0X</span></div>
+          <div class="start-brand">FM-1<span class="fw-tag">X0X</span></div>
           <button type="button" id="go">Switch on</button>
-          <small>The real firmware in your browser. Sound starts after you tap.</small>
+          <small>The real firmware in your browser. Sound starts after you tap; Menu switches firmware.</small>
         </div>
       </div>
     </div>
   </main>
   <dialog id="settings">
-    <div class="dialog-header"><h1>FM-1 / X0X</h1><button id="settings-close" type="button" aria-label="Close settings">×</button></div>
+    <div class="dialog-header"><h1>FM-1 · <span class="fw-tag">X0X</span></h1><button id="settings-close" type="button" aria-label="Close settings">×</button></div>
     <section class="quick" aria-label="Sound and screen">
       <div class="setting">
         <span class="display-led" aria-hidden="true"></span>
@@ -66,6 +66,11 @@
         <button id="filter-toggle" class="switch" type="button" aria-pressed="true" aria-label="Screen smoothing (xBR)"></button>
       </div>
     </section>
+    <section aria-labelledby="firmware-h">
+      <h2 id="firmware-h">Firmware</h2>
+      <p>Each is that firmware's own code, built for the browser. Its saved work stays with it when you switch.</p>
+      <div class="firmwares" id="firmwares"></div>
+    </section>
     <section class="breaks" aria-labelledby="breaks-h">
       <h2 id="breaks-h">Your loops</h2>
       <p>WAV, AIFF or MP3. Up to 16 loops and about 7 seconds per slot. To play them, choose BREAK with the ALGORITHM knob, press EDIT until the LOOPS page and pick a loop with KNOB1.</p>
@@ -78,10 +83,10 @@
       <p>xBR smooths the pixel screen like the filters of retro game emulators; switch it off to see the original pixels.</p>
       <p>SAVE keeps patterns in this browser, and loops stay on this device too. For a larger working area, add the page to your phone’s home screen.</p>
     </section>
-    <button id="reset" type="button">Reset patterns</button>
+    <button id="reset" type="button">Erase saved work</button>
     <footer>
-      <p>Mobile adaptation of <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">X0X / Charles Vestal</a>. Based on Felucca. Browser emulator idea by Groove OS. Screen filter: xBR by Hyllian.</p>
-      <p><a href="https://charlesvestal.github.io/fm1-x0x/manual/" target="_blank" rel="noopener">X0X manual</a> · <a href="source.tar.gz" download>Full source</a> · <a href="LICENSE.txt">GPL-3.0</a></p>
+      <p>Firmwares: <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">X0X</a> by Charles Vestal, <a href="https://github.com/hugelton/Felucca" target="_blank" rel="noopener">Felucca</a> by Leo Kuroshita / Hügelton Instruments, <a href="https://github.com/isod89/sloop-fm1" target="_blank" rel="noopener">SLOOP</a> by isod89, <a href="https://github.com/jadamsowers/fm1-fimba" target="_blank" rel="noopener">FiMba-1</a> by Adam Sowers. Browser emulator idea by Groove OS. Screen filter: xBR by Hyllian. M-VAVE and FM-1 are trademarks of their owners; none of this is affiliated with them.</p>
+      <p><a id="fw-manual" href="#" target="_blank" rel="noopener">Manual</a> · <a id="fw-source" href="#" target="_blank" rel="noopener">Source</a> · <a id="fw-archive" href="#" download>Firmware source archive</a> · <a href="source.tar.gz" download>App source</a> · <a href="LICENSE.txt">GPL-3.0</a></p>
     </footer>
   </dialog>
 </body>

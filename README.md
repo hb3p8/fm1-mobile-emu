@@ -1,27 +1,40 @@
-# FM-1 X0X Mobile
+# FM-1 Mobile
 
-Touch interface for the real X0X firmware, based on charlesvestal/fm1-x0x at 00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62. GPL-3.0-only; see upstream/LICENSE and upstream/LICENSING.md.
+A touch interface for real FM-1 firmwares running in the browser: X0X, Felucca, SLOOP and FiMba-1 (below). Based on charlesvestal/fm1-x0x's browser emulator. GPL-3.0-only, as every firmware here; see each source tree's LICENSE and LICENSING.md.
 
 The panel follows the look of AudioKit Synth One: dark tiles, black knobs with orange pointers, an orange Menu button. The controls keep the FM-1's arrangement: MASTER / SELECT / PRESETS / ALGORITHM in a 2×2 block with OCT− / OCT+ below, left of the screen in landscape; KNOB1–4 over the function buttons right of it (six by two, or four by three in portrait). A slim bar over KNOB1–4 (full width under the screen in portrait) holds the name, Hold and Menu, so the screen reaches the top edge; Menu holds the sound status and pause, the xBR switch, loops and help. In landscape the square screen fills the height beside the panels; in portrait it fills the width above them. Rotation changes only the layout and preserves the running firmware.
 
 The 240×240 screen is magnified on the GPU (WebGL) to the display's device pixels with xBR level 2 by Hyllian, the edge-directed filter used by emulators of old games (`screen.js`). The Screen smoothing switch in Menu turns it off for plain pixels; the choice is kept in localStorage.
 
+## Firmwares
+
+Menu > Firmware switches between four FM-1 firmwares, each its own C code compiled to WebAssembly; the choice and each firmware's saved work stay in the browser, and switching reloads the page.
+
+| Firmware | Source | Browser build | Saved work |
+| --- | --- | --- | --- |
+| X0X 1.0.3 | [charlesvestal/fm1-x0x](https://github.com/charlesvestal/fm1-x0x) | its own `web/emu` (x0x.wasm, worklet.js) | localStorage objects, loops in IndexedDB |
+| Felucca 1.5.1 | [hugelton/Felucca](https://github.com/hugelton/Felucca) | its own `web/emu` (felucca.wasm) played by `firmware/flash-worklet.js` | flash sectors in IndexedDB |
+| SLOOP 2.5 | [isod89/sloop-fm1](https://github.com/isod89/sloop-fm1) | none upstream: `firmware/sloop_web.c`, Felucca's browser build fitted to SLOOP's sources | flash sectors in IndexedDB |
+| FiMba-1 0.6.0 | [jadamsowers/fm1-fimba](https://github.com/jadamsowers/fm1-fimba) | its own `web/emu` (kalimba.wasm, worklet.js) | localStorage objects |
+
+`firmware/sources.txt` pins each repository's commit. The emulator runs firmware built from source this way; it cannot load `.fwsc` update packages, which hold machine code for the FM-1's own processor. Adding a firmware means a browser build of it (a host simulator with the `web_*` exports these use) and an entry in `firmwares.js`.
+
 ## Build
 
-Install Emscripten, a C compiler, Python 3 and Pillow. From the parent directory containing `upstream/` and `app/`:
+Install Emscripten, Git and Python 3 with Pillow (with raqm: on macOS `brew install fribidi`) and fontTools. From the parent directory of `app/` (the firmware checkouts go next to it):
 
 ```sh
-python3 -m venv app/.venv
-app/.venv/bin/pip install Pillow
-cd upstream
-mkdir -p build/gen
-../app/.venv/bin/python tools/gen_font.py build/gen/felucca_font.h
-PATH=/opt/homebrew/bin:$PATH sh web/emu/build.sh  # macOS/Homebrew; otherwise sh web/emu/build.sh
-cd ..
-python3 app/assemble.py   # app/.venv/bin/python app/make_icons.py first if icon.svg changed
+python3 -m venv firmwares/.venv
+firmwares/.venv/bin/pip install Pillow fonttools
+app/firmware/build.sh            # clones and builds the four firmwares into app/firmware/out/
+python3 app/assemble.py          # dist/: the page, the firmwares, sw.js and the source archives
 ```
 
-The font generator has a portability fallback for Pillow installations without libraqm. The audio engines, emulator wrapper and AudioWorklet are unchanged.
+`app/.venv/bin/python app/make_icons.py` redraws the PNG icons after a change to `icon.svg`. `dist/source.tar.gz` holds this app and the X0X tree, `dist/src/*.tar.gz` the other firmwares' trees as built; they are reproducible, so rebuilding the same commits leaves them unchanged.
+
+## GitHub Pages
+
+`.github/workflows/pages.yml` publishes the committed `dist/` on every push to `main`. In the repository: Settings > Pages > Build and deployment > Source: GitHub Actions. The site is then at `https://<user>.github.io/<repository>/`; every path is relative, and the service worker's scope is that folder. Install the app on a phone's home screen from that address.
 
 ## Run
 
@@ -29,14 +42,10 @@ The font generator has a portability fallback for Pillow installations without l
 python3 -m http.server 4180 --directory app/dist --bind 127.0.0.1
 ```
 
-Open http://localhost:4180 on the computer and press “Switch on”, then PLAY. On a phone use an HTTPS deployment of `dist/`; AudioWorklet is not available on ordinary LAN HTTP addresses. Settings contain the upstream manual, loop import, reset, full source archive and license.
+Open http://localhost:4180 on the computer and press “Switch on”, then PLAY. On a phone use an HTTPS address (GitHub Pages, or a tunnel to this server); AudioWorklet is not available on ordinary LAN HTTP addresses. Menu holds the sound, the screen filter, the firmware choice, loop import (X0X), the manual, erasing saved work, the source archives and the licence.
 
 ## Offline and updates
 
-`dist/sw.js` is a service worker generated by `assemble.py`: it caches every file the page needs (page, scripts, `worklet.js`, `x0x.wasm`, fonts, icons, licences; not `source.tar.gz`) under a version that is a hash of those files. Added to the home screen, the app then starts without a network. Each launch with a network, and each return to the app, the browser compares `sw.js`; after a rebuild it differs, the new files are cached, and the page reloads itself if the firmware has not been switched on yet, or otherwise shows “Update ready” in Menu. Patterns and loops survive updates. The PNG icons come from `make_icons.py` (Pillow).
+`dist/sw.js` is a service worker generated by `assemble.py`: it caches every file the page needs (page, scripts, the four firmwares and their worklets, fonts, icons, licences; not the source archives) under a version that is a hash of those files. Added to the home screen, the app then starts without a network. Each launch with a network, and each return to the app, the browser compares `sw.js`; after a rebuild it differs, the new files are cached, and the page reloads itself if the firmware has not been switched on yet, or otherwise shows “Update ready” in Menu. Patterns and loops survive updates. The PNG icons come from `make_icons.py` (Pillow).
 
-## Firmware
-
-`x0x.wasm` is the X0X firmware itself: upstream's `web/emu/build.sh` compiles the firmware sources (`firmware/src`, the host simulator `host/x0x_host.c` and `web/emu/x0x_web.c`) for WebAssembly. It is served from `dist/` next to the page, never fetched from elsewhere. To run another X0X version, check out that upstream version, rebuild the wasm and run `assemble.py`. The emulator cannot load FM-1 `.fwsc` update packages: they hold ARM machine code for the device, while this is the same C code built for the browser.
-
-Audio runs at 44.1 kHz. SAVE stores patterns in localStorage; loop slots use IndexedDB. Browser storage is specific to the current origin.
+Audio runs at 44.1 kHz. Browser storage is specific to the current origin.

@@ -1,0 +1,5 @@
+# id       directory (next to app/)   repository                                       commit
+x0x        upstream                   https://github.com/charlesvestal/fm1-x0x.git      00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62
+felucca    firmwares/Felucca          https://github.com/hugelton/Felucca.git          a4d7ca2e5d52a4c35e2468401f00d883cadbda03
+sloop      firmwares/sloop-fm1        https://github.com/isod89/sloop-fm1.git          fa9ce5742f4aea9484e7c129dd81079d07e7321f
+fimba      firmwares/fm1-fimba        https://github.com/jadamsowers/fm1-fimba.git     b2b647b91bb3e9f0014529a468eeb6ac65f90ad9
