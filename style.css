@@ -44,11 +44,11 @@ button:disabled { cursor: wait; opacity: .6; }
 
 /* ---------------------------------------------------------------- bar: brand, Hold, Menu (over KNOB1–4 in landscape, full width in portrait) */
 .bar {
-  grid-area: bar; position: relative; z-index: 6; /* stays usable above the power-on overlay */
+  grid-area: bar;
   display: flex; align-items: center; gap: 6px; height: var(--bar-h); padding: 0 8px; background: var(--bar);
 }
 .brand { margin-right: auto; font-size: 17px; font-weight: 600; letter-spacing: .5px; color: var(--text); white-space: nowrap; }
-.brand span, .start-brand span {
+.brand span {
   margin-left: 6px; padding: 1px 5px; border-radius: 3px; font-size: 11px; letter-spacing: 1px;
   vertical-align: 2px; color: var(--accent); border: 1px solid #5a3a1c;
 }
@@ -75,7 +75,7 @@ button:disabled { cursor: wait; opacity: .6; }
 }
 .screen-panel { grid-area: screen; min-width: 0; min-height: 0; display: grid; place-items: center; padding: 8px; background: var(--panel); }
 .screen-bezel {
-  width: var(--screen-size, 240px); height: var(--screen-size, 240px); padding: 3px; border-radius: 6px;
+  position: relative; width: var(--screen-size, 240px); height: var(--screen-size, 240px); padding: 3px; border-radius: 6px;
   background: #060606; box-shadow: 0 0 0 1px #000, 0 1px 0 1px #ffffff12, inset 0 0 0 1px #ffffff08;
 }
 #screen { width: 100%; height: 100%; display: block; border-radius: 3px; background: #000; image-rendering: pixelated; }
@@ -175,19 +175,13 @@ button:disabled { cursor: wait; opacity: .6; }
 .key.white.held { box-shadow: inset 0 -1px 0 #b8661d, inset 0 3px 6px #0004; }
 .key.black.lit, .key.black.held { background: linear-gradient(90deg, #8b4a10, var(--accent) 18%, #e07c22 82%, #8b4a10); box-shadow: inset 0 -2px 0 #b8661d, 0 3px 4px #000c; }
 
-/* ---------------------------------------------------------------- power-on overlay */
-.start { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; background: #0b0b0cd0; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-.start-card {
-  display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center;
-  padding: 22px 28px; border-radius: 12px; background: #232325ee; border: 1px solid #3a3a3d; box-shadow: 0 12px 40px #000a;
+/* ---------------------------------------------------------------- over the screen until the sound runs */
+.screen-hint {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: calc(100% - 24px);
+  padding: 10px 16px; border-radius: 8px; background: #1c1c1de8; border: 1px solid #3a3a3d;
+  color: var(--text); font-size: 15px; line-height: 1.35; text-align: center; pointer-events: none;
 }
-.start-brand { font-size: 30px; font-weight: 600; letter-spacing: 1px; }
-.start button {
-  background: var(--accent); color: var(--accent-ink); border: 1px solid var(--accent-hi); border-radius: 8px;
-  padding: 12px 30px; font-weight: 600; font-size: 20px; box-shadow: 0 0 22px #f08a2b44, inset 0 1px 0 #ffffff50;
-}
-.start button:active { background: var(--accent-hi); }
-.start small { font-size: 13px; max-width: 260px; line-height: 1.4; color: var(--label); }
+.screen-hint.error { border-color: #a2412c; }
 
 /* ---------------------------------------------------------------- settings */
 dialog {
@@ -261,14 +255,15 @@ a { color: var(--accent-hi); }
 @media (orientation: landscape) {
   :root {
     --bar-h: clamp(30px, 8.5vh, 40px); --knob: clamp(28px, 10.5vh, 72px); --btn-h: clamp(26px, 8.6vh, 52px);
-    --keys-h: clamp(70px, 23vh, 170px);
+    --keys-h: clamp(100px, 33vh, 250px);   /* 1.5 times the old keys: easier to hit */
   }
   .device {
     grid-template-columns: auto var(--screen-col, 40%) minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr) auto;
     grid-template-areas: "main screen bar" "main screen panels" "keys keys keys";
   }
-  .screen-panel { padding: 6px; }
+  .screen-panel { padding: 4px; }
+  .key.black { height: 50%; }
   .panel { padding: 4px 8px 6px; }
   .knob { gap: 3px; }
   .knob-label { font-size: clamp(9px, 2.8vh, 11px); letter-spacing: .2px; }

@@ -16,13 +16,13 @@ document.getElementById("audio-toggle").addEventListener("click",async(event)=> 
   const toggle=event.currentTarget;   // currentTarget is gone after the awaits below
   if (!audioContext) return;
   releaseInputs();
-  if (audioContext.state === "running") await audioContext.suspend();
+  userPaused=audioContext.state === "running";
+  if (userPaused) await audioContext.suspend();
   else await audioContext.resume();
   const running=audioContext.state === "running";
   toggle.querySelector(".tool-label").textContent=running ? "Pause" : "Resume";
   toggle.setAttribute("aria-label",running ? "Pause" : "Resume");
-  status.textContent=running ? "Sound on" : "Paused";
-  document.querySelector(".app-shell").classList.toggle("running",audioContext.state === "running");
+  if (!running) status.textContent="Paused";
 });
 const filterToggle = document.getElementById("filter-toggle");
 function syncFilter() {
@@ -74,8 +74,8 @@ Object.values(buttons).forEach(button=> {
 });
 
 // Offline use: sw.js keeps every file of this version. When a rebuilt version arrives (checked on
-// launch and whenever the app comes back to the front), it takes over at once if the firmware is
-// not running yet; otherwise Menu offers a reload so nothing stops in the middle of playing.
+// launch and whenever the app comes back to the front), it takes over at once if the sound has not
+// started yet; otherwise Menu offers a reload so nothing stops in the middle of playing.
 if ("serviceWorker" in navigator && window.isSecureContext) {
   const updated = !!navigator.serviceWorker.controller;   // false on the very first visit: nothing to replace
   navigator.serviceWorker.register("sw.js").then((registration)=> {
@@ -83,7 +83,7 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
   }).catch(()=>{});
   navigator.serviceWorker.addEventListener("controllerchange",()=> {
     if (!updated) return;
-    if (!node) { location.reload(); return; }
+    if (!soundStarted) { location.reload(); return; }
     document.getElementById("update").hidden=false;
     document.getElementById("settings-open").classList.add("has-update");
   });

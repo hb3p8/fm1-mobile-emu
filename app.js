@@ -111,22 +111,28 @@ BLACK_K.forEach((note,i) => {
   g.style.left=`${(BLACK_AFTER[i]+1)*100/16-2.05}%`; keyboard.append(g); keys[note]={g,hit:g};
 });
 
-// Resize only geometry; the worklet and active pattern survive device rotation. The screen stays
-// square: in landscape its column is as wide as the space is tall, but leaves the controls on the right
-// 40% of the width on squarish screens such as tablets; in portrait it fits the free height.
+// Resize only geometry; the worklet and active pattern survive device rotation. The screen stays square: in
+// landscape as tall as the space (but leaving the controls on the right 40% of the width on squarish screens
+// such as tablets), in portrait as wide. It snaps down to a whole multiple of 240 device pixels when that
+// costs at most a tenth of its size: every firmware pixel then covers the same number of the display's.
+const BEZEL = 3;                                          /* .screen-bezel's padding */
 const screenPanel = document.getElementById("screen-panel"), screenBezel = document.getElementById("screen-bezel");
 const mainPanel = document.querySelector(".panel-main");
+function screenSize(room) {
+  const dpr = window.devicePixelRatio || 1, k = Math.floor(room * dpr / 240), whole = k * 240 / dpr;
+  return k >= 1 && whole >= room * .9 ? whole : Math.max(120, Math.floor(room));
+}
 function resizePanel() {
-  const landscape = matchMedia("(orientation: landscape)").matches;
-  if (landscape) {
-    const room = device.clientWidth - mainPanel.offsetWidth - 2 - Math.max(260,device.clientWidth*.4);
-    device.style.setProperty("--screen-col",`${Math.round(Math.max(160,Math.min(screenPanel.getBoundingClientRect().height,room)))}px`);
-  }
+  const landscape = matchMedia("(orientation: landscape)").matches, style = getComputedStyle(screenPanel);
+  const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+  const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  const height = screenPanel.clientHeight - padY;
+  const width = landscape ? Math.min(height, device.clientWidth - mainPanel.offsetWidth - 2 - Math.max(260, device.clientWidth * .4) - padX)
+                          : screenPanel.clientWidth - padX;
+  const size = screenSize(Math.min(width, height) - 2 * BEZEL) + 2 * BEZEL;
+  screenBezel.style.setProperty("--screen-size", `${size}px`);
+  if (landscape) device.style.setProperty("--screen-col", `${size + padX}px`);
   else device.style.removeProperty("--screen-col");
-  const style = getComputedStyle(screenPanel);
-  const w = screenPanel.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
-  const h = screenPanel.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
-  screenBezel.style.setProperty("--screen-size",`${Math.max(120,Math.floor(Math.min(w,h)))}px`);
 }
 const panelObserver = new ResizeObserver(resizePanel);
 panelObserver.observe(screenPanel); panelObserver.observe(device);
@@ -623,22 +629,48 @@ async function flashForget() {
 }
 
 // ---------------------------------------------------------------- switching on
+// The firmware loads with the page. Browsers start sound only from a user's tap, so the audio clock (which
+// drives the firmware) waits for the first touch anywhere: that touch also plays the control it lands on.
 const status = document.getElementById("status"), cpu = document.getElementById("cpu");
+const hint = document.getElementById("screen-hint");
 const PLAY_GREEN = 14;                                   // Felucca: PLAY lit green (playing)
+let soundStarted = false, userPaused = false;            // (mobile.js: updates wait for an untouched page)
 function showLights(lit, keysLit, keysDim, buttonsDim = 0) {
   if (lit & (1 << PLAY_GREEN)) lit |= 1 << BTN.PLAY;
   drawLights(lit, keysLit, keysDim);
   for (const b of Object.values(buttons)) b.g.classList.toggle("dim", !(lit & (1 << b.bit)) && !!(buttonsDim & (1 << b.bit)));
 }
+function showHint(text, error = false) {
+  hint.hidden = !text;
+  hint.textContent = text || "";
+  hint.classList.toggle("error", error);
+}
+const UNLOCK = ["pointerdown", "pointerup", "touchend", "keydown", "click"];   // whichever this browser accepts
+function unlock() { if (audioContext && !userPaused) audioContext.resume().catch(() => {}); }
+function armUnlock(on) {
+  for (const type of UNLOCK) (on ? addEventListener : removeEventListener)(type, unlock, true);
+}
+function soundState() {
+  const running = audioContext && audioContext.state === "running";
+  document.querySelector(".app-shell").classList.toggle("running", !!running);
+  if (running) {
+    soundStarted = true;
+    armUnlock(false);
+    showHint("");
+    status.textContent = "Sound on";
+  } else if (!userPaused) {                              // not started yet, or iOS interrupted it (a call)
+    armUnlock(true);
+    showHint("Tap anywhere to start the sound");
+    status.textContent = "Waiting for a tap";
+  }
+}
 async function switchOn() {
-  const go = document.getElementById("go");
-  go.disabled = true;
-  go.textContent = "Starting…";
+  showHint(`Loading ${FW.name}…`);
   try {
-    if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Audio needs HTTPS or localhost");
+    if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Sound needs HTTPS (or localhost)");
+    if (navigator.audioSession) navigator.audioSession.type = "playback";   // iOS: play with the silent switch on
     const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
     audioContext = ac;
-    await ac.resume();
     const [wasm, saved] = await Promise.all([
       fetch(FW.wasm).then((r) => { if (!r.ok) throw new Error(`${FW.wasm}: ${r.status}`); return r.arrayBuffer(); }),
       FW.kind === "flash" ? flashLoad() : loadStore(),
@@ -646,7 +678,7 @@ async function switchOn() {
     node = new AudioWorkletNode(ac, FW.processor, { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
     node.connect(ac.destination);
     const ready = new Promise((res, reject) => {
-      const timer = setTimeout(() => reject(new Error("The audio engine did not answer")), 15000);
+      const timer = setTimeout(() => reject(new Error("The firmware did not answer")), 15000);
       node.port.onmessage = (e) => {
         const m = e.data;
         if (m.type === "ready") { clearTimeout(timer); res(); }
@@ -665,22 +697,19 @@ async function switchOn() {
     node.port.postMessage({ type: "load", wasm, master, ...load }, [wasm]);
     await ready;
     if (FW.loops) [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
-    await ac.resume();
-    document.getElementById("start").hidden = true;
-    status.textContent = "Sound on";
-    document.querySelector(".app-shell").classList.add("running");
     document.getElementById("audio-toggle").hidden = false;
     syncButtons(); syncKeys();
+    ac.onstatechange = soundState;
+    soundState();
+    unlock();                                            // (already allowed when the page was opened by a tap)
   } catch (err) {
-    go.disabled = false;
     if (audioContext) await audioContext.close().catch(() => {});
     audioContext = null; node = null;
-    go.textContent = "Try again";
     status.textContent = "Could not start";
-    document.querySelector(".start small").textContent = err && err.message || String(err);
+    showHint(err && err.message || String(err), true);
   }
 }
-document.getElementById("go").addEventListener("click", switchOn);
+switchOn();
 document.getElementById("reset").addEventListener("click", async (event) => {
   const reset = event.currentTarget;
   if (reset.dataset.armed) {
@@ -741,13 +770,13 @@ document.getElementById("audio-toggle").addEventListener("click",async(event)=> 
   const toggle=event.currentTarget;   // currentTarget is gone after the awaits below
   if (!audioContext) return;
   releaseInputs();
-  if (audioContext.state === "running") await audioContext.suspend();
+  userPaused=audioContext.state === "running";
+  if (userPaused) await audioContext.suspend();
   else await audioContext.resume();
   const running=audioContext.state === "running";
   toggle.querySelector(".tool-label").textContent=running ? "Pause" : "Resume";
   toggle.setAttribute("aria-label",running ? "Pause" : "Resume");
-  status.textContent=running ? "Sound on" : "Paused";
-  document.querySelector(".app-shell").classList.toggle("running",audioContext.state === "running");
+  if (!running) status.textContent="Paused";
 });
 const filterToggle = document.getElementById("filter-toggle");
 function syncFilter() {
@@ -799,8 +828,8 @@ Object.values(buttons).forEach(button=> {
 });
 
 // Offline use: sw.js keeps every file of this version. When a rebuilt version arrives (checked on
-// launch and whenever the app comes back to the front), it takes over at once if the firmware is
-// not running yet; otherwise Menu offers a reload so nothing stops in the middle of playing.
+// launch and whenever the app comes back to the front), it takes over at once if the sound has not
+// started yet; otherwise Menu offers a reload so nothing stops in the middle of playing.
 if ("serviceWorker" in navigator && window.isSecureContext) {
   const updated = !!navigator.serviceWorker.controller;   // false on the very first visit: nothing to replace
   navigator.serviceWorker.register("sw.js").then((registration)=> {
@@ -808,7 +837,7 @@ if ("serviceWorker" in navigator && window.isSecureContext) {
   }).catch(()=>{});
   navigator.serviceWorker.addEventListener("controllerchange",()=> {
     if (!updated) return;
-    if (!node) { location.reload(); return; }
+    if (!soundStarted) { location.reload(); return; }
     document.getElementById("update").hidden=false;
     document.getElementById("settings-open").classList.add("has-update");
   });

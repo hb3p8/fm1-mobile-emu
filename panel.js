@@ -68,22 +68,28 @@ BLACK_K.forEach((note,i) => {
   g.style.left=`${(BLACK_AFTER[i]+1)*100/16-2.05}%`; keyboard.append(g); keys[note]={g,hit:g};
 });
 
-// Resize only geometry; the worklet and active pattern survive device rotation. The screen stays
-// square: in landscape its column is as wide as the space is tall, but leaves the controls on the right
-// 40% of the width on squarish screens such as tablets; in portrait it fits the free height.
+// Resize only geometry; the worklet and active pattern survive device rotation. The screen stays square: in
+// landscape as tall as the space (but leaving the controls on the right 40% of the width on squarish screens
+// such as tablets), in portrait as wide. It snaps down to a whole multiple of 240 device pixels when that
+// costs at most a tenth of its size: every firmware pixel then covers the same number of the display's.
+const BEZEL = 3;                                          /* .screen-bezel's padding */
 const screenPanel = document.getElementById("screen-panel"), screenBezel = document.getElementById("screen-bezel");
 const mainPanel = document.querySelector(".panel-main");
+function screenSize(room) {
+  const dpr = window.devicePixelRatio || 1, k = Math.floor(room * dpr / 240), whole = k * 240 / dpr;
+  return k >= 1 && whole >= room * .9 ? whole : Math.max(120, Math.floor(room));
+}
 function resizePanel() {
-  const landscape = matchMedia("(orientation: landscape)").matches;
-  if (landscape) {
-    const room = device.clientWidth - mainPanel.offsetWidth - 2 - Math.max(260,device.clientWidth*.4);
-    device.style.setProperty("--screen-col",`${Math.round(Math.max(160,Math.min(screenPanel.getBoundingClientRect().height,room)))}px`);
-  }
+  const landscape = matchMedia("(orientation: landscape)").matches, style = getComputedStyle(screenPanel);
+  const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+  const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  const height = screenPanel.clientHeight - padY;
+  const width = landscape ? Math.min(height, device.clientWidth - mainPanel.offsetWidth - 2 - Math.max(260, device.clientWidth * .4) - padX)
+                          : screenPanel.clientWidth - padX;
+  const size = screenSize(Math.min(width, height) - 2 * BEZEL) + 2 * BEZEL;
+  screenBezel.style.setProperty("--screen-size", `${size}px`);
+  if (landscape) device.style.setProperty("--screen-col", `${size + padX}px`);
   else device.style.removeProperty("--screen-col");
-  const style = getComputedStyle(screenPanel);
-  const w = screenPanel.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
-  const h = screenPanel.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
-  screenBezel.style.setProperty("--screen-size",`${Math.max(120,Math.floor(Math.min(w,h)))}px`);
 }
 const panelObserver = new ResizeObserver(resizePanel);
 panelObserver.observe(screenPanel); panelObserver.observe(device);

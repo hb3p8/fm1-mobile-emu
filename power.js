@@ -46,22 +46,48 @@ async function flashForget() {
 }
 
 // ---------------------------------------------------------------- switching on
+// The firmware loads with the page. Browsers start sound only from a user's tap, so the audio clock (which
+// drives the firmware) waits for the first touch anywhere: that touch also plays the control it lands on.
 const status = document.getElementById("status"), cpu = document.getElementById("cpu");
+const hint = document.getElementById("screen-hint");
 const PLAY_GREEN = 14;                                   // Felucca: PLAY lit green (playing)
+let soundStarted = false, userPaused = false;            // (mobile.js: updates wait for an untouched page)
 function showLights(lit, keysLit, keysDim, buttonsDim = 0) {
   if (lit & (1 << PLAY_GREEN)) lit |= 1 << BTN.PLAY;
   drawLights(lit, keysLit, keysDim);
   for (const b of Object.values(buttons)) b.g.classList.toggle("dim", !(lit & (1 << b.bit)) && !!(buttonsDim & (1 << b.bit)));
 }
+function showHint(text, error = false) {
+  hint.hidden = !text;
+  hint.textContent = text || "";
+  hint.classList.toggle("error", error);
+}
+const UNLOCK = ["pointerdown", "pointerup", "touchend", "keydown", "click"];   // whichever this browser accepts
+function unlock() { if (audioContext && !userPaused) audioContext.resume().catch(() => {}); }
+function armUnlock(on) {
+  for (const type of UNLOCK) (on ? addEventListener : removeEventListener)(type, unlock, true);
+}
+function soundState() {
+  const running = audioContext && audioContext.state === "running";
+  document.querySelector(".app-shell").classList.toggle("running", !!running);
+  if (running) {
+    soundStarted = true;
+    armUnlock(false);
+    showHint("");
+    status.textContent = "Sound on";
+  } else if (!userPaused) {                              // not started yet, or iOS interrupted it (a call)
+    armUnlock(true);
+    showHint("Tap anywhere to start the sound");
+    status.textContent = "Waiting for a tap";
+  }
+}
 async function switchOn() {
-  const go = document.getElementById("go");
-  go.disabled = true;
-  go.textContent = "Starting…";
+  showHint(`Loading ${FW.name}…`);
   try {
-    if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Audio needs HTTPS or localhost");
+    if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Sound needs HTTPS (or localhost)");
+    if (navigator.audioSession) navigator.audioSession.type = "playback";   // iOS: play with the silent switch on
     const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
     audioContext = ac;
-    await ac.resume();
     const [wasm, saved] = await Promise.all([
       fetch(FW.wasm).then((r) => { if (!r.ok) throw new Error(`${FW.wasm}: ${r.status}`); return r.arrayBuffer(); }),
       FW.kind === "flash" ? flashLoad() : loadStore(),
@@ -69,7 +95,7 @@ async function switchOn() {
     node = new AudioWorkletNode(ac, FW.processor, { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
     node.connect(ac.destination);
     const ready = new Promise((res, reject) => {
-      const timer = setTimeout(() => reject(new Error("The audio engine did not answer")), 15000);
+      const timer = setTimeout(() => reject(new Error("The firmware did not answer")), 15000);
       node.port.onmessage = (e) => {
         const m = e.data;
         if (m.type === "ready") { clearTimeout(timer); res(); }
@@ -88,22 +114,19 @@ async function switchOn() {
     node.port.postMessage({ type: "load", wasm, master, ...load }, [wasm]);
     await ready;
     if (FW.loops) [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
-    await ac.resume();
-    document.getElementById("start").hidden = true;
-    status.textContent = "Sound on";
-    document.querySelector(".app-shell").classList.add("running");
     document.getElementById("audio-toggle").hidden = false;
     syncButtons(); syncKeys();
+    ac.onstatechange = soundState;
+    soundState();
+    unlock();                                            // (already allowed when the page was opened by a tap)
   } catch (err) {
-    go.disabled = false;
     if (audioContext) await audioContext.close().catch(() => {});
     audioContext = null; node = null;
-    go.textContent = "Try again";
     status.textContent = "Could not start";
-    document.querySelector(".start small").textContent = err && err.message || String(err);
+    showHint(err && err.message || String(err), true);
   }
 }
-document.getElementById("go").addEventListener("click", switchOn);
+switchOn();
 document.getElementById("reset").addEventListener("click", async (event) => {
   const reset = event.currentTarget;
   if (reset.dataset.armed) {
