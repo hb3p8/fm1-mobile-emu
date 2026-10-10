@@ -2,7 +2,7 @@
 
 Touch interface for the real X0X firmware, based on charlesvestal/fm1-x0x at 00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62. GPL-3.0-only; see upstream/LICENSE and upstream/LICENSING.md.
 
-The panel follows the look of AudioKit Synth One: dark tiles, black knobs with orange pointers, a top bar with the performance switches. The controls keep the FM-1's arrangement: MASTER / SELECT / PRESETS / ALGORITHM in a 2×2 block with OCT− / OCT+ below on the left, KNOB1–4 over the function buttons on the right (six by two, or four by three in portrait). The top bar holds Hold and the xBR switch next to the status display. In landscape the square screen fills the height beside the panels; in portrait it fills the width above them. Rotation changes only the layout and preserves the running firmware.
+The panel follows the look of AudioKit Synth One: dark tiles, black knobs with orange pointers, a top bar with the performance switches. The controls keep the FM-1's arrangement: MASTER / SELECT / PRESETS / ALGORITHM in a 2×2 block with OCT− / OCT+ below, left of the screen in landscape; KNOB1–4 over the function buttons right of it (six by two, or four by three in portrait). The top bar holds Hold and the xBR switch next to the status display. In landscape the square screen fills the height beside the panels; in portrait it fills the width above them. Rotation changes only the layout and preserves the running firmware.
 
 The 240×240 screen is magnified on the GPU (WebGL) to the display's device pixels with xBR level 2 by Hyllian, the edge-directed filter used by emulators of old games (`screen.js`). The xBR button switches to plain pixels; the choice is kept in localStorage.
 

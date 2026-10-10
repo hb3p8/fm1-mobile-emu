@@ -34,14 +34,14 @@
       </button>
     </header>
     <div class="device" id="device" aria-label="FM-1 emulator">
+      <section class="panel panel-main" aria-label="Main">
+        <div class="main-knobs" id="global-knobs"></div>
+        <div class="octave" id="octaves" role="group" aria-label="Octave"></div>
+      </section>
       <section class="screen-panel" id="screen-panel" aria-label="Display">
         <div class="screen-bezel" id="screen-bezel"><canvas id="screen" width="240" height="240" aria-label="FM-1 screen"></canvas></div>
       </section>
       <div class="panels">
-        <section class="panel panel-main" aria-label="Main">
-          <div class="main-knobs" id="global-knobs"></div>
-          <div class="octave" id="octaves" role="group" aria-label="Octave"></div>
-        </section>
         <section class="panel panel-params" aria-label="Parameters">
           <div class="knob-row" id="parameter-knobs"></div>
         </section>
