@@ -18,8 +18,16 @@ document.getElementById("audio-toggle").addEventListener("click",async(event)=> 
   if (audioContext.state === "running") await audioContext.suspend();
   else await audioContext.resume();
   event.currentTarget.textContent=audioContext.state === "running" ? "Пауза" : "Звук";
-  status.textContent=audioContext.state === "running" ? "● Звук включён" : "На паузе";
+  status.textContent=audioContext.state === "running" ? "Звук включён" : "На паузе";
+  document.querySelector(".app-shell").classList.toggle("running",audioContext.state === "running");
 });
+const filterToggle = document.getElementById("filter-toggle");
+function syncFilter() {
+  filterToggle.hidden=!screenRenderer.available;
+  filterToggle.setAttribute("aria-pressed",String(screenRenderer.filter === "xbr"));
+}
+filterToggle.addEventListener("click",()=> { screenRenderer.filter=screenRenderer.filter === "xbr" ? "pixel" : "xbr"; syncFilter(); });
+syncFilter();
 const fullscreen = document.getElementById("fullscreen");
 if (!document.documentElement.requestFullscreen) fullscreen.hidden=true;
 fullscreen.addEventListener("click",async()=> {

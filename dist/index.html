@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#24262a">
+  <meta name="theme-color" content="#1c1c1c">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Рабочий эмулятор FM-1 с прошивкой X0X, адаптированный для телефона.">
@@ -15,29 +15,45 @@
 </head>
 <body>
   <main class="app-shell">
-    <header class="app-header">
-      <div class="brand">X0X <span>FM-1</span></div>
-      <span id="status" role="status">Выключен</span>
-      <button id="audio-toggle" type="button" hidden>Пауза</button>
-      <button id="hold-toggle" type="button" aria-pressed="false" title="Фиксировать кнопки для сочетаний одним пальцем">Hold</button>
-      <button id="fullscreen" type="button" aria-label="Полный экран">⛶</button>
-      <button id="settings-open" type="button" aria-label="Настройки и помощь">≡</button>
+    <header class="topbar">
+      <div class="brand" aria-label="FM-1 X0X">FM-1<span>X0X</span></div>
+      <div class="display"><span class="display-led" aria-hidden="true"></span><span id="status" role="status">Выключен</span></div>
+      <button id="audio-toggle" class="tool" type="button" hidden>Пауза</button>
+      <button id="fullscreen" class="tool icon" type="button" aria-label="Полный экран" title="Полный экран">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5"/></svg>
+      </button>
+      <button id="settings-open" class="tool" type="button" aria-label="Настройки и помощь">Меню</button>
     </header>
     <div class="device" id="device" aria-label="Эмулятор FM-1">
-      <div class="screen-area"><canvas id="screen" width="240" height="240" aria-label="Дисплей FM-1"></canvas></div>
-      <div class="controls">
-        <section class="global-group" aria-label="Основные ручки и октава">
-          <div class="global-knobs" id="global-knobs"></div>
-          <div class="octaves" id="octaves"></div>
+      <section class="screen-panel" id="screen-panel" aria-label="Дисплей">
+        <div class="screen-bezel" id="screen-bezel"><canvas id="screen" width="240" height="240" aria-label="Дисплей FM-1"></canvas></div>
+      </section>
+      <div class="panels">
+        <section class="panel panel-params" aria-labelledby="params-h">
+          <h2 id="params-h">Parameters</h2>
+          <div class="knob-row" id="parameter-knobs"></div>
         </section>
-        <section class="performance-group" aria-label="Ручки параметров и функции">
-          <div class="parameter-knobs" id="parameter-knobs"></div>
+        <section class="panel panel-main" aria-labelledby="main-h">
+          <h2 id="main-h">Main</h2>
+          <div class="knob-row" id="global-knobs"></div>
+        </section>
+        <section class="panel panel-functions" aria-labelledby="functions-h">
+          <h2 id="functions-h">Functions</h2>
           <div class="function-buttons" id="function-buttons"></div>
         </section>
       </div>
+      <div class="toolbar">
+        <button id="hold-toggle" class="tool" type="button" aria-pressed="false" title="Фиксировать кнопки для сочетаний одним пальцем">Hold</button>
+        <button id="filter-toggle" class="tool" type="button" aria-pressed="true" title="Сглаживание экрана xBR, как в эмуляторах ретро-консолей">xBR</button>
+        <div class="octave" id="octaves" role="group" aria-label="Октава"></div>
+      </div>
       <div class="keyboard" id="keyboard" aria-label="Клавиатура FM-1"></div>
       <div class="start" id="start">
-        <div class="start-content"><span>FM-1 / X0X</span><button type="button" id="go">Включить звук</button><small>Настоящая прошивка. Звук начинается после нажатия.</small></div>
+        <div class="start-card">
+          <div class="start-brand">FM-1<span>X0X</span></div>
+          <button type="button" id="go">Включить звук</button>
+          <small>Настоящая прошивка в браузере. Звук начинается после нажатия.</small>
+        </div>
       </div>
     </div>
   </main>
@@ -52,12 +68,13 @@
     <section class="help">
       <h2>Управление</h2>
       <p>Ручки: тяните вверх или вниз. Клавиши поддерживают несколько пальцев и скольжение. Держите SEL вместе с другой кнопкой для сочетаний. Hold фиксирует кнопки до повторного нажатия; на компьютере также можно использовать Shift + клик.</p>
-      <p>Space — PLAY, Enter — REC, Shift — SEL, Esc — HOME. Q–I и A–K — белые клавиши; 1–0 и «−» — чёрные. ↑ / ↓ — SELECT.</p>
+      <p>Space — PLAY, Enter — REC, Shift — SEL, Esc — HOME, Z / X — октава. Q–I и A–K — белые клавиши; 1–0 и «−» — чёрные. ↑ / ↓ — SELECT.</p>
+      <p>xBR сглаживает пиксельный экран, как фильтры эмуляторов старых игр; выключите его, чтобы видеть исходные пиксели.</p>
       <p>SAVE сохраняет паттерны в этом браузере. Лупы также остаются на устройстве. Для большего рабочего экрана добавьте страницу на экран «Домой» телефона.</p>
     </section>
     <button id="reset" type="button">Сбросить паттерны</button>
     <footer>
-      <p>Мобильная адаптация <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">X0X / Charles Vestal</a>. Основано на Felucca. Идея браузерного эмулятора — Groove OS.</p>
+      <p>Мобильная адаптация <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">X0X / Charles Vestal</a>. Основано на Felucca. Идея браузерного эмулятора — Groove OS. Экранный фильтр — xBR, Hyllian.</p>
       <p><a href="https://charlesvestal.github.io/fm1-x0x/manual/" target="_blank" rel="noopener">Руководство X0X</a> · <a href="source.tar.gz" download>Полные исходники</a> · <a href="LICENSE.txt">GPL-3.0</a></p>
     </footer>
   </dialog>

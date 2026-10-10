@@ -2,7 +2,9 @@
 
 Touch interface for the real X0X firmware, based on charlesvestal/fm1-x0x at 00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62. GPL-3.0-only; see upstream/LICENSE and upstream/LICENSING.md.
 
-MASTER / SELECT / PRESETS / ALGORITHM keep the original 2×2 layout with OCT− / OCT+ below. KNOB1–4 sit above the function buttons. The 16 white and 11 black keys form one compact piano row. Rotation changes only the layout and preserves the running firmware.
+The panel follows the look of AudioKit Synth One: dark tiles with section headings, black knobs with orange pointers, a toolbar above the keys. KNOB1–4 (Parameters) line up with the four parameter columns on the screen, MASTER / SELECT / PRESETS / ALGORITHM (Main) sit beside them, the twelve function buttons keep the hardware order, and OCT− / OCT+ form the octave stepper in the toolbar. In landscape the square screen fills the height beside the panels; in portrait it fills the width above them. Rotation changes only the layout and preserves the running firmware.
+
+The 240×240 screen is magnified on the GPU (WebGL) to the display's device pixels with xBR level 2 by Hyllian, the edge-directed filter used by emulators of old games (`screen.js`). The xBR toolbar button switches to plain pixels; the choice is kept in localStorage.
 
 ## Build
 

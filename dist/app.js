@@ -32,28 +32,34 @@ function releasePointer(pointerId) {
 
 function knob(label, role, parent) {
   const g = document.createElement("div");
-  g.className = "knob"; g.tabIndex = 0; g.setAttribute("role","slider");
+  g.className = "knob" + (role === "master" ? " knob-master" : ""); g.tabIndex = 0; g.setAttribute("role","slider");
   g.setAttribute("aria-label",label); g.setAttribute("aria-valuemin","0");
   g.setAttribute("aria-valuemax",role === "master" ? "100" : "360");
   g.setAttribute("aria-valuenow","0"); g.dataset.encoder = label;
-  const name = document.createElement("span"); name.className = "knob-label"; name.textContent=label;
   const face = document.createElement("span"); face.className = "knob-face"; face.setAttribute("aria-hidden","true");
   const ind = document.createElement("span"); ind.className = "knob-indicator";
-  face.append(ind); g.append(name,face); parent.append(g);
+  const name = document.createElement("span"); name.className = "knob-label"; name.textContent=label;
+  face.append(ind); g.append(face,name); parent.append(g);
   knobs[label] = {g,hit:g,ind,angle:0,role};
 }
+for (let i=1;i<=4;i++) knob(`KNOB${i}`,ENC[`KNOB${i}`],document.getElementById("parameter-knobs"));
 const globalKnobs = document.getElementById("global-knobs");
 knob("MASTER","master",globalKnobs); knob("SELECT",ENC.SELECT,globalKnobs);
 knob("PRESETS",ENC.PRESETS,globalKnobs); knob("ALGORITHM",ENC.ALGORITHM,globalKnobs);
-for (let i=1;i<=4;i++) knob(`KNOB${i}`,ENC[`KNOB${i}`],document.getElementById("parameter-knobs"));
 
+const CHEVRON = { "OCT-":'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M8 2 3.5 6 8 10z"/></svg>',
+                  "OCT+":'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m4 2 4.5 4L4 10z"/></svg>' };
 function button(label,parent) {
   const g = document.createElement("button"); g.type="button"; g.className="control-button";
-  g.textContent=label.replace("-","−"); g.dataset.button=label;
+  if (CHEVRON[label]) g.innerHTML=CHEVRON[label]; else g.textContent=label;
+  g.dataset.button=label;
   g.setAttribute("aria-label",label); g.setAttribute("aria-pressed","false"); parent.append(g);
   buttons[label] = {g,hit:g,bit:BTN[label]};
 }
-button("OCT-",document.getElementById("octaves")); button("OCT+",document.getElementById("octaves"));
+const octaves = document.getElementById("octaves");
+button("OCT-",octaves);
+octaves.insertAdjacentHTML("beforeend",'<span class="octave-label" aria-hidden="true">OCT</span>');
+button("OCT+",octaves);
 const functionButtons = document.getElementById("function-buttons");
 ["FX","SEL","ENV","LFO","EDIT","GLO","HOME","SAVE","ARP","SEQ","PLAY","REC"].forEach(label => button(label,functionButtons));
 const keyboard = document.getElementById("keyboard");
@@ -68,15 +74,19 @@ BLACK_K.forEach((note,i) => {
   g.style.left=`${(BLACK_AFTER[i]+1)*100/16-2.05}%`; keyboard.append(g); keys[note]={g,hit:g};
 });
 
-// Resize only geometry; the worklet and active pattern survive device rotation.
+// Resize only geometry; the worklet and active pattern survive device rotation. The screen stays
+// square: in landscape its column is as wide as the space is tall, in portrait it fits the free height.
+const screenPanel = document.getElementById("screen-panel"), screenBezel = document.getElementById("screen-bezel");
 function resizePanel() {
   const landscape = matchMedia("(orientation: landscape)").matches;
-  if (landscape) {
-    const rows=getComputedStyle(device).gridTemplateRows.split(" ");
-    device.style.setProperty("--screen-size",rows[0]);
-  } else device.style.removeProperty("--screen-size");
+  if (landscape) device.style.setProperty("--screen-col",`${Math.round(screenPanel.getBoundingClientRect().height)}px`);
+  else device.style.removeProperty("--screen-col");
+  const style = getComputedStyle(screenPanel);
+  const w = screenPanel.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
+  const h = screenPanel.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
+  screenBezel.style.setProperty("--screen-size",`${Math.max(120,Math.floor(Math.min(w,h)))}px`);
 }
-new ResizeObserver(resizePanel).observe(device);
+new ResizeObserver(resizePanel).observe(screenPanel);
 window.addEventListener("orientationchange",resizePanel);
 resizePanel();
 
@@ -313,6 +323,7 @@ device.addEventListener("lostpointercapture", pointerUp);
 
 function drawKnob(k) {
   k.ind.style.transform = `rotate(${k.angle}deg)`;
+  if (k.role === "master") k.g.style.setProperty("--level", (master / 4096).toFixed(3));
   k.hit.setAttribute("aria-valuenow", k.role === "master" ? Math.round(master * 100 / 4096) : ((k.angle % 360 + 360) % 360));
 }
 function turn(k, n) {
@@ -555,7 +566,8 @@ async function switchOn() {
     [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
     await ac.resume();
     document.getElementById("start").hidden = true;
-    status.textContent = "● Звук включён";
+    status.textContent = "Звук включён";
+    document.querySelector(".app-shell").classList.add("running");
     document.getElementById("audio-toggle").hidden = false;
     syncButtons(); syncKeys();
   } catch (err) {
@@ -598,8 +610,16 @@ document.getElementById("audio-toggle").addEventListener("click",async(event)=> 
   if (audioContext.state === "running") await audioContext.suspend();
   else await audioContext.resume();
   event.currentTarget.textContent=audioContext.state === "running" ? "Пауза" : "Звук";
-  status.textContent=audioContext.state === "running" ? "● Звук включён" : "На паузе";
+  status.textContent=audioContext.state === "running" ? "Звук включён" : "На паузе";
+  document.querySelector(".app-shell").classList.toggle("running",audioContext.state === "running");
 });
+const filterToggle = document.getElementById("filter-toggle");
+function syncFilter() {
+  filterToggle.hidden=!screenRenderer.available;
+  filterToggle.setAttribute("aria-pressed",String(screenRenderer.filter === "xbr"));
+}
+filterToggle.addEventListener("click",()=> { screenRenderer.filter=screenRenderer.filter === "xbr" ? "pixel" : "xbr"; syncFilter(); });
+syncFilter();
 const fullscreen = document.getElementById("fullscreen");
 if (!document.documentElement.requestFullscreen) fullscreen.hidden=true;
 fullscreen.addEventListener("click",async()=> {

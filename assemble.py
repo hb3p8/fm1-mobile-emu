@@ -15,7 +15,7 @@ tail = tail.replace('btnHeldBy.set("p" + e.pointerId, b.bit);', 'rememberPress("
 tail = tail.replace('keyHeldBy.set("p" + e.pointerId, i);', 'rememberPress("p" + e.pointerId);\n    keyHeldBy.set("p" + e.pointerId, i);')
 tail = tail.replace('const id = "p" + e.pointerId;\n  if (btnHeldBy.delete(id)) syncButtons();\n  if (keyHeldBy.delete(id)) syncKeys();', 'releasePointer(e.pointerId);')
 tail = tail.replace('k.ind.setAttribute("transform", `rotate(${k.angle} ${k.x} ${k.y})`);',
-    'k.ind.style.transform = `rotate(${k.angle}deg)`;\n  k.hit.setAttribute("aria-valuenow", k.role === "master" ? Math.round(master * 100 / 4096) : ((k.angle % 360 + 360) % 360));')
+    'k.ind.style.transform = `rotate(${k.angle}deg)`;\n  if (k.role === "master") k.g.style.setProperty("--level", (master / 4096).toFixed(3));\n  k.hit.setAttribute("aria-valuenow", k.role === "master" ? Math.round(master * 100 / 4096) : ((k.angle % 360 + 360) % 360));')
 tail = tail.replace('if (!node || e.metaKey || e.ctrlKey || e.altKey) return;',
     'if (!node || e.metaKey || e.ctrlKey || e.altKey || document.getElementById("settings").open) return;')
 tail = tail.replace('if (e.code === "ArrowUp" || e.code === "ArrowDown")',
@@ -30,7 +30,7 @@ tail = tail.replace('if (m.type === "ready") res();', 'if (m.type === "ready") {
 tail = tail.replace('go.textContent = "Starting...";', 'go.textContent = "Запускается…";')
 tail = tail.replace('`X0X uses ${m.load}% of this computer\'s time`', '`Загрузка аудиопотока: ${m.load}%`')
 tail = tail.replace('status.textContent = ac.sampleRate === 44100 ? "On." : `On (the browser runs audio at ${ac.sampleRate} Hz).`;',
-    'status.textContent = "● Звук включён";\n    document.getElementById("audio-toggle").hidden = false;')
+    'status.textContent = "Звук включён";\n    document.querySelector(".app-shell").classList.add("running");\n    document.getElementById("audio-toggle").hidden = false;')
 tail = tail.replace('go.textContent = "Switch on";', 'if (audioContext) await audioContext.close().catch(() => {});\n    audioContext = null; node = null;\n    go.textContent = "Повторить запуск";')
 tail = tail.replace('status.textContent = "Could not start: " + (err && err.message || err) + ". Chrome, Edge, Firefox and Safari should all work.";',
     'status.textContent = "Ошибка запуска";\n    document.querySelector(".start small").textContent = err && err.message || String(err);')
