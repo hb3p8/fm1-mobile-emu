@@ -20,7 +20,6 @@
       <div class="display"><span class="display-led" aria-hidden="true"></span><span id="status" role="status">Off</span></div>
       <button id="hold-toggle" class="tool" type="button" aria-pressed="false" title="Latch buttons for one-finger combinations">Hold</button>
       <button id="filter-toggle" class="tool" type="button" aria-pressed="true" title="xBR screen smoothing, as in retro game emulators">xBR</button>
-      <div class="octave" id="octaves" role="group" aria-label="Octave"></div>
       <button id="audio-toggle" class="tool" type="button" data-state="running" aria-label="Pause" hidden>
         <svg class="tool-icon i-pause" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg>
         <svg class="tool-icon i-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z"/></svg>
@@ -39,13 +38,12 @@
         <div class="screen-bezel" id="screen-bezel"><canvas id="screen" width="240" height="240" aria-label="FM-1 screen"></canvas></div>
       </section>
       <div class="panels">
-        <section class="panel panel-params" aria-labelledby="params-h">
-          <h2 id="params-h">Parameters</h2>
-          <div class="knob-row" id="parameter-knobs"></div>
+        <section class="panel panel-main" aria-label="Main">
+          <div class="main-knobs" id="global-knobs"></div>
+          <div class="octave" id="octaves" role="group" aria-label="Octave"></div>
         </section>
-        <section class="panel panel-main" aria-labelledby="main-h">
-          <h2 id="main-h">Main</h2>
-          <div class="knob-row" id="global-knobs"></div>
+        <section class="panel panel-params" aria-label="Parameters">
+          <div class="knob-row" id="parameter-knobs"></div>
         </section>
         <section class="panel panel-functions" aria-label="Functions">
           <div class="function-buttons" id="function-buttons"></div>

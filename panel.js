@@ -47,19 +47,13 @@ const globalKnobs = document.getElementById("global-knobs");
 knob("MASTER","master",globalKnobs); knob("SELECT",ENC.SELECT,globalKnobs);
 knob("PRESETS",ENC.PRESETS,globalKnobs); knob("ALGORITHM",ENC.ALGORITHM,globalKnobs);
 
-const CHEVRON = { "OCT-":'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M8 2 3.5 6 8 10z"/></svg>',
-                  "OCT+":'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="m4 2 4.5 4L4 10z"/></svg>' };
 function button(label,parent) {
   const g = document.createElement("button"); g.type="button"; g.className="control-button";
-  if (CHEVRON[label]) g.innerHTML=CHEVRON[label]; else g.textContent=label;
-  g.dataset.button=label;
+  g.textContent=label.replace("-","−"); g.dataset.button=label;
   g.setAttribute("aria-label",label); g.setAttribute("aria-pressed","false"); parent.append(g);
   buttons[label] = {g,hit:g,bit:BTN[label]};
 }
-const octaves = document.getElementById("octaves");
-button("OCT-",octaves);
-octaves.insertAdjacentHTML("beforeend",'<span class="octave-label" aria-hidden="true">OCT</span>');
-button("OCT+",octaves);
+button("OCT-",document.getElementById("octaves")); button("OCT+",document.getElementById("octaves"));
 const functionButtons = document.getElementById("function-buttons");
 ["FX","SEL","ENV","LFO","EDIT","GLO","HOME","SAVE","ARP","SEQ","PLAY","REC"].forEach(label => button(label,functionButtons));
 const keyboard = document.getElementById("keyboard");

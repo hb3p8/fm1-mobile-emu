@@ -24,7 +24,6 @@
   --btn-h: 40px;
   --bar-h: 36px;
   --keys-h: 112px;
-  --head: 12px;
   font: 500 14px Barlow, "Arial Narrow", Arial, sans-serif;
   background: var(--page);
   color: var(--text);
@@ -92,16 +91,17 @@ button:disabled { cursor: wait; opacity: .6; }
 }
 #screen { width: 100%; height: 100%; display: block; border-radius: 3px; background: #000; image-rendering: pixelated; }
 
-.panels {
+.panels { /* as on the FM-1: the 2×2 encoders over OCT on the left, KNOB1–4 over the functions on the right */
   grid-area: panels; min-width: 0; min-height: 0; display: grid; gap: 1px;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "params" "main" "functions";
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(min-content, 1fr) minmax(min-content, 1.4fr);
+  grid-template-areas: "main params" "main functions";
 }
-.panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 5px 8px 8px; background: var(--panel); }
-.panel h2 { margin: 0 0 2px; font-size: var(--head); font-weight: 500; line-height: 1.2; color: var(--text); letter-spacing: .3px; }
+.panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 6px 8px; background: var(--panel); }
 .panel-params { grid-area: params; }
-.panel-main { grid-area: main; }
+.panel-main { grid-area: main; gap: 6px; }
 .panel-functions { grid-area: functions; }
+.main-knobs { flex: 1; display: grid; grid-template-columns: repeat(2, minmax(var(--knob), max-content)); column-gap: 8px; align-content: space-evenly; }
 
 /* ---------------------------------------------------------------- knobs */
 .knob-row { flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; }
@@ -138,6 +138,7 @@ button:disabled { cursor: wait; opacity: .6; }
   grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(var(--btn-h), 1fr));
 }
 .function-buttons { margin-block: auto; }
+.octave { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; height: var(--btn-h); }
 .control-button {
   position: relative; min-width: 0; padding: 0 2px; touch-action: none;
   border: 1px solid var(--control-edge); border-radius: var(--radius);
@@ -159,15 +160,6 @@ button:disabled { cursor: wait; opacity: .6; }
   content: ""; position: absolute; inset: 2px; border-radius: 3px; border: 2px solid var(--accent); pointer-events: none;
 }
 .control-button.lit.latched::after { border-color: var(--accent-ink); }
-
-/* ---------------------------------------------------------------- octave stepper in the top bar */
-.octave {
-  flex: none; display: flex; align-items: center; height: calc(var(--bar-h) - 10px);
-  border-radius: 4px; background: var(--inset); box-shadow: inset 0 1px 3px #000a, 0 1px 0 #ffffff0d;
-}
-.octave .control-button { width: 38px; height: 100%; display: grid; place-items: center; box-shadow: none; }
-.octave .control-button svg { width: 12px; height: 12px; fill: currentColor; }
-.octave-label { min-width: 38px; text-align: center; font-size: 13px; letter-spacing: 1px; color: var(--label); }
 
 /* ---------------------------------------------------------------- keys */
 .keyboard {
@@ -241,11 +233,12 @@ a { color: var(--accent-hi); }
 @media (orientation: portrait) {
   :root { --knob: clamp(34px, 10.5vw, 58px); --btn-h: clamp(32px, 5.2vh, 52px); --keys-h: clamp(88px, 14vh, 160px); }
   .app-shell { max-width: 640px; }
+  .function-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(var(--btn-h), 1fr)); max-height: 200px; }
+  .control-button { font-size: 12px; letter-spacing: .3px; }
 }
 @media (orientation: portrait) and (max-height: 700px) {
   :root { --knob: clamp(30px, 9vw, 40px); --btn-h: 32px; --keys-h: 84px; --bar-h: 34px; }
   .panel { padding: 5px 8px; }
-  .panel h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .knob { gap: 2px; }
   .knob-label { font-size: 10px; }
 }
@@ -261,8 +254,6 @@ a { color: var(--accent-hi); }
   .tool:not(.icon) .tool-icon { display: inline-block; }
   #audio-toggle, #settings-open, #fullscreen { width: 32px; padding: 0; display: grid; place-items: center; }
   #audio-toggle[data-state=running] .i-play, #audio-toggle[data-state=paused] .i-pause { display: none; }
-  .octave .control-button { width: 30px; }
-  .octave-label { min-width: 30px; font-size: 12px; letter-spacing: .5px; }
   .display { margin-right: auto; }
 }
 
@@ -270,7 +261,7 @@ a { color: var(--accent-hi); }
 @media (orientation: landscape) {
   :root {
     --bar-h: clamp(30px, 8.5vh, 40px); --knob: clamp(28px, 10.5vh, 72px); --btn-h: clamp(26px, 8.6vh, 52px);
-    --keys-h: clamp(70px, 23vh, 170px); --head: clamp(10px, 3vh, 13px);
+    --keys-h: clamp(70px, 23vh, 170px);
   }
   .device {
     grid-template-columns: var(--screen-col, 40%) minmax(0, 1fr);
@@ -278,7 +269,6 @@ a { color: var(--accent-hi); }
     grid-template-areas: "screen panels" "keys keys";
   }
   .screen-panel { padding: 6px; }
-  .panels { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(min-content, 1fr) minmax(min-content, 1.4fr); grid-template-areas: "params main" "functions functions"; }
   .panel { padding: 4px 8px 6px; }
   .knob { gap: 3px; }
   .knob-label { font-size: clamp(9px, 2.8vh, 11px); letter-spacing: .2px; }
@@ -289,5 +279,4 @@ a { color: var(--accent-hi); }
   .brand { font-size: 17px; }
   .display { font-size: 13px; }
   .tool { font-size: 13px; padding: 0 9px; }
-  .panel h2 { margin-bottom: 0; }
 }
