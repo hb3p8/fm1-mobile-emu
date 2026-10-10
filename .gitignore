@@ -2,7 +2,7 @@
 .venv/
 __pycache__/
 .DS_Store
-.openai/local/
+.openai/
 firmware/checkouts/
 firmware/out/
 # source archives: only the ones dist/ publishes

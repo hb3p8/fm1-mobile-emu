@@ -116,8 +116,4 @@ archive(dist/'source.tar.gz', [('fm1-mobile-emu/'+n, HERE/n) for n in APP_FILES]
 for fid, directory, repo, commit in SOURCES:
     archive(dist/'src'/f'{fid}.tar.gz', tree(CHECKOUTS/directory, f'{directory}/'))
 
-manifest=HERE/'.openai/hosting.json'
-if manifest.exists():
-    config=json.loads(manifest.read_text()); config['static']={'directory':'dist'}
-    manifest.write_text(json.dumps(config,indent=2)+'\n')
 print('Ready: '+str(dist)+' ('+', '.join(f'{k} {v["version"]}' for k, v in builds.items())+')')
