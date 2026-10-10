@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#24262a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Рабочий эмулятор FM-1 с прошивкой X0X, адаптированный для телефона.">
+  <title>FM-1 · X0X Mobile</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div class="brand">X0X <span>FM-1</span></div>
+      <span id="status" role="status">Выключен</span>
+      <button id="audio-toggle" type="button" hidden>Пауза</button>
+      <button id="hold-toggle" type="button" aria-pressed="false" title="Фиксировать кнопки для сочетаний одним пальцем">Hold</button>
+      <button id="fullscreen" type="button" aria-label="Полный экран">⛶</button>
+      <button id="settings-open" type="button" aria-label="Настройки и помощь">≡</button>
+    </header>
+    <div class="device" id="device" aria-label="Эмулятор FM-1">
+      <div class="screen-area"><canvas id="screen" width="240" height="240" aria-label="Дисплей FM-1"></canvas></div>
+      <div class="controls">
+        <section class="global-group" aria-label="Основные ручки и октава">
+          <div class="global-knobs" id="global-knobs"></div>
+          <div class="octaves" id="octaves"></div>
+        </section>
+        <section class="performance-group" aria-label="Ручки параметров и функции">
+          <div class="parameter-knobs" id="parameter-knobs"></div>
+          <div class="function-buttons" id="function-buttons"></div>
+        </section>
+      </div>
+      <div class="keyboard" id="keyboard" aria-label="Клавиатура FM-1"></div>
+      <div class="start" id="start">
+        <div class="start-content"><span>FM-1 / X0X</span><button type="button" id="go">Включить звук</button><small>Настоящая прошивка. Звук начинается после нажатия.</small></div>
+      </div>
+    </div>
+  </main>
+  <dialog id="settings">
+    <div class="dialog-header"><h1>FM-1 / X0X</h1><button id="settings-close" type="button" aria-label="Закрыть настройки">×</button></div>
+    <p class="detail" id="cpu"></p>
+    <section class="breaks" aria-labelledby="breaks-h">
+      <h2 id="breaks-h">Ваши лупы</h2>
+      <p>WAV, AIFF или MP3. До 16 лупов и примерно 7 секунд в каждом слоте. Для воспроизведения выберите BREAK ручкой ALGORITHM, нажимайте EDIT до страницы LOOPS и выберите луп ручкой KNOB1.</p>
+      <div class="slots" id="slots"></div>
+    </section>
+    <section class="help">
+      <h2>Управление</h2>
+      <p>Ручки: тяните вверх или вниз. Клавиши поддерживают несколько пальцев и скольжение. Держите SEL вместе с другой кнопкой для сочетаний. Hold фиксирует кнопки до повторного нажатия; на компьютере также можно использовать Shift + клик.</p>
+      <p>Space — PLAY, Enter — REC, Shift — SEL, Esc — HOME. Q–I и A–K — белые клавиши; 1–0 и «−» — чёрные. ↑ / ↓ — SELECT.</p>
+      <p>SAVE сохраняет паттерны в этом браузере. Лупы также остаются на устройстве. Для большего рабочего экрана добавьте страницу на экран «Домой» телефона.</p>
+    </section>
+    <button id="reset" type="button">Сбросить паттерны</button>
+    <footer>
+      <p>Мобильная адаптация <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">X0X / Charles Vestal</a>. Основано на Felucca. Идея браузерного эмулятора — Groove OS.</p>
+      <p><a href="https://charlesvestal.github.io/fm1-x0x/manual/" target="_blank" rel="noopener">Руководство X0X</a> · <a href="source.tar.gz" download>Полные исходники</a> · <a href="LICENSE.txt">GPL-3.0</a></p>
+    </footer>
+  </dialog>
+</body>
+</html>

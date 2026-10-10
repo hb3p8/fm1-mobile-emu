@@ -1,0 +1,5 @@
+.venv/
+.openai/local/
+*.tar.gz
+!dist/source.tar.gz
+__pycache__/

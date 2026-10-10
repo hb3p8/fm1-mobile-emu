@@ -1,0 +1,69 @@
+// SPDX-License-Identifier: GPL-3.0-only
+const settings = document.getElementById("settings");
+const keyPointers = new Set();
+function releaseInputs() {
+  for (const timer of pointerReleaseTimers.values()) clearTimeout(timer);
+  pointerReleaseTimers.clear(); pointerPressedAt.clear();
+  btnHeldBy.clear(); keyHeldBy.clear(); keyPointers.clear(); syncButtons(); syncKeys();
+}
+document.getElementById("settings-open").addEventListener("click",()=> { releaseInputs(); settings.showModal(); });
+document.getElementById("settings-close").addEventListener("click",()=>settings.close());
+document.getElementById("hold-toggle").addEventListener("click",(event)=> {
+  latchMode=!latchMode; event.currentTarget.setAttribute("aria-pressed",String(latchMode));
+  if (!latchMode) { latched=0; syncButtons(); }
+});
+document.getElementById("audio-toggle").addEventListener("click",async(event)=> {
+  if (!audioContext) return;
+  releaseInputs();
+  if (audioContext.state === "running") await audioContext.suspend();
+  else await audioContext.resume();
+  event.currentTarget.textContent=audioContext.state === "running" ? "Пауза" : "Звук";
+  status.textContent=audioContext.state === "running" ? "● Звук включён" : "На паузе";
+});
+const fullscreen = document.getElementById("fullscreen");
+if (!document.documentElement.requestFullscreen) fullscreen.hidden=true;
+fullscreen.addEventListener("click",async()=> {
+  if (document.fullscreenElement) await document.exitFullscreen();
+  else await document.documentElement.requestFullscreen().catch(()=>{});
+});
+document.addEventListener("visibilitychange",()=> { if(document.hidden) releaseInputs(); });
+window.addEventListener("blur",releaseInputs);
+
+// Captured pointer events stay with the first key; hit-test for glissando and multi-touch.
+keys.forEach(key=>key.hit.addEventListener("pointerdown",event=>keyPointers.add("p"+event.pointerId)));
+["pointerup","pointercancel","lostpointercapture"].forEach(type=>device.addEventListener(type,event=>keyPointers.delete("p"+event.pointerId)));
+device.addEventListener("pointermove",(event)=> {
+  const id="p"+event.pointerId;
+  if (!keyPointers.has(id)) return;
+  const under=document.elementFromPoint(event.clientX,event.clientY)?.closest(".key");
+  const note=under ? Number(under.dataset.key) : null;
+  if (note === null) { if (keyHeldBy.delete(id)) syncKeys(); }
+  else if (note !== keyHeldBy.get(id)) { keyHeldBy.set(id,note); syncKeys(); }
+});
+
+keys.forEach((key,index)=> {
+  key.hit.addEventListener("keydown",event=> {
+    if (event.code!=="Enter" && event.code!=="Space") return;
+    event.preventDefault(); event.stopPropagation();
+    if (!event.repeat) { keyHeldBy.set("focus-"+event.code,index); syncKeys(); }
+  });
+  key.hit.addEventListener("keyup",event=> {
+    if (event.code!=="Enter" && event.code!=="Space") return;
+    event.preventDefault(); event.stopPropagation();
+    keyHeldBy.delete("focus-"+event.code); syncKeys();
+  });
+});
+
+// Enter/Space on a focused hardware button behaves as a press/release, not a click toggle.
+Object.values(buttons).forEach(button=> {
+  button.hit.addEventListener("keydown",event=> {
+    if (event.code!=="Enter" && event.code!=="Space") return;
+    event.preventDefault(); event.stopPropagation();
+    if (!event.repeat) { btnHeldBy.set("focus-"+event.code,button.bit); syncButtons(); }
+  });
+  button.hit.addEventListener("keyup",event=> {
+    if (event.code!=="Enter" && event.code!=="Space") return;
+    event.preventDefault(); event.stopPropagation();
+    btnHeldBy.delete("focus-"+event.code); syncButtons();
+  });
+});
