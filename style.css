@@ -42,7 +42,7 @@ button:disabled { cursor: wait; opacity: .6; }
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
-/* ---------------------------------------------------------------- bar: brand, Hold, Menu over KNOB1–4 */
+/* ---------------------------------------------------------------- bar: brand, Hold, Menu (over KNOB1–4 in landscape, full width in portrait) */
 .bar {
   grid-area: bar; position: relative; z-index: 6; /* stays usable above the power-on overlay */
   display: flex; align-items: center; gap: 6px; height: var(--bar-h); padding: 0 8px; background: var(--bar);
@@ -65,8 +65,8 @@ button:disabled { cursor: wait; opacity: .6; }
 .device {
   position: relative; flex: 1; min-height: 0; display: grid; gap: 1px;
   grid-template-columns: auto minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto auto;
-  grid-template-areas: "screen screen" "main panels" "keys keys";
+  grid-template-rows: minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "screen screen" "bar bar" "main panels" "keys keys";
   user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
 }
 .screen-panel { grid-area: screen; min-width: 0; min-height: 0; display: grid; place-items: center; padding: 8px; background: var(--panel); }
@@ -79,8 +79,8 @@ button:disabled { cursor: wait; opacity: .6; }
 .panels { /* as on the FM-1: the 2×2 encoders over OCT left of the screen, KNOB1–4 over the functions right of it */
   grid-area: panels; min-width: 0; min-height: 0; display: grid; gap: 1px;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(min-content, 1fr) minmax(min-content, 1.4fr);
-  grid-template-areas: "bar" "params" "functions";
+  grid-template-rows: minmax(min-content, 1fr) minmax(min-content, 1.4fr);
+  grid-template-areas: "params" "functions";
 }
 .panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; padding: 6px 8px; background: var(--panel); }
 .panel-params { grid-area: params; }
@@ -249,8 +249,8 @@ a { color: var(--accent-hi); }
   }
   .device {
     grid-template-columns: auto var(--screen-col, 40%) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
-    grid-template-areas: "main screen panels" "keys keys keys";
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "main screen bar" "main screen panels" "keys keys keys";
   }
   .screen-panel { padding: 6px; }
   .panel { padding: 4px 8px 6px; }
