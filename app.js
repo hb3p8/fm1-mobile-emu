@@ -599,14 +599,14 @@ document.getElementById("hold-toggle").addEventListener("click",(event)=> {
   if (!latchMode) { latched=0; syncButtons(); }
 });
 document.getElementById("audio-toggle").addEventListener("click",async(event)=> {
+  const toggle=event.currentTarget;   // currentTarget is gone after the awaits below
   if (!audioContext) return;
   releaseInputs();
   if (audioContext.state === "running") await audioContext.suspend();
   else await audioContext.resume();
   const running=audioContext.state === "running";
-  event.currentTarget.dataset.state=running ? "running" : "paused";
-  event.currentTarget.querySelector(".tool-label").textContent=running ? "Pause" : "Resume";
-  event.currentTarget.setAttribute("aria-label",running ? "Pause" : "Resume");
+  toggle.querySelector(".tool-label").textContent=running ? "Pause" : "Resume";
+  toggle.setAttribute("aria-label",running ? "Pause" : "Resume");
   status.textContent=running ? "Sound on" : "Paused";
   document.querySelector(".app-shell").classList.toggle("running",audioContext.state === "running");
 });
@@ -617,12 +617,6 @@ function syncFilter() {
 }
 filterToggle.addEventListener("click",()=> { screenRenderer.filter=screenRenderer.filter === "xbr" ? "pixel" : "xbr"; syncFilter(); });
 syncFilter();
-const fullscreen = document.getElementById("fullscreen");
-if (!document.documentElement.requestFullscreen) fullscreen.hidden=true;
-fullscreen.addEventListener("click",async()=> {
-  if (document.fullscreenElement) await document.exitFullscreen();
-  else await document.documentElement.requestFullscreen().catch(()=>{});
-});
 document.addEventListener("visibilitychange",()=> { if(document.hidden) releaseInputs(); });
 window.addEventListener("blur",releaseInputs);
 

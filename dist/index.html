@@ -15,24 +15,6 @@
 </head>
 <body>
   <main class="app-shell">
-    <header class="topbar">
-      <div class="brand" aria-label="FM-1 X0X">FM-1<span>X0X</span></div>
-      <div class="display"><span class="display-led" aria-hidden="true"></span><span id="status" role="status">Off</span></div>
-      <button id="hold-toggle" class="tool" type="button" aria-pressed="false" title="Latch buttons for one-finger combinations">Hold</button>
-      <button id="filter-toggle" class="tool" type="button" aria-pressed="true" title="xBR screen smoothing, as in retro game emulators">xBR</button>
-      <button id="audio-toggle" class="tool" type="button" data-state="running" aria-label="Pause" hidden>
-        <svg class="tool-icon i-pause" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg>
-        <svg class="tool-icon i-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z"/></svg>
-        <span class="tool-label">Pause</span>
-      </button>
-      <button id="fullscreen" class="tool icon" type="button" aria-label="Fullscreen" title="Fullscreen">
-        <svg class="tool-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5"/></svg>
-      </button>
-      <button id="settings-open" class="tool" type="button" aria-label="Settings and help">
-        <svg class="tool-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h12"/></svg>
-        <span class="tool-label">Menu</span>
-      </button>
-    </header>
     <div class="device" id="device" aria-label="FM-1 emulator">
       <section class="panel panel-main" aria-label="Main">
         <div class="main-knobs" id="global-knobs"></div>
@@ -42,6 +24,11 @@
         <div class="screen-bezel" id="screen-bezel"><canvas id="screen" width="240" height="240" aria-label="FM-1 screen"></canvas></div>
       </section>
       <div class="panels">
+        <div class="bar">
+          <div class="brand" aria-label="FM-1 X0X">FM-1<span>X0X</span></div>
+          <button id="hold-toggle" class="tool" type="button" aria-pressed="false" title="Latch buttons for one-finger combinations">Hold</button>
+          <button id="settings-open" class="tool" type="button" aria-label="Menu: sound, screen, loops and help">Menu</button>
+        </div>
         <section class="panel panel-params" aria-label="Parameters">
           <div class="knob-row" id="parameter-knobs"></div>
         </section>
@@ -61,7 +48,17 @@
   </main>
   <dialog id="settings">
     <div class="dialog-header"><h1>FM-1 / X0X</h1><button id="settings-close" type="button" aria-label="Close settings">×</button></div>
-    <p class="detail" id="cpu"></p>
+    <section class="quick" aria-label="Sound and screen">
+      <div class="setting">
+        <span class="display-led" aria-hidden="true"></span>
+        <span class="setting-text"><span id="status" role="status">Off</span><small id="cpu"></small></span>
+        <button id="audio-toggle" type="button" data-state="running" aria-label="Pause" hidden><span class="tool-label">Pause</span></button>
+      </div>
+      <div class="setting">
+        <span class="setting-text">Screen smoothing<small>xBR, like the filters of retro game emulators</small></span>
+        <button id="filter-toggle" class="switch" type="button" aria-pressed="true" aria-label="Screen smoothing (xBR)"></button>
+      </div>
+    </section>
     <section class="breaks" aria-labelledby="breaks-h">
       <h2 id="breaks-h">Your loops</h2>
       <p>WAV, AIFF or MP3. Up to 16 loops and about 7 seconds per slot. To play them, choose BREAK with the ALGORITHM knob, press EDIT until the LOOPS page and pick a loop with KNOB1.</p>
