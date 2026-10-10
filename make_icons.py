@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Draw the PNG home-screen icons after icon.svg (Pillow): app/.venv/bin/python app/make_icons.py"""
+"""Draw the PNG home-screen icons after icon.svg (Pillow): firmware/.venv/bin/python make_icons.py
+(after firmware/build.sh x0x, which checks out the font)"""
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 HERE = Path(__file__).resolve().parent
-FONT = HERE.parent / "upstream/assets/fonts/BarlowSemiCondensed-Bold.ttf"
+FONT = HERE / "firmware/checkouts/fm1-x0x/assets/fonts/BarlowSemiCondensed-Bold.ttf"
 BG, SCREEN, ACCENT, KEY = "#1c1c1d", "#08090a", "#f08a2b", "#eeeeec"
 
 
@@ -19,7 +20,7 @@ def draw(size, rounded, scale=1.0):
     o = big * (1 - scale) / 2
     box = lambda x, y, w, h: (o + x * k, o + y * k, o + (x + w) * k, o + (y + h) * k)
     d.rounded_rectangle(box(24, 26, 144, 94), radius=8 * k, fill=SCREEN)
-    d.text((o + 96 * k, o + 87 * k), "X0X", font=ImageFont.truetype(str(FONT), round(42 * k)), fill=ACCENT, anchor="ms")
+    d.text((o + 96 * k, o + 87 * k), "FM-1", font=ImageFont.truetype(str(FONT), round(42 * k)), fill=ACCENT, anchor="ms")
     for x in (25, 54, 83, 112, 141):
         d.rounded_rectangle(box(x, 135, 24, 30), radius=3 * k, fill=KEY)
     return img.resize((size, size), Image.LANCZOS)

@@ -10,11 +10,11 @@ import shutil
 import tarfile
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent
-UPSTREAM = ROOT / "upstream"
 FW_OUT = HERE / "firmware/out"
+CHECKOUTS = HERE / "firmware/checkouts"
 SOURCES = [line.split() for line in (HERE / "firmware/sources.txt").read_text().splitlines()
            if line.strip() and not line.startswith('#')]                       # id, directory, repository, commit
+UPSTREAM = CHECKOUTS / dict((s[0], s[1]) for s in SOURCES)['x0x']             # X0X: its page's input / screen code
 
 source = (UPSTREAM / "web/emu/index.html").read_text()
 script = source.split('<script>\n',1)[1].split('</script>',1)[0]
@@ -50,7 +50,7 @@ for fid, directory, repo, commit in SOURCES:
     out = FW_OUT / fid
     assert (out / 'commit').read_text().strip() == commit, f'{fid}: run firmware/build.sh (built from another commit)'
     builds[fid] = {'version': (out / 'version').read_text().strip(), 'commit': commit,
-                   'archive': 'source.tar.gz' if fid == 'x0x' else f'src/{fid}.tar.gz'}
+                   'archive': f'src/{fid}.tar.gz'}
 app_js = ('const FIRMWARE_BUILDS = ' + json.dumps(builds) + ';\n' + (HERE/'firmwares.js').read_text() + '\n' +
           (HERE/'panel.js').read_text() + '\n' + (HERE/'screen.js').read_text() + '\nlet audioContext = null;\n' + tail + '\n' +
           (HERE/'power.js').read_text() + '\n' + (HERE/'mobile.js').read_text())
@@ -92,7 +92,7 @@ for name in OFFLINE:
 
 # The corresponding source (GPL-3.0): the app, and each firmware's tree as built. Byte-identical for the same
 # files (no times, no owners, sorted), so a rebuild of the same commits leaves the archives unchanged.
-SKIP = {'.git', 'build', '.venv', '__pycache__', 'out', 'dist', '.DS_Store'}
+SKIP = {'.git', 'build', '.venv', '__pycache__', 'out', 'dist', 'checkouts', '.DS_Store'}
 def archive(path, files):
     """files: (archive name, source path), written as a reproducible .tar.gz"""
     raw = io.BytesIO()
@@ -110,13 +110,11 @@ def tree(base, prefix):
     return [(prefix + str(p.relative_to(base)), p) for p in base.rglob('*')
             if p.is_file() and not SKIP.intersection(p.relative_to(base).parts)]
 APP_FILES = ['index.html','style.css','firmwares.js','panel.js','screen.js','power.js','mobile.js','sw.js','assemble.py',
-             'make_icons.py','app.js','README.md','manifest.webmanifest','.gitignore']+ICONS
-archive(dist/'source.tar.gz', [('fm1-mobile-emu/app/'+n, HERE/n) for n in APP_FILES] +
-        tree(HERE/'firmware', 'fm1-mobile-emu/app/firmware/') + tree(HERE/'.github', 'fm1-mobile-emu/app/.github/') +
-        tree(UPSTREAM, 'fm1-mobile-emu/upstream/'))
+             'make_icons.py','app.js','README.md','LICENSE','manifest.webmanifest','.gitignore']+ICONS
+archive(dist/'source.tar.gz', [('fm1-mobile-emu/'+n, HERE/n) for n in APP_FILES] +
+        tree(HERE/'firmware', 'fm1-mobile-emu/firmware/') + tree(HERE/'.github', 'fm1-mobile-emu/.github/'))
 for fid, directory, repo, commit in SOURCES:
-    if fid != 'x0x':                                                       # (X0X: in source.tar.gz above)
-        archive(dist/'src'/f'{fid}.tar.gz', tree(ROOT/directory, f'{Path(directory).name}/'))
+    archive(dist/'src'/f'{fid}.tar.gz', tree(CHECKOUTS/directory, f'{directory}/'))
 
 manifest=HERE/'.openai/hosting.json'
 if manifest.exists():

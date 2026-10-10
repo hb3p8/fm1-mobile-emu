@@ -1,7 +1,11 @@
+# local tools and build products
 .venv/
+__pycache__/
+.DS_Store
 .openai/local/
+firmware/checkouts/
+firmware/out/
+# source archives: only the ones dist/ publishes
 *.tar.gz
 !dist/source.tar.gz
 !dist/src/*.tar.gz
-__pycache__/
-firmware/out/

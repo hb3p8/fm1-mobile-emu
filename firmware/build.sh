@@ -5,15 +5,15 @@
 #   felucca  hugelton/Felucca        its own web/emu build (felucca.wasm; app/firmware/flash-worklet.js plays it)
 #   sloop    isod89/sloop-fm1        no browser build upstream: app/firmware/sloop_web.c (felucca.wasm's design)
 #   fimba    jadamsowers/fm1-fimba   its own web/emu build (kalimba.wasm + worklet.js)
-# The checkouts live next to app/ (sources.txt: directory, repository, pinned commit) and are cloned when
-# missing. Needs emcc, git and Python 3 with Pillow (with raqm: brew install fribidi) and fontTools:
-#   python3 -m venv firmwares/.venv && firmwares/.venv/bin/pip install Pillow fonttools
-#   PYTHON=... app/firmware/build.sh [id ...]
+# The checkouts live in firmware/checkouts/ (sources.txt: directory, repository, pinned commit; git-ignored)
+# and are cloned when missing, or moved to the pinned commit. Needs emcc, git and Python 3 with Pillow (with
+# raqm; on macOS: brew install fribidi) and fontTools:
+#   python3 -m venv firmware/.venv && firmware/.venv/bin/pip install Pillow fonttools
+#   firmware/build.sh [id ...]          (PYTHON=... for another Python)
 set -e
 HERE=$(cd "$(dirname "$0")" && pwd)
-ROOT=$(cd "$HERE/../.." && pwd)
 OUT="$HERE/out"
-PY=${PYTHON:-$ROOT/firmwares/.venv/bin/python}
+PY=${PYTHON:-$HERE/.venv/bin/python}
 [ -x "$PY" ] || PY=$(command -v python3)
 # the upstream build scripts call python3 (the generators) and emcc (Python >= 3.10): this Python first
 [ -d /opt/homebrew/bin ] && PATH=/opt/homebrew/bin:$PATH
@@ -29,7 +29,7 @@ gen() {   # generator script and output header, in the checkout, unless the head
 
 grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
     case " $WANT " in *" $id "*) ;; *) continue ;; esac
-    src="$ROOT/$dir"
+    src="$HERE/checkouts/$dir"
     [ -d "$src/.git" ] || git clone -q "$repo" "$src"
     if [ "$(git -C "$src" rev-parse HEAD)" != "$commit" ]; then
         git -C "$src" fetch -q origin
