@@ -259,7 +259,7 @@ void main() {
 
 const screenRenderer = (() => {
   const canvas = document.getElementById("screen");
-  let filter = "xbr", frame = null;
+  let filter = "pixel", frame = null;   // plain pixels unless Menu > Screen smoothing was turned on
   try { if (SCREEN_FILTERS.includes(localStorage.getItem(SCREEN_FILTER_KEY))) filter = localStorage.getItem(SCREEN_FILTER_KEY); } catch {}
   const gl = canvas.getContext("webgl", { alpha: false, antialias: false, depth: false, stencil: false });
   let program = null, uMode = null, uDelta = null;

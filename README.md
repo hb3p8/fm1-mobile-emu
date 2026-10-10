@@ -4,7 +4,7 @@ A touch interface for real FM-1 firmwares running in the browser: X0X, Felucca, 
 
 The panel follows the look of AudioKit Synth One: dark tiles, black knobs with orange pointers, an orange Menu button. The controls keep the FM-1's arrangement: MASTER / SELECT / PRESETS / ALGORITHM in a 2×2 block with OCT− / OCT+ below, left of the screen in landscape; KNOB1–4 over the function buttons right of it (six by two, or four by three in portrait). A slim bar over KNOB1–4 (full width under the screen in portrait) holds the name, Hold and Menu, so the screen reaches the top edge; Menu holds the sound status and pause, the xBR switch, loops and help. In landscape the square screen fills the height beside the panels, over keys tall enough to hit (the black ones half their height); in portrait it fills the width above them. The screen snaps to a whole number of display pixels per firmware pixel when that costs at most a tenth of its size: on an iPhone XR from the home screen, 2× (240 pt) in landscape and 3× (360 pt) in portrait. Rotation changes only the layout and preserves the running firmware.
 
-The 240×240 screen is magnified on the GPU (WebGL) to the display's device pixels with xBR level 2 by Hyllian, the edge-directed filter used by emulators of old games (`screen.js`). The Screen smoothing switch in Menu turns it off for plain pixels; the choice is kept in localStorage.
+The 240×240 screen is drawn on the GPU (WebGL) at the display's device pixels, as plain pixels by default. Menu > Screen smoothing turns on xBR level 2 by Hyllian, the edge-directed filter used by emulators of old games (`screen.js`); the choice is kept in localStorage.
 
 ## Firmwares
 
