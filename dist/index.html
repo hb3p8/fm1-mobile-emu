@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#1c1c1c">
+  <meta name="theme-color" content="#1c1c1d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="description" content="Рабочий эмулятор FM-1 с прошивкой X0X, адаптированный для телефона.">
+  <meta name="description" content="A working FM-1 emulator running the X0X firmware, made for phones.">
   <title>FM-1 · X0X Mobile</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.webmanifest">
@@ -17,16 +17,26 @@
   <main class="app-shell">
     <header class="topbar">
       <div class="brand" aria-label="FM-1 X0X">FM-1<span>X0X</span></div>
-      <div class="display"><span class="display-led" aria-hidden="true"></span><span id="status" role="status">Выключен</span></div>
-      <button id="audio-toggle" class="tool" type="button" hidden>Пауза</button>
-      <button id="fullscreen" class="tool icon" type="button" aria-label="Полный экран" title="Полный экран">
-        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5"/></svg>
+      <div class="display"><span class="display-led" aria-hidden="true"></span><span id="status" role="status">Off</span></div>
+      <button id="hold-toggle" class="tool" type="button" aria-pressed="false" title="Latch buttons for one-finger combinations">Hold</button>
+      <button id="filter-toggle" class="tool" type="button" aria-pressed="true" title="xBR screen smoothing, as in retro game emulators">xBR</button>
+      <div class="octave" id="octaves" role="group" aria-label="Octave"></div>
+      <button id="audio-toggle" class="tool" type="button" data-state="running" aria-label="Pause" hidden>
+        <svg class="tool-icon i-pause" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 4v12M13 4v12"/></svg>
+        <svg class="tool-icon i-play" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4l10 6-10 6z"/></svg>
+        <span class="tool-label">Pause</span>
       </button>
-      <button id="settings-open" class="tool" type="button" aria-label="Настройки и помощь">Меню</button>
+      <button id="fullscreen" class="tool icon" type="button" aria-label="Fullscreen" title="Fullscreen">
+        <svg class="tool-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8V3h5M12 3h5v5M17 12v5h-5M8 17H3v-5"/></svg>
+      </button>
+      <button id="settings-open" class="tool" type="button" aria-label="Settings and help">
+        <svg class="tool-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h12"/></svg>
+        <span class="tool-label">Menu</span>
+      </button>
     </header>
-    <div class="device" id="device" aria-label="Эмулятор FM-1">
-      <section class="screen-panel" id="screen-panel" aria-label="Дисплей">
-        <div class="screen-bezel" id="screen-bezel"><canvas id="screen" width="240" height="240" aria-label="Дисплей FM-1"></canvas></div>
+    <div class="device" id="device" aria-label="FM-1 emulator">
+      <section class="screen-panel" id="screen-panel" aria-label="Display">
+        <div class="screen-bezel" id="screen-bezel"><canvas id="screen" width="240" height="240" aria-label="FM-1 screen"></canvas></div>
       </section>
       <div class="panels">
         <section class="panel panel-params" aria-labelledby="params-h">
@@ -37,45 +47,39 @@
           <h2 id="main-h">Main</h2>
           <div class="knob-row" id="global-knobs"></div>
         </section>
-        <section class="panel panel-functions" aria-labelledby="functions-h">
-          <h2 id="functions-h">Functions</h2>
+        <section class="panel panel-functions" aria-label="Functions">
           <div class="function-buttons" id="function-buttons"></div>
         </section>
       </div>
-      <div class="toolbar">
-        <button id="hold-toggle" class="tool" type="button" aria-pressed="false" title="Фиксировать кнопки для сочетаний одним пальцем">Hold</button>
-        <button id="filter-toggle" class="tool" type="button" aria-pressed="true" title="Сглаживание экрана xBR, как в эмуляторах ретро-консолей">xBR</button>
-        <div class="octave" id="octaves" role="group" aria-label="Октава"></div>
-      </div>
-      <div class="keyboard" id="keyboard" aria-label="Клавиатура FM-1"></div>
+      <div class="keyboard" id="keyboard" aria-label="FM-1 keyboard"></div>
       <div class="start" id="start">
         <div class="start-card">
           <div class="start-brand">FM-1<span>X0X</span></div>
-          <button type="button" id="go">Включить звук</button>
-          <small>Настоящая прошивка в браузере. Звук начинается после нажатия.</small>
+          <button type="button" id="go">Switch on</button>
+          <small>The real firmware in your browser. Sound starts after you tap.</small>
         </div>
       </div>
     </div>
   </main>
   <dialog id="settings">
-    <div class="dialog-header"><h1>FM-1 / X0X</h1><button id="settings-close" type="button" aria-label="Закрыть настройки">×</button></div>
+    <div class="dialog-header"><h1>FM-1 / X0X</h1><button id="settings-close" type="button" aria-label="Close settings">×</button></div>
     <p class="detail" id="cpu"></p>
     <section class="breaks" aria-labelledby="breaks-h">
-      <h2 id="breaks-h">Ваши лупы</h2>
-      <p>WAV, AIFF или MP3. До 16 лупов и примерно 7 секунд в каждом слоте. Для воспроизведения выберите BREAK ручкой ALGORITHM, нажимайте EDIT до страницы LOOPS и выберите луп ручкой KNOB1.</p>
+      <h2 id="breaks-h">Your loops</h2>
+      <p>WAV, AIFF or MP3. Up to 16 loops and about 7 seconds per slot. To play them, choose BREAK with the ALGORITHM knob, press EDIT until the LOOPS page and pick a loop with KNOB1.</p>
       <div class="slots" id="slots"></div>
     </section>
     <section class="help">
-      <h2>Управление</h2>
-      <p>Ручки: тяните вверх или вниз. Клавиши поддерживают несколько пальцев и скольжение. Держите SEL вместе с другой кнопкой для сочетаний. Hold фиксирует кнопки до повторного нажатия; на компьютере также можно использовать Shift + клик.</p>
-      <p>Space — PLAY, Enter — REC, Shift — SEL, Esc — HOME, Z / X — октава. Q–I и A–K — белые клавиши; 1–0 и «−» — чёрные. ↑ / ↓ — SELECT.</p>
-      <p>xBR сглаживает пиксельный экран, как фильтры эмуляторов старых игр; выключите его, чтобы видеть исходные пиксели.</p>
-      <p>SAVE сохраняет паттерны в этом браузере. Лупы также остаются на устройстве. Для большего рабочего экрана добавьте страницу на экран «Домой» телефона.</p>
+      <h2>Controls</h2>
+      <p>Knobs: drag up or down. Keys work with several fingers and glide. Hold SEL together with another button for combinations. Hold latches buttons until you tap them again; on a computer, Shift + click does the same.</p>
+      <p>Space — PLAY, Enter — REC, Shift — SEL, Esc — HOME, Z / X — octave. Q–I and A–K are the white keys; 1–0 and “−” the black ones. ↑ / ↓ turn SELECT.</p>
+      <p>xBR smooths the pixel screen like the filters of retro game emulators; switch it off to see the original pixels.</p>
+      <p>SAVE keeps patterns in this browser, and loops stay on this device too. For a larger working area, add the page to your phone’s home screen.</p>
     </section>
-    <button id="reset" type="button">Сбросить паттерны</button>
+    <button id="reset" type="button">Reset patterns</button>
     <footer>
-      <p>Мобильная адаптация <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">X0X / Charles Vestal</a>. Основано на Felucca. Идея браузерного эмулятора — Groove OS. Экранный фильтр — xBR, Hyllian.</p>
-      <p><a href="https://charlesvestal.github.io/fm1-x0x/manual/" target="_blank" rel="noopener">Руководство X0X</a> · <a href="source.tar.gz" download>Полные исходники</a> · <a href="LICENSE.txt">GPL-3.0</a></p>
+      <p>Mobile adaptation of <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">X0X / Charles Vestal</a>. Based on Felucca. Browser emulator idea by Groove OS. Screen filter: xBR by Hyllian.</p>
+      <p><a href="https://charlesvestal.github.io/fm1-x0x/manual/" target="_blank" rel="noopener">X0X manual</a> · <a href="source.tar.gz" download>Full source</a> · <a href="LICENSE.txt">GPL-3.0</a></p>
     </footer>
   </dialog>
 </body>

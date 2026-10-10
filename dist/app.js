@@ -317,9 +317,9 @@ keys.forEach((k, i) => {
 function pointerUp(e) {
   releasePointer(e.pointerId);
 }
-device.addEventListener("pointerup", pointerUp);
-device.addEventListener("pointercancel", pointerUp);
-device.addEventListener("lostpointercapture", pointerUp);
+document.addEventListener("pointerup", pointerUp);
+document.addEventListener("pointercancel", pointerUp);
+document.addEventListener("lostpointercapture", pointerUp);
 
 function drawKnob(k) {
   k.ind.style.transform = `rotate(${k.angle}deg)`;
@@ -488,7 +488,7 @@ async function slotFill(k, files) {
   files = [...files].filter((f) => f && f.size).slice(0, SLOT_ZONES);
   if (!files.length) return;
   const row = document.querySelectorAll(".slot")[k];
-  row.querySelector(".sname").textContent = "Чтение…";
+  row.querySelector(".sname").textContent = "Reading...";
   const zones = [];
   let used = 0, skipped = 0;
   for (const f of files) {
@@ -506,7 +506,7 @@ async function slotFill(k, files) {
 }
 function slotDraw(k, skipped = 0) {
   const row = document.querySelectorAll(".slot")[k], s = slots[k], n = row.querySelector(".sname");
-  if (!s) { n.textContent = skipped ? "Не удалось прочитать файл" : "Пусто"; return; }
+  if (!s) { n.textContent = skipped ? "Could not read that file" : "Empty"; return; }
   const sec = s.zones.reduce((a, z) => a + z.pcm.length, 0) / SLOT_RATE;
   n.innerHTML = "";
   const b = document.createElement("strong");
@@ -519,8 +519,8 @@ function slotDraw(k, skipped = 0) {
   for (let k = 0; k < 3; k++) {
     const row = document.createElement("div");
     row.className = "slot";
-    row.innerHTML = `<b>Slot ${k + 1}</b><span class="sname">Пусто</span>` +
-      `<label>Выбрать файлы<input type="file" multiple accept="audio/*,.wav,.aif,.aiff,.mp3,.flac"></label><button type="button">Очистить</button>`;
+    row.innerHTML = `<b>Slot ${k + 1}</b><span class="sname">Empty</span>` +
+      `<label>Choose files<input type="file" multiple accept="audio/*,.wav,.aif,.aiff,.mp3,.flac"></label><button type="button">Clear</button>`;
     row.querySelector("input").addEventListener("change", (e) => { slotFill(k, e.target.files); e.target.value = ""; });
     row.querySelector("button").addEventListener("click", () => { slots[k] = null; slotDraw(k); slotSend(k); slotSave(k); });
     row.addEventListener("dragover", (e) => { e.preventDefault(); row.classList.add("over"); });
@@ -536,9 +536,9 @@ const status = document.getElementById("status"), cpu = document.getElementById(
 async function switchOn() {
   const go = document.getElementById("go");
   go.disabled = true;
-  go.textContent = "Запускается…";
+  go.textContent = "Starting...";
   try {
-    if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Для звука откройте страницу по HTTPS или на localhost");
+    if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Audio needs HTTPS or localhost");
     const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
     audioContext = ac;
     await ac.resume();
@@ -547,7 +547,7 @@ async function switchOn() {
     node = new AudioWorkletNode(ac, "x0x", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
     node.connect(ac.destination);
     const ready = new Promise((res, reject) => {
-      const timer = setTimeout(() => reject(new Error("Звуковое ядро не ответило")), 15000);
+      const timer = setTimeout(() => reject(new Error("The audio engine did not answer")), 15000);
       node.port.onmessage = (e) => {
         const m = e.data;
         if (m.type === "ready") { clearTimeout(timer); res(); }
@@ -556,7 +556,7 @@ async function switchOn() {
           if (m.fb) drawScreen(m.fb);
           drawLights(m.buttons, m.keys, m.dim);
           window.x0xLast = m;
-          if (m.load !== undefined) cpu.textContent = `Загрузка аудиопотока: ${m.load}%`;
+          if (m.load !== undefined) cpu.textContent = `Audio thread load: ${m.load}%`;
           if (m.store) saveStore(m.store);
         }
       };
@@ -566,7 +566,7 @@ async function switchOn() {
     [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
     await ac.resume();
     document.getElementById("start").hidden = true;
-    status.textContent = "Звук включён";
+    status.textContent = "Sound on";
     document.querySelector(".app-shell").classList.add("running");
     document.getElementById("audio-toggle").hidden = false;
     syncButtons(); syncKeys();
@@ -574,8 +574,8 @@ async function switchOn() {
     go.disabled = false;
     if (audioContext) await audioContext.close().catch(() => {});
     audioContext = null; node = null;
-    go.textContent = "Повторить запуск";
-    status.textContent = "Ошибка запуска";
+    go.textContent = "Try again";
+    status.textContent = "Could not start";
     document.querySelector(".start small").textContent = err && err.message || String(err);
   }
 }
@@ -586,7 +586,7 @@ document.getElementById("reset").addEventListener("click", () => {
     location.reload();
   } else {
     document.getElementById("reset").dataset.armed = "1";
-    document.getElementById("reset").textContent = "Нажмите ещё раз для сброса";
+    document.getElementById("reset").textContent = "Click again to forget everything";
   }
 });
 
@@ -609,8 +609,11 @@ document.getElementById("audio-toggle").addEventListener("click",async(event)=> 
   releaseInputs();
   if (audioContext.state === "running") await audioContext.suspend();
   else await audioContext.resume();
-  event.currentTarget.textContent=audioContext.state === "running" ? "Пауза" : "Звук";
-  status.textContent=audioContext.state === "running" ? "Звук включён" : "На паузе";
+  const running=audioContext.state === "running";
+  event.currentTarget.dataset.state=running ? "running" : "paused";
+  event.currentTarget.querySelector(".tool-label").textContent=running ? "Pause" : "Resume";
+  event.currentTarget.setAttribute("aria-label",running ? "Pause" : "Resume");
+  status.textContent=running ? "Sound on" : "Paused";
   document.querySelector(".app-shell").classList.toggle("running",audioContext.state === "running");
 });
 const filterToggle = document.getElementById("filter-toggle");

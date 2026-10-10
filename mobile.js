@@ -17,8 +17,11 @@ document.getElementById("audio-toggle").addEventListener("click",async(event)=> 
   releaseInputs();
   if (audioContext.state === "running") await audioContext.suspend();
   else await audioContext.resume();
-  event.currentTarget.textContent=audioContext.state === "running" ? "Пауза" : "Звук";
-  status.textContent=audioContext.state === "running" ? "Звук включён" : "На паузе";
+  const running=audioContext.state === "running";
+  event.currentTarget.dataset.state=running ? "running" : "paused";
+  event.currentTarget.querySelector(".tool-label").textContent=running ? "Pause" : "Resume";
+  event.currentTarget.setAttribute("aria-label",running ? "Pause" : "Resume");
+  status.textContent=running ? "Sound on" : "Paused";
   document.querySelector(".app-shell").classList.toggle("running",audioContext.state === "running");
 });
 const filterToggle = document.getElementById("filter-toggle");

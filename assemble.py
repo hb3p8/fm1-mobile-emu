@@ -24,21 +24,19 @@ tail = tail.replace('const ctx = document.getElementById("screen").getContext("2
     'const img = new ImageData(240, 240);')
 tail = tail.replace('ctx.putImageData(img, 0, 0);', 'screenRenderer.draw(img);')
 tail = tail.replace('const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });',
-    'if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Для звука откройте страницу по HTTPS или на localhost");\n    const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });\n    audioContext = ac;\n    await ac.resume();')
-tail = tail.replace('const ready = new Promise((res) => {', 'const ready = new Promise((res, reject) => {\n      const timer = setTimeout(() => reject(new Error("Звуковое ядро не ответило")), 15000);')
+    'if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Audio needs HTTPS or localhost");\n    const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });\n    audioContext = ac;\n    await ac.resume();')
+tail = tail.replace('const ready = new Promise((res) => {', 'const ready = new Promise((res, reject) => {\n      const timer = setTimeout(() => reject(new Error("The audio engine did not answer")), 15000);')
 tail = tail.replace('if (m.type === "ready") res();', 'if (m.type === "ready") { clearTimeout(timer); res(); }\n        else if (m.type === "error") { clearTimeout(timer); reject(new Error(m.message)); }')
-tail = tail.replace('go.textContent = "Starting...";', 'go.textContent = "Запускается…";')
-tail = tail.replace('`X0X uses ${m.load}% of this computer\'s time`', '`Загрузка аудиопотока: ${m.load}%`')
+tail = tail.replace('`X0X uses ${m.load}% of this computer\'s time`', '`Audio thread load: ${m.load}%`')
 tail = tail.replace('status.textContent = ac.sampleRate === 44100 ? "On." : `On (the browser runs audio at ${ac.sampleRate} Hz).`;',
-    'status.textContent = "Звук включён";\n    document.querySelector(".app-shell").classList.add("running");\n    document.getElementById("audio-toggle").hidden = false;')
-tail = tail.replace('go.textContent = "Switch on";', 'if (audioContext) await audioContext.close().catch(() => {});\n    audioContext = null; node = null;\n    go.textContent = "Повторить запуск";')
+    'status.textContent = "Sound on";\n    document.querySelector(".app-shell").classList.add("running");\n    document.getElementById("audio-toggle").hidden = false;')
+tail = tail.replace('go.textContent = "Switch on";', 'if (audioContext) await audioContext.close().catch(() => {});\n    audioContext = null; node = null;\n    go.textContent = "Try again";')
 tail = tail.replace('status.textContent = "Could not start: " + (err && err.message || err) + ". Chrome, Edge, Firefox and Safari should all work.";',
-    'status.textContent = "Ошибка запуска";\n    document.querySelector(".start small").textContent = err && err.message || String(err);')
-tail = tail.replace('"Click again to forget everything"', '"Нажмите ещё раз для сброса"')
-tail = tail.replace('"Reading..."', '"Чтение…"').replace('"Choose files', '"Выбрать файлы')
-tail = tail.replace('<label>Choose files', '<label>Выбрать файлы').replace('>Clear</button>', '>Очистить</button>')
-tail = tail.replace('>Empty</span>', '>Пусто</span>').replace('"Could not read that file" : "Empty"', '"Не удалось прочитать файл" : "Пусто"')
-for marker in ['const img = new ImageData(240, 240);', 'screenRenderer.draw(img);']:
+    'status.textContent = "Could not start";\n    document.querySelector(".start small").textContent = err && err.message || String(err);')
+# OCT− / OCT+ live in the top bar, outside #device: releases must be heard everywhere.
+for event in ['pointerup', 'pointercancel', 'lostpointercapture']:
+    tail = tail.replace(f'device.addEventListener("{event}", pointerUp);', f'document.addEventListener("{event}", pointerUp);')
+for marker in ['const img = new ImageData(240, 240);', 'screenRenderer.draw(img);', 'document.addEventListener("lostpointercapture", pointerUp);']:
     assert marker in tail, 'upstream changed: ' + marker
 (HERE/'app.js').write_text((HERE/'panel.js').read_text()+'\n'+(HERE/'screen.js').read_text()+'\nlet audioContext = null;\n'+tail+'\n'+(HERE/'mobile.js').read_text())
 dist = HERE/'dist'

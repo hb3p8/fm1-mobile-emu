@@ -6,7 +6,7 @@
   color-scheme: dark;
   --page: #0e0e0f;
   --seam: #131314;          /* the dark lines between panels */
-  --bar: #1c1c1d;           /* top bar and toolbar */
+  --bar: #1c1c1d;           /* top bar */
   --panel: #2a2a2c;
   --inset: #151516;
   --control: #353537;
@@ -46,6 +46,7 @@ button:disabled { cursor: wait; opacity: .6; }
 /* ---------------------------------------------------------------- top bar */
 .topbar {
   flex: none; display: flex; align-items: center; gap: 6px;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
   height: calc(var(--bar-h) + env(safe-area-inset-top)); padding: env(safe-area-inset-top) 8px 0;
   background: var(--bar); border-bottom: 1px solid var(--seam);
 }
@@ -71,15 +72,17 @@ button:disabled { cursor: wait; opacity: .6; }
 .tool:active { background: var(--control-on); }
 .tool[aria-pressed=true] { background: var(--control-on); border-color: #707075; }
 .tool.icon { display: grid; place-items: center; padding: 0; min-width: 34px; }
-.tool.icon svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tool-icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
+.tool:not(.icon) .tool-icon { display: none; }
+.i-play { fill: currentColor; stroke-width: 1.2; }
 #settings-open { background: var(--accent); border-color: var(--accent-hi); color: var(--accent-ink); font-weight: 600; }
 
 /* ---------------------------------------------------------------- device grid */
 .device {
   position: relative; flex: 1; min-height: 0; display: grid; gap: 1px;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr) auto auto auto;
-  grid-template-areas: "screen" "panels" "toolbar" "keys";
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  grid-template-areas: "screen" "panels" "keys";
   user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none;
 }
 .screen-panel { grid-area: screen; min-width: 0; min-height: 0; display: grid; place-items: center; padding: 8px; background: var(--panel); }
@@ -157,18 +160,14 @@ button:disabled { cursor: wait; opacity: .6; }
 }
 .control-button.lit.latched::after { border-color: var(--accent-ink); }
 
-/* ---------------------------------------------------------------- toolbar */
-.toolbar {
-  grid-area: toolbar; display: flex; align-items: center; gap: 6px; height: var(--bar-h);
-  padding: 0 8px; background: var(--bar);
-}
+/* ---------------------------------------------------------------- octave stepper in the top bar */
 .octave {
-  margin-left: auto; display: flex; align-items: center; height: calc(var(--bar-h) - 8px);
+  flex: none; display: flex; align-items: center; height: calc(var(--bar-h) - 10px);
   border-radius: 4px; background: var(--inset); box-shadow: inset 0 1px 3px #000a, 0 1px 0 #ffffff0d;
 }
-.octave .control-button { width: 40px; height: 100%; display: grid; place-items: center; box-shadow: none; }
+.octave .control-button { width: 38px; height: 100%; display: grid; place-items: center; box-shadow: none; }
 .octave .control-button svg { width: 12px; height: 12px; fill: currentColor; }
-.octave-label { min-width: 42px; text-align: center; font-size: 13px; letter-spacing: 1px; color: var(--label); }
+.octave-label { min-width: 38px; text-align: center; font-size: 13px; letter-spacing: 1px; color: var(--label); }
 
 /* ---------------------------------------------------------------- keys */
 .keyboard {
@@ -250,9 +249,21 @@ a { color: var(--accent-hi); }
   .knob { gap: 2px; }
   .knob-label { font-size: 10px; }
 }
-@media (max-width: 400px) {
+/* Narrow top bar: icons instead of words, the status LED without its text. */
+@media (max-width: 560px) {
+  .topbar { gap: 4px; padding-inline: 6px; }
+  .topbar .brand { font-size: 17px; padding-right: 0; }
   .topbar .brand span { display: none; }
-  .tool { padding: 0 9px; }
+  .display { flex: 0 0 auto; margin: 0; padding: 0 4px; background: none; box-shadow: none; }
+  .display #status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .tool { min-width: 0; padding: 0 8px; font-size: 13px; }
+  .tool .tool-label { display: none; }
+  .tool:not(.icon) .tool-icon { display: inline-block; }
+  #audio-toggle, #settings-open, #fullscreen { width: 32px; padding: 0; display: grid; place-items: center; }
+  #audio-toggle[data-state=running] .i-play, #audio-toggle[data-state=paused] .i-pause { display: none; }
+  .octave .control-button { width: 30px; }
+  .octave-label { min-width: 30px; font-size: 12px; letter-spacing: .5px; }
+  .display { margin-right: auto; }
 }
 
 /* ---------------------------------------------------------------- landscape: screen beside the panels */
@@ -263,8 +274,8 @@ a { color: var(--accent-hi); }
   }
   .device {
     grid-template-columns: var(--screen-col, 40%) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto auto;
-    grid-template-areas: "screen panels" "toolbar toolbar" "keys keys";
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: "screen panels" "keys keys";
   }
   .screen-panel { padding: 6px; }
   .panels { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: minmax(min-content, 1fr) minmax(min-content, 1.4fr); grid-template-areas: "params main" "functions functions"; }

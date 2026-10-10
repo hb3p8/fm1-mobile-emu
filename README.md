@@ -2,9 +2,9 @@
 
 Touch interface for the real X0X firmware, based on charlesvestal/fm1-x0x at 00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62. GPL-3.0-only; see upstream/LICENSE and upstream/LICENSING.md.
 
-The panel follows the look of AudioKit Synth One: dark tiles with section headings, black knobs with orange pointers, a toolbar above the keys. KNOB1–4 (Parameters) line up with the four parameter columns on the screen, MASTER / SELECT / PRESETS / ALGORITHM (Main) sit beside them, the twelve function buttons keep the hardware order, and OCT− / OCT+ form the octave stepper in the toolbar. In landscape the square screen fills the height beside the panels; in portrait it fills the width above them. Rotation changes only the layout and preserves the running firmware.
+The panel follows the look of AudioKit Synth One: dark tiles with section headings, black knobs with orange pointers, a top bar with the performance switches. KNOB1–4 (Parameters) line up with the four parameter columns on the screen, MASTER / SELECT / PRESETS / ALGORITHM (Main) sit beside them, the twelve function buttons keep the hardware order, and the top bar holds Hold, the xBR switch and the OCT− / OCT+ stepper next to the status display. In landscape the square screen fills the height beside the panels; in portrait it fills the width above them. Rotation changes only the layout and preserves the running firmware.
 
-The 240×240 screen is magnified on the GPU (WebGL) to the display's device pixels with xBR level 2 by Hyllian, the edge-directed filter used by emulators of old games (`screen.js`). The xBR toolbar button switches to plain pixels; the choice is kept in localStorage.
+The 240×240 screen is magnified on the GPU (WebGL) to the display's device pixels with xBR level 2 by Hyllian, the edge-directed filter used by emulators of old games (`screen.js`). The xBR button switches to plain pixels; the choice is kept in localStorage.
 
 ## Build
 
@@ -29,6 +29,6 @@ The font generator has a portability fallback for Pillow installations without l
 python3 -m http.server 4180 --directory app/dist --bind 127.0.0.1
 ```
 
-Open http://localhost:4180 on the computer and press “Включить звук”, then PLAY. On a phone use an HTTPS deployment of `dist/`; AudioWorklet is not available on ordinary LAN HTTP addresses. Settings contain the upstream manual, loop import, reset, full source archive and license.
+Open http://localhost:4180 on the computer and press “Switch on”, then PLAY. On a phone use an HTTPS deployment of `dist/`; AudioWorklet is not available on ordinary LAN HTTP addresses. Settings contain the upstream manual, loop import, reset, full source archive and license.
 
-Audio runs at 44.1 kHz. SAVЕ stores patterns in localStorage; loop slots use IndexedDB. Browser storage is specific to the current origin.
+Audio runs at 44.1 kHz. SAVE stores patterns in localStorage; loop slots use IndexedDB. Browser storage is specific to the current origin.
