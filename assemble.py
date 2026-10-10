@@ -20,7 +20,9 @@ tail = tail.replace('if (!node || e.metaKey || e.ctrlKey || e.altKey) return;',
     'if (!node || e.metaKey || e.ctrlKey || e.altKey || document.getElementById("settings").open) return;')
 tail = tail.replace('if (e.code === "ArrowUp" || e.code === "ArrowDown")',
     'if ((e.code === "ArrowUp" || e.code === "ArrowDown") && !e.target.closest(".knob"))')
-tail = tail.replace('let drag = null, wheel = 0;', 'let drag = null, wheel = 0;')
+tail = tail.replace('const ctx = document.getElementById("screen").getContext("2d");\nconst img = ctx.createImageData(240, 240);',
+    'const img = new ImageData(240, 240);')
+tail = tail.replace('ctx.putImageData(img, 0, 0);', 'screenRenderer.draw(img);')
 tail = tail.replace('const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });',
     'if (!window.isSecureContext || !window.AudioWorkletNode) throw new Error("Для звука откройте страницу по HTTPS или на localhost");\n    const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });\n    audioContext = ac;\n    await ac.resume();')
 tail = tail.replace('const ready = new Promise((res) => {', 'const ready = new Promise((res, reject) => {\n      const timer = setTimeout(() => reject(new Error("Звуковое ядро не ответило")), 15000);')
@@ -36,7 +38,9 @@ tail = tail.replace('"Click again to forget everything"', '"Нажмите ещ�
 tail = tail.replace('"Reading..."', '"Чтение…"').replace('"Choose files', '"Выбрать файлы')
 tail = tail.replace('<label>Choose files', '<label>Выбрать файлы').replace('>Clear</button>', '>Очистить</button>')
 tail = tail.replace('>Empty</span>', '>Пусто</span>').replace('"Could not read that file" : "Empty"', '"Не удалось прочитать файл" : "Пусто"')
-(HERE/'app.js').write_text((HERE/'panel.js').read_text()+'\nlet audioContext = null;\n'+tail+'\n'+(HERE/'mobile.js').read_text())
+for marker in ['const img = new ImageData(240, 240);', 'screenRenderer.draw(img);']:
+    assert marker in tail, 'upstream changed: ' + marker
+(HERE/'app.js').write_text((HERE/'panel.js').read_text()+'\n'+(HERE/'screen.js').read_text()+'\nlet audioContext = null;\n'+tail+'\n'+(HERE/'mobile.js').read_text())
 dist = HERE/'dist'
 dist.mkdir(exist_ok=True)
 for name in ['index.html','style.css','app.js','manifest.webmanifest','icon.svg']:
@@ -51,7 +55,7 @@ with tarfile.open(dist/'source.tar.gz','w:gz') as archive:
     for file in UPSTREAM.rglob('*'):
         if file.is_file() and not any(part in ['.git','build'] for part in file.relative_to(UPSTREAM).parts):
             archive.add(file,arcname='fm1-mobile-emu/upstream/'+str(file.relative_to(UPSTREAM)))
-    for name in ['index.html','style.css','panel.js','mobile.js','assemble.py','app.js','README.md','manifest.webmanifest','icon.svg']:
+    for name in ['index.html','style.css','panel.js','screen.js','mobile.js','assemble.py','app.js','README.md','manifest.webmanifest','icon.svg']:
         archive.add(HERE/name,arcname='fm1-mobile-emu/app/'+name)
 manifest=HERE/'.openai/hosting.json'
 if manifest.exists():
