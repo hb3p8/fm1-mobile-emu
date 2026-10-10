@@ -69,18 +69,24 @@ BLACK_K.forEach((note,i) => {
 });
 
 // Resize only geometry; the worklet and active pattern survive device rotation. The screen stays
-// square: in landscape its column is as wide as the space is tall, in portrait it fits the free height.
+// square: in landscape its column is as wide as the space is tall, but leaves the controls on the right
+// 40% of the width on squarish screens such as tablets; in portrait it fits the free height.
 const screenPanel = document.getElementById("screen-panel"), screenBezel = document.getElementById("screen-bezel");
+const mainPanel = document.querySelector(".panel-main");
 function resizePanel() {
   const landscape = matchMedia("(orientation: landscape)").matches;
-  if (landscape) device.style.setProperty("--screen-col",`${Math.round(screenPanel.getBoundingClientRect().height)}px`);
+  if (landscape) {
+    const room = device.clientWidth - mainPanel.offsetWidth - 2 - Math.max(260,device.clientWidth*.4);
+    device.style.setProperty("--screen-col",`${Math.round(Math.max(160,Math.min(screenPanel.getBoundingClientRect().height,room)))}px`);
+  }
   else device.style.removeProperty("--screen-col");
   const style = getComputedStyle(screenPanel);
   const w = screenPanel.clientWidth-parseFloat(style.paddingLeft)-parseFloat(style.paddingRight);
   const h = screenPanel.clientHeight-parseFloat(style.paddingTop)-parseFloat(style.paddingBottom);
   screenBezel.style.setProperty("--screen-size",`${Math.max(120,Math.floor(Math.min(w,h)))}px`);
 }
-new ResizeObserver(resizePanel).observe(screenPanel);
+const panelObserver = new ResizeObserver(resizePanel);
+panelObserver.observe(screenPanel); panelObserver.observe(device);
 window.addEventListener("orientationchange",resizePanel);
 resizePanel();
 
@@ -658,3 +664,20 @@ Object.values(buttons).forEach(button=> {
     btnHeldBy.delete("focus-"+event.code); syncButtons();
   });
 });
+
+// Offline use: sw.js keeps every file of this version. When a rebuilt version arrives (checked on
+// launch and whenever the app comes back to the front), it takes over at once if the firmware is
+// not running yet; otherwise Menu offers a reload so nothing stops in the middle of playing.
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  const updated = !!navigator.serviceWorker.controller;   // false on the very first visit: nothing to replace
+  navigator.serviceWorker.register("sw.js").then((registration)=> {
+    document.addEventListener("visibilitychange",()=> { if (!document.hidden) registration.update().catch(()=>{}); });
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener("controllerchange",()=> {
+    if (!updated) return;
+    if (!node) { location.reload(); return; }
+    document.getElementById("update").hidden=false;
+    document.getElementById("settings-open").classList.add("has-update");
+  });
+  document.getElementById("update-reload").addEventListener("click",()=>location.reload());
+}

@@ -4,13 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#1c1c1d">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FM-1">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="A working FM-1 emulator running the X0X firmware, made for phones.">
   <title>FM-1 · X0X Mobile</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -53,6 +56,10 @@
         <span class="display-led" aria-hidden="true"></span>
         <span class="setting-text"><span id="status" role="status">Off</span><small id="cpu"></small></span>
         <button id="audio-toggle" type="button" data-state="running" aria-label="Pause" hidden><span class="tool-label">Pause</span></button>
+      </div>
+      <div class="setting update" id="update" hidden>
+        <span class="setting-text">Update ready<small>Reload to switch to the new version. Patterns and loops are kept.</small></span>
+        <button id="update-reload" type="button">Reload</button>
       </div>
       <div class="setting">
         <span class="setting-text">Screen smoothing<small>xBR, like the filters of retro game emulators</small></span>

@@ -72,3 +72,20 @@ Object.values(buttons).forEach(button=> {
     btnHeldBy.delete("focus-"+event.code); syncButtons();
   });
 });
+
+// Offline use: sw.js keeps every file of this version. When a rebuilt version arrives (checked on
+// launch and whenever the app comes back to the front), it takes over at once if the firmware is
+// not running yet; otherwise Menu offers a reload so nothing stops in the middle of playing.
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  const updated = !!navigator.serviceWorker.controller;   // false on the very first visit: nothing to replace
+  navigator.serviceWorker.register("sw.js").then((registration)=> {
+    document.addEventListener("visibilitychange",()=> { if (!document.hidden) registration.update().catch(()=>{}); });
+  }).catch(()=>{});
+  navigator.serviceWorker.addEventListener("controllerchange",()=> {
+    if (!updated) return;
+    if (!node) { location.reload(); return; }
+    document.getElementById("update").hidden=false;
+    document.getElementById("settings-open").classList.add("has-update");
+  });
+  document.getElementById("update-reload").addEventListener("click",()=>location.reload());
+}

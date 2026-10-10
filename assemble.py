@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 import tarfile
 import json
+import hashlib
 
 HERE = Path(__file__).resolve().parent
 UPSTREAM = HERE.parent / "upstream"
@@ -41,7 +42,8 @@ for marker in ['const img = new ImageData(240, 240);', 'screenRenderer.draw(img)
 (HERE/'app.js').write_text((HERE/'panel.js').read_text()+'\n'+(HERE/'screen.js').read_text()+'\nlet audioContext = null;\n'+tail+'\n'+(HERE/'mobile.js').read_text())
 dist = HERE/'dist'
 dist.mkdir(exist_ok=True)
-for name in ['index.html','style.css','app.js','manifest.webmanifest','icon.svg']:
+ICONS = ['icon.svg','apple-touch-icon.png','icon-192.png','icon-512.png','icon-maskable-512.png']
+for name in ['index.html','style.css','app.js','manifest.webmanifest']+ICONS:
     shutil.copy2(HERE/name,dist/name)
 for name in ['worklet.js','x0x.wasm']:
     shutil.copy2(UPSTREAM/'build/emu'/name,dist/name)
@@ -49,11 +51,19 @@ for name in ['BarlowSemiCondensed-Medium.ttf','BarlowSemiCondensed-SemiBold.ttf'
     shutil.copy2(UPSTREAM/'assets/fonts'/name,dist/name)
 shutil.copy2(UPSTREAM/'LICENSE',dist/'LICENSE.txt')
 shutil.copy2(UPSTREAM/'LICENSING.md',dist/'LICENSING.md')
+# Everything the page needs offline; the source archive stays online-only.
+OFFLINE = ['index.html','style.css','app.js','manifest.webmanifest']+ICONS+['worklet.js','x0x.wasm',
+           'BarlowSemiCondensed-Medium.ttf','BarlowSemiCondensed-SemiBold.ttf','Barlow-OFL.txt','LICENSE.txt','LICENSING.md']
+digest=hashlib.sha256()
+for name in OFFLINE:
+    digest.update(name.encode()+b'\0'+(dist/name).read_bytes())
+(dist/'sw.js').write_text((HERE/'sw.js').read_text().replace('"__VERSION__"',json.dumps(digest.hexdigest()[:16]))
+                          .replace('__FILES__',json.dumps(OFFLINE)))
 with tarfile.open(dist/'source.tar.gz','w:gz') as archive:
     for file in UPSTREAM.rglob('*'):
         if file.is_file() and not any(part in ['.git','build'] for part in file.relative_to(UPSTREAM).parts):
             archive.add(file,arcname='fm1-mobile-emu/upstream/'+str(file.relative_to(UPSTREAM)))
-    for name in ['index.html','style.css','panel.js','screen.js','mobile.js','assemble.py','app.js','README.md','manifest.webmanifest','icon.svg']:
+    for name in ['index.html','style.css','panel.js','screen.js','mobile.js','sw.js','assemble.py','make_icons.py','app.js','README.md','manifest.webmanifest']+ICONS:
         archive.add(HERE/name,arcname='fm1-mobile-emu/app/'+name)
 manifest=HERE/'.openai/hosting.json'
 if manifest.exists():

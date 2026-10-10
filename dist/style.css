@@ -59,7 +59,11 @@ button:disabled { cursor: wait; opacity: .6; }
 }
 .tool:active { background: var(--control-on); }
 .tool[aria-pressed=true] { background: var(--control-on); border-color: #707075; }
-#settings-open { background: var(--accent); border-color: var(--accent-hi); color: var(--accent-ink); font-weight: 600; }
+#settings-open { position: relative; background: var(--accent); border-color: var(--accent-hi); color: var(--accent-ink); font-weight: 600; }
+#settings-open.has-update::after { /* an update is waiting in Menu */
+  content: ""; position: absolute; top: -4px; right: -4px; width: 10px; height: 10px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--bar);
+}
 
 /* ---------------------------------------------------------------- device grid */
 .device {
@@ -207,6 +211,7 @@ dialog button, .slot label {
 .setting { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 10px 8px 12px; border-radius: 6px; background: var(--inset); border: 1px solid #3f3f43; }
 .setting-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; font-size: 15px; }
 .setting-text small { font-size: 12px; color: var(--muted); }
+.setting.update { border-color: var(--accent); }
 .display-led { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #48484c; }
 .app-shell.running ~ dialog .display-led { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
 #audio-toggle { min-width: 84px; }
