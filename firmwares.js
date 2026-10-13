@@ -32,6 +32,27 @@ const FIRMWARES = {
     kind: "store", wasm: "fw/fimba/kalimba.wasm", worklet: "fw/fimba/worklet.js", processor: "kalimba",
     store: "fimba-emu-store", masterMax: 4096, masterDefault: 2800,
   },
+  melodee: {
+    name: "Melodee", tag: "MELODEE", by: "keremimo, after Felucca", repo: "https://github.com/keremimo/melodee",
+    about: "Multi-engine synth and sequencer: CZ-1, six-operator FM, Prophet, microtonal scales.",
+    manual: "https://github.com/keremimo/melodee#readme",
+    kind: "flash", wasm: "fw/melodee/melodee.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "melodee", masterMax: 1023, masterDefault: 700,
+  },
+  amb: {
+    name: "AMB-1", tag: "AMB-1", by: "Charles Vestal", repo: "https://github.com/charlesvestal/fm1-amb",
+    about: "Generative ambient: breathing voices, bells on unequal tape loops, a gliding bass.",
+    manual: "https://charlesvestal.github.io/fm1-amb/manual/",
+    kind: "store", wasm: "fw/amb/amb.wasm", worklet: "fw/amb/worklet.js", processor: "amb",
+    store: "amb-emu-store", masterMax: 4096, masterDefault: 2800,
+  },
+  maku: {
+    name: "MAKU", tag: "MAKU", by: "okumurari", repo: "https://github.com/okumurari2/maku",
+    about: "An always-on ambience machine: four parts, random worlds, drift and saved favourites.",
+    manual: "https://github.com/okumurari2/maku/blob/main/AMBIENT.md",
+    kind: "flash", wasm: "fw/maku/maku.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "maku", masterMax: 1023, masterDefault: 700,
+  },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit
 const FIRMWARE_KEY = "fm1-firmware";

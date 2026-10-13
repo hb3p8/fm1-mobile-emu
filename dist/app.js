@@ -1,4 +1,4 @@
-const FIRMWARE_BUILDS = {"x0x": {"version": "1.0.3", "commit": "00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62", "archive": "src/x0x.tar.gz"}, "felucca": {"version": "1.5.1", "commit": "a4d7ca2e5d52a4c35e2468401f00d883cadbda03", "archive": "src/felucca.tar.gz"}, "sloop": {"version": "2.5", "commit": "fa9ce5742f4aea9484e7c129dd81079d07e7321f", "archive": "src/sloop.tar.gz"}, "fimba": {"version": "0.6.0", "commit": "b2b647b91bb3e9f0014529a468eeb6ac65f90ad9", "archive": "src/fimba.tar.gz"}};
+const FIRMWARE_BUILDS = {"x0x": {"version": "1.0.6", "commit": "47f8e4c4ad602591b81c21bc5480db7a94f6d6af", "archive": "src/x0x.tar.gz", "prerelease": false, "release": "https://github.com/charlesvestal/fm1-x0x/releases/tag/v1.0.6", "screenshot": "screenshots/x0x.png"}, "felucca": {"version": "1.6", "commit": "1727537624390cc3f9c7dff2456b43b3a8edb005", "archive": "src/felucca.tar.gz", "prerelease": false, "release": "https://github.com/hugelton/Felucca/releases/tag/v1.6", "screenshot": "screenshots/felucca.png"}, "sloop": {"version": "2.6", "commit": "d30d6553353373cf5506b9ed285fc4a2aa0c30ef", "archive": "src/sloop.tar.gz", "prerelease": false, "release": "https://github.com/isod89/sloop-fm1/releases/tag/v2.6", "screenshot": "screenshots/sloop.png"}, "fimba": {"version": "0.6.1", "commit": "0485ed0d387ce78216428c7b19f97d77bbe10b4d", "archive": "src/fimba.tar.gz", "prerelease": true, "release": "https://github.com/jadamsowers/fm1-fimba/releases/tag/v0.6.1", "screenshot": "screenshots/fimba.png"}, "melodee": {"version": "1.4.0-rc.1", "commit": "fbc69717d9855542f6b109616ab8b0ad28783777", "archive": "src/melodee.tar.gz", "prerelease": true, "release": "https://github.com/keremimo/melodee/releases/tag/v1.4.0-rc.1", "screenshot": "screenshots/melodee.png"}, "amb": {"version": "1.1", "commit": "7e4d497ab52b3d4e1d0e9a228bc302a6e25f018a", "archive": "src/amb.tar.gz", "prerelease": false, "release": "https://github.com/charlesvestal/fm1-amb/releases/tag/v1.1", "screenshot": "screenshots/amb.png"}, "maku": {"version": "0.1", "commit": "db910aabfc979f172db87817eb9b377990ac2298", "archive": "src/maku.tar.gz", "prerelease": false, "release": "https://github.com/okumurari2/maku/releases/tag/v0.1", "screenshot": "screenshots/maku.png"}};
 // SPDX-License-Identifier: GPL-3.0-only
 // The firmwares this page runs: each is that firmware's own C code built for the browser (firmware/build.sh).
 // "store" ones (X0X's lineage) keep numbered save objects in localStorage; "flash" ones (Felucca's lineage)
@@ -32,6 +32,27 @@ const FIRMWARES = {
     manual: "https://github.com/jadamsowers/fm1-fimba#readme",
     kind: "store", wasm: "fw/fimba/kalimba.wasm", worklet: "fw/fimba/worklet.js", processor: "kalimba",
     store: "fimba-emu-store", masterMax: 4096, masterDefault: 2800,
+  },
+  melodee: {
+    name: "Melodee", tag: "MELODEE", by: "keremimo, after Felucca", repo: "https://github.com/keremimo/melodee",
+    about: "Multi-engine synth and sequencer: CZ-1, six-operator FM, Prophet, microtonal scales.",
+    manual: "https://github.com/keremimo/melodee#readme",
+    kind: "flash", wasm: "fw/melodee/melodee.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "melodee", masterMax: 1023, masterDefault: 700,
+  },
+  amb: {
+    name: "AMB-1", tag: "AMB-1", by: "Charles Vestal", repo: "https://github.com/charlesvestal/fm1-amb",
+    about: "Generative ambient: breathing voices, bells on unequal tape loops, a gliding bass.",
+    manual: "https://charlesvestal.github.io/fm1-amb/manual/",
+    kind: "store", wasm: "fw/amb/amb.wasm", worklet: "fw/amb/worklet.js", processor: "amb",
+    store: "amb-emu-store", masterMax: 4096, masterDefault: 2800,
+  },
+  maku: {
+    name: "MAKU", tag: "MAKU", by: "okumurari", repo: "https://github.com/okumurari2/maku",
+    about: "An always-on ambience machine: four parts, random worlds, drift and saved favourites.",
+    manual: "https://github.com/okumurari2/maku/blob/main/AMBIENT.md",
+    kind: "flash", wasm: "fw/maku/maku.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "maku", masterMax: 1023, masterDefault: 700,
   },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit
@@ -707,7 +728,7 @@ async function switchOn() {
         }
       };
     });
-    const load = FW.kind === "flash" ? { sectors: saved } : { store: saved };
+    const load = FW.kind === "flash" ? { sectors: saved, seed: crypto.getRandomValues(new Uint32Array(1))[0] } : { store: saved };
     node.port.postMessage({ type: "load", wasm, master, ...load }, [wasm]);
     await ready;
     if (FW.loops) [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
@@ -744,8 +765,12 @@ document.getElementById("reset").addEventListener("click", async (event) => {
     row.type = "button";
     row.className = "firmware";
     row.setAttribute("aria-pressed", String(id === FW_ID));
-    row.innerHTML = `<span class="firmware-name"></span><span class="firmware-about"></span><span class="firmware-by"></span>`;
-    row.querySelector(".firmware-name").textContent = `${f.name} ${f.version || ""}`.trim();
+    row.innerHTML = `<img class="firmware-shot" width="88" height="88"><span class="firmware-name"></span><span class="firmware-about"></span><span class="firmware-by"></span>`;
+    const shot = row.querySelector(".firmware-shot");
+    shot.src = f.screenshot;
+    shot.alt = `${f.name} screenshot from the FM-1 Firmware Hub`;
+    shot.loading = "lazy";
+    row.querySelector(".firmware-name").textContent = `${f.name} ${f.version || ""}${f.prerelease ? " · pre-release" : ""}`.trim();
     row.querySelector(".firmware-about").textContent = f.about;
     row.querySelector(".firmware-by").textContent = f.by;
     row.addEventListener("click", () => {

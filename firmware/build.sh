@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-3.0-only
-# Build the four firmwares for the browser (WebAssembly, Emscripten) into app/firmware/out/<id>/:
+# Build the pinned firmwares for the browser (WebAssembly, Emscripten) into app/firmware/out/<id>/:
 #   x0x      charlesvestal/fm1-x0x   its own web/emu build (x0x.wasm + worklet.js)
 #   felucca  hugelton/Felucca        its own web/emu build (felucca.wasm; app/firmware/flash-worklet.js plays it)
 #   sloop    isod89/sloop-fm1        no browser build upstream: app/firmware/sloop_web.c (felucca.wasm's design)
@@ -20,7 +20,7 @@ PY=${PYTHON:-$HERE/.venv/bin/python}
 PATH=$(dirname "$PY"):$PATH
 command -v emcc >/dev/null 2>&1 || { echo "firmware: no emcc (Emscripten)"; exit 1; }
 "$PY" -c 'import PIL, fontTools' || { echo "firmware: $PY needs Pillow and fontTools"; exit 1; }
-WANT=${*:-"x0x felucca sloop fimba"}
+WANT=${*:-"x0x felucca sloop fimba melodee amb maku"}
 EMCC_FLAGS="-O2 -ffp-contract=off -std=gnu99 -w --no-entry -sSTANDALONE_WASM -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=33554432 -sFILESYSTEM=0"
 
 gen() {   # generator script and output header, in the checkout, unless the header is there
@@ -37,12 +37,13 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
         rm -rf "$src/build"
     fi
     mkdir -p "$OUT/$id"
+    VERSION=$("$PY" -c 'import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]]["tag"].removeprefix("v"))' "$HERE/releases.json" "$id")
     cd "$src"
     case $id in
     x0x)
-        X0X_VERSION=1.0.3 sh web/emu/build.sh >/dev/null
+        X0X_VERSION="$VERSION" sh web/emu/build.sh >/dev/null
         cp build/emu/x0x.wasm build/emu/worklet.js "$OUT/$id/"
-        echo 1.0.3 > "$OUT/$id/version" ;;
+        echo "$VERSION" > "$OUT/$id/version" ;;
     felucca)
         mkdir -p build/gen
         [ -f build/gen/ui_fonts.h ] || "$PY" tools/gen_aa_font.py build/gen/ui_fonts.h --preset inter-tight >/dev/null 2>&1
@@ -66,6 +67,33 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
         OM_VERSION=$(cat VERSION) PYTHON="$PY" sh web/emu/build.sh >/dev/null
         cp build/emu/kalimba.wasm build/emu/worklet.js "$OUT/$id/"
         cp VERSION "$OUT/$id/version" ;;
+    amb)
+        EN_VERSION="$VERSION" sh web/emu/build.sh >/dev/null
+        cp build/emu/amb.wasm build/emu/worklet.js "$OUT/$id/"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    maku)
+        mkdir -p build/gen
+        [ -f build/gen/ui_fonts.h ] || "$PY" tools/gen_aa_font.py build/gen/ui_fonts.h --preset inter-tight >/dev/null 2>&1
+        for g in aa_icons:ui_icons aa_keycaps:ui_keycaps ui_palettes:ui_palettes tables:felucca_tables \
+                 fm6_patches:felucca_fm6 samples:felucca_samples; do
+            gen "gen_${g%%:*}.py" "build/gen/${g#*:}.h"
+        done
+        EMU_PREVIEW=0 sh web/emu/build.sh >/dev/null
+        cp build/emu/felucca.wasm "$OUT/$id/maku.wasm"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    melodee)
+        mkdir -p build/gen
+        [ -f build/gen/ui_fonts.h ] || "$PY" tools/gen_aa_font.py build/gen/ui_fonts.h --preset rubik >/dev/null 2>&1
+        for g in icons:ui_icons aa_keycaps:ui_keycaps ui_palettes:ui_palettes tables:melodee_tables \
+                 fm6_patches:melodee_fm6 cz1_factory:melodee_cz1 prophet_factory:melodee_prophet_factory \
+                 909_tables:x0x_drum_tables; do
+            gen "gen_${g%%:*}.py" "build/gen/${g#*:}.h"
+        done
+        # Melodee's documented serial (one-core) audio path, with the real UI and NOR storage.
+        emcc $EMCC_FLAGS -DMELODEE_DUAL_CORE=0 "-DMELODEE_VERSION=\"v$VERSION\"" \
+            -I. -Ifirmware/src -Ibuild/gen -o "$OUT/$id/melodee.wasm" "$HERE/melodee_web.c"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    *) echo "firmware: unsupported id $id" >&2; exit 1 ;;
     esac
     echo "$id $(cat "$OUT/$id/version"): $(ls "$OUT/$id" | tr '\n' ' ')"
     echo "$commit" > "$OUT/$id/commit"

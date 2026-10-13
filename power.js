@@ -110,7 +110,7 @@ async function switchOn() {
         }
       };
     });
-    const load = FW.kind === "flash" ? { sectors: saved } : { store: saved };
+    const load = FW.kind === "flash" ? { sectors: saved, seed: crypto.getRandomValues(new Uint32Array(1))[0] } : { store: saved };
     node.port.postMessage({ type: "load", wasm, master, ...load }, [wasm]);
     await ready;
     if (FW.loops) [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
@@ -147,8 +147,12 @@ document.getElementById("reset").addEventListener("click", async (event) => {
     row.type = "button";
     row.className = "firmware";
     row.setAttribute("aria-pressed", String(id === FW_ID));
-    row.innerHTML = `<span class="firmware-name"></span><span class="firmware-about"></span><span class="firmware-by"></span>`;
-    row.querySelector(".firmware-name").textContent = `${f.name} ${f.version || ""}`.trim();
+    row.innerHTML = `<img class="firmware-shot" width="88" height="88"><span class="firmware-name"></span><span class="firmware-about"></span><span class="firmware-by"></span>`;
+    const shot = row.querySelector(".firmware-shot");
+    shot.src = f.screenshot;
+    shot.alt = `${f.name} screenshot from the FM-1 Firmware Hub`;
+    shot.loading = "lazy";
+    row.querySelector(".firmware-name").textContent = `${f.name} ${f.version || ""}${f.prerelease ? " · pre-release" : ""}`.trim();
     row.querySelector(".firmware-about").textContent = f.about;
     row.querySelector(".firmware-by").textContent = f.by;
     row.addEventListener("click", () => {

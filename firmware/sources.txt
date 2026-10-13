@@ -1,6 +1,9 @@
 # The firmwares the app runs: id, checkout directory (under firmware/checkouts/), repository, pinned commit.
 # To update one, change its commit here and run firmware/build.sh then assemble.py (see README.md).
-x0x        fm1-x0x      https://github.com/charlesvestal/fm1-x0x.git      00bff73d6f8c0d5e5cf8c44314d0531efe0e8e62
-felucca    Felucca      https://github.com/hugelton/Felucca.git          a4d7ca2e5d52a4c35e2468401f00d883cadbda03
-sloop      sloop-fm1    https://github.com/isod89/sloop-fm1.git          fa9ce5742f4aea9484e7c129dd81079d07e7321f
-fimba      fm1-fimba    https://github.com/jadamsowers/fm1-fimba.git     b2b647b91bb3e9f0014529a468eeb6ac65f90ad9
+x0x        fm1-x0x      https://github.com/charlesvestal/fm1-x0x.git 47f8e4c4ad602591b81c21bc5480db7a94f6d6af
+felucca    Felucca      https://github.com/hugelton/Felucca.git 1727537624390cc3f9c7dff2456b43b3a8edb005
+sloop      sloop-fm1    https://github.com/isod89/sloop-fm1.git d30d6553353373cf5506b9ed285fc4a2aa0c30ef
+fimba      fm1-fimba    https://github.com/jadamsowers/fm1-fimba.git 0485ed0d387ce78216428c7b19f97d77bbe10b4d
+melodee    melodee      https://github.com/keremimo/melodee.git fbc69717d9855542f6b109616ab8b0ad28783777
+amb        fm1-amb      https://github.com/charlesvestal/fm1-amb.git 7e4d497ab52b3d4e1d0e9a228bc302a6e25f018a
+maku       maku         https://github.com/okumurari2/maku.git db910aabfc979f172db87817eb9b377990ac2298

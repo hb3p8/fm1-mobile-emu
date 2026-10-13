@@ -1,6 +1,6 @@
 # FM-1 Mobile
 
-The M-VAVE FM-1 on your phone: real FM-1 firmwares, their own C code compiled to WebAssembly, behind a touch panel laid out like the instrument. Pick X0X, Felucca, SLOOP or FiMba-1 in the menu, add the page to your home screen, and it works offline.
+The M-VAVE FM-1 on your phone: real FM-1 firmwares, their own C code compiled to WebAssembly, behind a touch panel laid out like the instrument. Pick X0X, Felucca, SLOOP, FiMba-1, Melodee, AMB-1 or MAKU in the menu, add the page to your home screen, and it works offline.
 
 **▶ Open it: <https://hb3p8.github.io/fm1-mobile-emu/>**
 
@@ -15,12 +15,15 @@ This is a fan project. It is not affiliated with M-VAVE or with the firmwares' a
 
 | Firmware | What it is | By |
 | --- | --- | --- |
-| [X0X](https://github.com/charlesvestal/fm1-x0x) 1.0.3 | Drum machine and acid bass line: 909 and 808 drums, a 303, breaks (your own loops too) | Charles Vestal |
-| [Felucca](https://github.com/hugelton/Felucca) 1.5.1 | Multi-engine synthesizer: thirteen engines, four tracks, a 64-step sequencer | Leo Kuroshita, Hügelton Instruments |
-| [SLOOP](https://github.com/isod89/sloop-fm1) 2.5 | Live groovebox: three synths and a drum machine, song mode, physical models | isod89, after Felucca |
-| [FiMba-1](https://github.com/jadamsowers/fm1-fimba) 0.6.0 | A kalimba: modelled tines on a body, thumb-roll chords, mbira patterns | Adam Sowers |
+| [X0X](https://github.com/charlesvestal/fm1-x0x) 1.0.6 | Drum machine and acid bass line: 909 and 808 drums, a 303, breaks (your own loops too) | Charles Vestal |
+| [Felucca](https://github.com/hugelton/Felucca) 1.6 | Multi-engine synthesizer: thirteen engines, four tracks, a 64-step sequencer | Leo Kuroshita, Hügelton Instruments |
+| [SLOOP](https://github.com/isod89/sloop-fm1) 2.6 | Live groovebox: three synths and a drum machine, song mode, physical models | isod89, after Felucca |
+| [FiMba-1](https://github.com/jadamsowers/fm1-fimba) 0.6.1 (pre-release) | A kalimba: modelled tines on a body, thumb-roll chords, mbira patterns | Adam Sowers |
+| [Melodee](https://github.com/keremimo/melodee) 1.4.0-rc.1 (pre-release) | Multi-engine synthesizer: CZ-1, FM6, Prophet, microtonal scales and sequencing | keremimo |
+| [AMB-1](https://github.com/charlesvestal/fm1-amb) 1.1 | Generative ambient voices, bells on tape loops and a gliding bass | Charles Vestal |
+| [MAKU](https://github.com/okumurari2/maku) 0.1 | An always-on ambience machine with random worlds and saved favourites | okumurari |
 
-Each firmware's manual is linked from the menu. Their saved work (patterns, projects, settings) stays in the browser, separately for each, and survives switching between them.
+Each firmware's manual is linked from the menu. All seven have screenshot previews from [the FM-1 Firmware Hub](https://fm1.designburgapps.com/); the images are kept locally for offline use, with original URLs and checksums in `screenshots/sources.json`. Release tags, dates and pre-release status are recorded in `firmware/releases.json`. Their saved work (patterns, projects, settings) stays in the browser, separately for each, and survives switching between them.
 
 ## Using it
 
@@ -48,7 +51,7 @@ Each firmware is built from its own source with its host simulator: the whole FM
 | Offline | `sw.js`: the service worker; `assemble.py` writes its file list and a version hash |
 | The site | `dist/`: what GitHub Pages serves, made by `assemble.py` and committed |
 
-Two kinds of firmware build exist. X0X and FiMba-1 (the X0X line) keep numbered save objects, kept in localStorage, and come with their own worklet. Felucca and SLOOP (the Felucca line) write a simulated 1 MiB NOR flash; `firmware/flash-worklet.js` sends the page every changed 4 KiB sector, kept in IndexedDB. SLOOP has no browser build of its own: `firmware/sloop_web.c` is Felucca's (`web/emu/felucca_web.c`) fitted to SLOOP's sources, without changing any of them. The emulator cannot load FM-1 `.fwsc` update packages, which hold machine code for the instrument's processor.
+Two kinds of firmware build exist. X0X, FiMba-1 and AMB-1 (the X0X line) keep numbered save objects, kept in localStorage, and come with their own worklet. Felucca, SLOOP, Melodee and MAKU (the Felucca line) write a simulated 1 MiB NOR flash; `firmware/flash-worklet.js` sends the page every changed 4 KiB sector, kept in IndexedDB. SLOOP has no browser build of its own: `firmware/sloop_web.c` is Felucca's (`web/emu/felucca_web.c`) fitted to SLOOP's sources, without changing any of them. Melodee similarly uses `firmware/melodee_web.c`: the real DSP, UI and NOR persistence, with its supported one-core audio path. It does not emulate the second hardware CPU, PLL clock switching or USB audio. MAKU uses its own browser build, with a fresh world seed each launch. The emulator cannot load FM-1 `.fwsc` update packages, which hold machine code for the instrument's processor.
 
 ## Building
 
@@ -58,7 +61,7 @@ You need Git, [Emscripten](https://emscripten.org) (`emcc`), and Python 3 with P
 git clone git@github.com:hb3p8/fm1-mobile-emu.git && cd fm1-mobile-emu
 python3 -m venv firmware/.venv
 firmware/.venv/bin/pip install Pillow fonttools
-firmware/build.sh            # clones the four firmwares into firmware/checkouts/ and builds them into firmware/out/
+firmware/build.sh            # clones the seven firmwares into firmware/checkouts/ and builds them into firmware/out/
 python3 assemble.py          # writes dist/: the page, the firmwares, sw.js, the source archives
 python3 -m http.server 4180 --directory dist --bind 127.0.0.1
 ```
@@ -72,7 +75,7 @@ Open <http://localhost:4180>. Sound needs a secure page, so a phone on the same 
 1. Find the commit to use in the firmware's repository (usually its latest release) and put it in `firmware/sources.txt`.
 2. `firmware/build.sh <id>`: moves the checkout to that commit, regenerates its tables, fonts and samples, and builds it. It prints the version it found (from the firmware's own sources).
 3. `python3 assemble.py`.
-4. Try it locally: start it, play, save something, reload and check it is still there. A firmware that changes its storage format can ignore or reset older saved work; its release notes say so.
+4. `node firmware/smoke.mjs` verifies the shipped worklets and WebAssembly: boot, screens, audio, input and saved work restore. Try it locally: start it, play, save something, reload and check it is still there. A firmware that changes its storage format can ignore or reset older saved work; its release notes say so.
 5. Commit everything, including `dist/`, and push. GitHub Pages publishes it, and installed copies pick it up at their next launch with a connection.
 
 What can need attention:

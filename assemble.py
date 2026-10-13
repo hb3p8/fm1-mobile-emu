@@ -46,11 +46,14 @@ for marker in ['const img = new ImageData(240, 240);', 'screenRenderer.draw(img)
 assert '4096' not in tail, 'upstream changed: a MASTER range left'
 
 builds = {}
+releases = json.loads((HERE/'firmware/releases.json').read_text())
 for fid, directory, repo, commit in SOURCES:
     out = FW_OUT / fid
     assert (out / 'commit').read_text().strip() == commit, f'{fid}: run firmware/build.sh (built from another commit)'
     builds[fid] = {'version': (out / 'version').read_text().strip(), 'commit': commit,
-                   'archive': f'src/{fid}.tar.gz'}
+                   'archive': f'src/{fid}.tar.gz', 'prerelease': releases[fid]['prerelease'],
+                   'release': f"https://github.com/{releases[fid]['repo']}/releases/tag/{releases[fid]['tag']}",
+                   'screenshot': f'screenshots/{fid}.png'}
 app_js = ('const FIRMWARE_BUILDS = ' + json.dumps(builds) + ';\n' + (HERE/'firmwares.js').read_text() + '\n' +
           (HERE/'panel.js').read_text() + '\n' + (HERE/'screen.js').read_text() + '\nlet audioContext = null;\n' + tail + '\n' +
           (HERE/'power.js').read_text() + '\n' + (HERE/'mobile.js').read_text())
@@ -67,7 +70,9 @@ dist.mkdir(exist_ok=True)
 ICONS = ['icon.svg','apple-touch-icon.png','icon-192.png','icon-512.png','icon-maskable-512.png']
 for name in ['index.html','style.css','app.js','manifest.webmanifest']+ICONS:
     shutil.copy2(HERE/name,dist/name)
-FW_FILES = {'x0x': ['x0x.wasm', 'worklet.js'], 'felucca': ['felucca.wasm'], 'sloop': ['sloop.wasm'], 'fimba': ['kalimba.wasm', 'worklet.js']}
+FW_FILES = {'x0x': ['x0x.wasm', 'worklet.js'], 'felucca': ['felucca.wasm'], 'sloop': ['sloop.wasm'],
+            'fimba': ['kalimba.wasm', 'worklet.js'], 'melodee': ['melodee.wasm'],
+            'amb': ['amb.wasm', 'worklet.js'], 'maku': ['maku.wasm']}
 firmware_files = ['fw/flash-worklet.js']
 (dist/'fw').mkdir()
 shutil.copy2(HERE/'firmware/flash-worklet.js', dist/'fw/flash-worklet.js')
@@ -80,9 +85,10 @@ for name in ['BarlowSemiCondensed-Medium.ttf','BarlowSemiCondensed-SemiBold.ttf'
     shutil.copy2(UPSTREAM/'assets/fonts'/name,dist/name)
 shutil.copy2(UPSTREAM/'LICENSE',dist/'LICENSE.txt')
 shutil.copy2(UPSTREAM/'LICENSING.md',dist/'LICENSING.md')
+shutil.copytree(HERE/'screenshots',dist/'screenshots',dirs_exist_ok=True)
 
 # Everything the page needs offline; the source archives stay online-only.
-OFFLINE = ['index.html','style.css','app.js','manifest.webmanifest']+ICONS+firmware_files+[
+OFFLINE = ['index.html','style.css','app.js','manifest.webmanifest']+ICONS+firmware_files+[f'screenshots/{fid}.png' for fid in builds]+[
            'BarlowSemiCondensed-Medium.ttf','BarlowSemiCondensed-SemiBold.ttf','Barlow-OFL.txt','LICENSE.txt','LICENSING.md']
 digest=hashlib.sha256()
 for name in OFFLINE:
@@ -112,7 +118,8 @@ def tree(base, prefix):
 APP_FILES = ['index.html','style.css','firmwares.js','panel.js','screen.js','power.js','mobile.js','sw.js','assemble.py',
              'make_icons.py','app.js','README.md','LICENSE','manifest.webmanifest','.gitignore']+ICONS
 archive(dist/'source.tar.gz', [('fm1-mobile-emu/'+n, HERE/n) for n in APP_FILES] +
-        tree(HERE/'firmware', 'fm1-mobile-emu/firmware/') + tree(HERE/'.github', 'fm1-mobile-emu/.github/'))
+        tree(HERE/'firmware', 'fm1-mobile-emu/firmware/') + tree(HERE/'.github', 'fm1-mobile-emu/.github/') +
+        tree(HERE/'screenshots', 'fm1-mobile-emu/screenshots/'))
 for fid, directory, repo, commit in SOURCES:
     archive(dist/'src'/f'{fid}.tar.gz', tree(CHECKOUTS/directory, f'{directory}/'))
 

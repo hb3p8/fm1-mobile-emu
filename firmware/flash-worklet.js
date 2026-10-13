@@ -36,6 +36,7 @@ class FlashFirmware extends AudioWorkletProcessor {
           if (off % SECTOR === 0 && off + SECTOR <= nor.length && b.length === SECTOR) nor.set(b, off);
         }
         this.sent = nor.slice();
+        if (ex.web_set_seed) ex.web_set_seed(m.seed ?? 0);
         ex.web_master(m.master ?? 700);
         ex.web_boot();
         this.ex = ex;
