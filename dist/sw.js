@@ -2,8 +2,8 @@
 // Offline cache. assemble.py fills in VERSION (a hash of every file below) and FILES, so any
 // rebuild changes this script; the browser notices on the next online launch, installs the new
 // files next to the old ones and the page switches over (see mobile.js).
-const VERSION = "54b9f22d591a4f4c";
-const FILES = ["index.html", "style.css", "app.js", "manifest.webmanifest", "icon.svg", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "fw/flash-worklet.js", "fw/x0x/x0x.wasm", "fw/x0x/worklet.js", "fw/felucca/felucca.wasm", "fw/sloop/sloop.wasm", "fw/fimba/kalimba.wasm", "fw/fimba/worklet.js", "fw/melodee/melodee.wasm", "fw/amb/amb.wasm", "fw/amb/worklet.js", "fw/maku/maku.wasm", "screenshots/x0x.png", "screenshots/felucca.png", "screenshots/sloop.png", "screenshots/fimba.png", "screenshots/melodee.png", "screenshots/amb.png", "screenshots/maku.png", "BarlowSemiCondensed-Medium.ttf", "BarlowSemiCondensed-SemiBold.ttf", "Barlow-OFL.txt", "LICENSE.txt", "LICENSING.md"];
+const VERSION = "031be2c6aa076242";
+const FILES = ["index.html", "style.css", "app.js", "manifest.webmanifest", "icon.svg", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "engine/fm1_web.wasm", "engine/worklet.js", "engine/fwsc.js", "engine/LICENSE.txt", "packages/x0x.fwsc", "packages/felucca.fwsc", "packages/sloop.fwsc", "packages/fimba.fwsc", "packages/melodee.fwsc", "packages/amb.fwsc", "packages/maku.fwsc", "screenshots/x0x.png", "screenshots/felucca.png", "screenshots/sloop.png", "screenshots/fimba.png", "screenshots/melodee.png", "screenshots/amb.png", "screenshots/maku.png", "BarlowSemiCondensed-Medium.ttf", "BarlowSemiCondensed-SemiBold.ttf", "Barlow-OFL.txt", "LICENSE.txt", "LICENSING.md"];
 const CACHE = "fm1-x0x-" + VERSION;
 
 self.addEventListener("install", (event) => {
