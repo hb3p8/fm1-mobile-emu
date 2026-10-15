@@ -277,21 +277,3 @@ a { color: var(--accent-hi); }
   .brand { font-size: 16px; }
   .tool { font-size: 17px; padding: 0 12px; }
 }
-/* Additional hardware firmware catalog; the seven screenshot cards stay at the top. */
-.more-firmwares { margin-top: 16px; }
-.more-firmwares summary { cursor: pointer; padding: 12px 14px; border: 1px solid #484849; border-radius: 8px; font-weight: 600; }
-.more-firmwares summary > span { float: right; font-size: 13px; font-weight: 400; color: #a9a7a3; }
-.firmware-search { display: grid; gap: 6px; margin: 12px 0; font-size: 13px; }
-.firmware-search input { width: 100%; box-sizing: border-box; padding: 12px; background: #171718; color: #f2eee6; border: 1px solid #484849; border-radius: 6px; font: inherit; font-size: 16px; }
-.firmware.firmware-compact { grid-template-columns: 1fr; gap: 4px; }
-.firmware.firmware-compact > span { grid-column: 1; }
-.firmware[hidden] { display: none; }
-.firmware-open { margin-top: 16px; }
-.firmware-open .file-button { display: inline-block; padding: 10px 14px; background: #353536; border: 1px solid #62605b; border-radius: 6px; cursor: pointer; font-weight: 600; }
-.file-button input { width: 1px; height: 1px; position: absolute; opacity: 0; }
-.file-button:focus-within { outline: 2px solid #ffae45; outline-offset: 3px; }
-#bring-firmware { display: block; margin-top: 12px; }
-#bring-firmware[hidden] { display: none; }
-
-.more-firmwares:not([open]) > :not(summary) { display: none; }
-.firmware-compact .firmware-about { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }

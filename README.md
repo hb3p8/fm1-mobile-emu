@@ -1,77 +1,102 @@
 # FM-1 Mobile
 
-The M-VAVE FM-1 on your phone: **original hardware `.fwsc` packages**, executed by [Joakim Eriksson's fm1-emu](https://github.com/joakimeriksson/fm1-emu) CPU emulator behind a touch panel laid out like the instrument.
+The M-VAVE FM-1 on your phone: real FM-1 firmwares, their own C code compiled to WebAssembly, behind a touch panel laid out like the instrument. Pick X0X, Felucca, SLOOP, FiMba-1, Melodee, AMB-1 or MAKU in the menu, add the page to your home screen, and it works offline.
 
-**[Play on GitHub Pages](https://hb3p8.github.io/fm1-mobile-emu/)**
+**▶ Open it: <https://hb3p8.github.io/fm1-mobile-emu/>**
 
-The square screen spans the phone in portrait; landscape puts MASTER / SELECT / PRESETS / ALGORITHM and OCT− / OCT+ to its left and KNOB1–4 and the function buttons to its right. The compact Synth One style keyboard has one row of 16 white keys with 11 short black keys above them. Rotating changes the layout while the firmware continues running.
+<p>
+<img src="docs/landscape-x0x.jpg" alt="X0X in landscape: the encoders and OCT left of the screen, KNOB1–4 and the function buttons right of it, the keys below" width="560">
+<img src="docs/portrait-sloop.jpg" alt="SLOOP in portrait: the screen on top, then the encoders, knobs, buttons and keys" width="200">
+</p>
 
-## Firmware menu
+This is a fan project. It is not affiliated with M-VAVE or with the firmwares' authors; M-VAVE and FM-1 are trademarks of their owners.
 
-The seven screenshot cards stay in the main menu:
+## The firmwares
 
-| Firmware | Pinned hardware release |
-|---|---|
-| X0X | 1.0.6 |
-| Felucca | 1.6 |
-| SLOOP | 2.6 |
-| FiMba-1 | 0.6.1, pre-release |
-| Melodee | 1.4.0-rc.1, pre-release, dual-core build |
-| AMB-1 | 1.1 |
-| MAKU | 0.1 |
+| Firmware | What it is | By |
+| --- | --- | --- |
+| [X0X](https://github.com/charlesvestal/fm1-x0x) 1.0.6 | Drum machine and acid bass line: 909 and 808 drums, a 303, breaks (your own loops too) | Charles Vestal |
+| [Felucca](https://github.com/hugelton/Felucca) 1.6 | Multi-engine synthesizer: thirteen engines, four tracks, a 64-step sequencer | Leo Kuroshita, Hügelton Instruments |
+| [SLOOP](https://github.com/isod89/sloop-fm1) 2.6 | Live groovebox: three synths and a drum machine, song mode, physical models | isod89, after Felucca |
+| [FiMba-1](https://github.com/jadamsowers/fm1-fimba) 0.6.1 (pre-release) | A kalimba: modelled tines on a body, thumb-roll chords, mbira patterns | Adam Sowers |
+| [Melodee](https://github.com/keremimo/melodee) 1.4.0-rc.1 (pre-release) | Multi-engine synthesizer: CZ-1, FM6, Prophet, microtonal scales and sequencing | keremimo |
+| [AMB-1](https://github.com/charlesvestal/fm1-amb) 1.1 | Generative ambient voices, bells on tape loops and a gliding bass | Charles Vestal |
+| [MAKU](https://github.com/okumurari2/maku) 0.1 | An always-on ambience machine with random worlds and saved favourites | okumurari |
 
-**More** opens the complete upstream catalog, with search: 36 entries including these seven and M-VAVE's stock firmware. Extra packages download from their authors and are kept in IndexedDB for the next launch, including offline. The seven main packages ship with the page and are cached with it. Their bytes and SHA-256 checksums are pinned in `firmware/packages.json`; they are not recompiled or modified.
+Each firmware's manual is linked from the menu. All seven have screenshot previews from [the FM-1 Firmware Hub](https://fm1.designburgapps.com/); the images are kept locally for offline use, with original URLs and checksums in `screenshots/sources.json`. Release tags, dates and pre-release status are recorded in `firmware/releases.json`. Their saved work (patterns, projects, settings) stays in the browser, separately for each, and survives switching between them.
 
-**Open .fwsc** loads another FM-1 update package from the device and keeps it locally. Select M-VAVE's stock entry in More to see its download link, then open the downloaded file. M-VAVE's package is not hosted by this project. SMK-37 packages are rejected because this panel has the FM-1's controls.
+## Using it
 
-The seven thumbnails are from the [FM-1 Firmware Hub](https://fm1.designburgapps.com/), by the firmware authors. `screenshots/sources.json` records their URLs and checksums. Main releases remain pinned independently of the extended catalog.
+Open the link in Safari or Chrome on the phone. The firmware starts at once; the first touch anywhere starts the sound (browsers allow sound only after a user's action). On an iPhone it plays with the silent switch on.
 
-## Playing
+- **Install:** Share > Add to Home Screen (iOS) or Install app (Android). From the home screen it runs full screen and offline. When a new version is published it is fetched in the background at the next launch with a connection, and taken over at once if you have not touched the page yet, otherwise offered as Menu > Update ready.
+- **Panel:** as on the FM-1. MASTER, SELECT, PRESETS and ALGORITHM in a 2×2 block over OCT− / OCT+ (left of the screen in landscape), KNOB1–4 over the twelve function buttons, the 27 keys below. Rotating the phone changes only the layout; the firmware keeps running.
+- **Knobs:** drag up or down. **Keys:** several fingers at once, and glide across them.
+- **Hold:** latches the buttons you tap until you tap them again, for the FM-1's button combinations with one finger (SEL + another button). On a computer, Shift + click does the same.
+- **Menu:** the sound (pause / resume), screen smoothing (xBR, off by default), the firmware, your loops (X0X), help, erasing the current firmware's saved work, the manual and the sources.
+- **Computer keyboard:** Space PLAY, Enter REC, Shift SEL, Esc HOME, Z / X OCT− / OCT+, Q–I and A–K the white keys, 1–0 and − the black ones, ↑ / ↓ SELECT.
 
-Open the page in Safari or Chrome. The first tap starts audio; use Add to Home Screen for the full phone display and offline use. Knobs turn by dragging up or down or using a mouse wheel. Keys support multi-touch and glissando. **Hold** latches buttons for one-finger combinations; Shift + click does the same on a computer.
+The screen is the firmware's 240 × 240 frame drawn by the GPU at the display's own pixels: sharp square pixels, at a whole multiple when that costs at most a tenth of the size (on an iPhone XR from the home screen: 2× in landscape, 3× in portrait). Menu > Screen smoothing switches to xBR, the edge-directed filter of retro game emulators.
 
-Space is PLAY, Enter REC, Shift SEL, Esc HOME, Z / X octave, ↑ / ↓ SELECT. Q–I and A–K play the white keys, 1–0 and minus the black keys. Menu contains pause, xBR screen smoothing, firmware selection, X0X loop import, help and source links. Smoothing is off by default for sharp original pixels.
+## How it works
 
-X0X accepts three sample slots, each with up to 16 audio files and about 7 seconds total. Imports are encoded into the hardware's IMA ADPCM flash format. Changing a slot restarts the firmware so it scans the slots again; save your pattern first. Existing imported loops are carried across the engine change.
+Each firmware is built from its own source with its host simulator: the whole FM-1 application (UI, sequencer, sound engines, storage) against a simulated FM-1 instead of the hardware. It runs in an AudioWorklet: rendering audio advances the device's clock, which runs the firmware's audio interrupt and main loop exactly as on the instrument. Around 30 times a second the worklet sends the screen and the LEDs to the page; the page sends the buttons, keys and knobs back.
 
-## Saves and the engine change
+| Part | Files |
+| --- | --- |
+| Panel, layout, input | `index.html`, `style.css`, `panel.js`, `mobile.js`, and X0X's own page script (input, screen, storage), taken from its checkout by `assemble.py` |
+| Screen | `screen.js`: WebGL, nearest pixels or xBR level 2 (Hyllian) |
+| Firmware choice and start-up | `firmwares.js` (the list), `power.js` (loading, sound, saved work) |
+| Firmware builds | `firmware/sources.txt` (pinned commits), `firmware/build.sh`, `firmware/sloop_web.c`, `firmware/flash-worklet.js` |
+| Offline | `sw.js`: the service worker; `assemble.py` writes its file list and a version hash |
+| The site | `dist/`: what GitHub Pages serves, made by `assemble.py` and committed |
 
-The engine executes the unmodified pi32v2 machine code from each update package. It models both CPU cores, timers, interrupts, GPIO/key scanning, encoders, ADC, LCD, SPI flash and audio DMA. Hot instructions are JIT compiled to WebAssembly in the AudioWorklet. The emulated clock is 240 MHz, audio 44.1 kHz. Firmware is no longer built as a host-simulator C port.
+Two kinds of firmware build exist. X0X, FiMba-1 and AMB-1 (the X0X line) keep numbered save objects, kept in localStorage, and come with their own worklet. Felucca, SLOOP, Melodee and MAKU (the Felucca line) write a simulated 1 MiB NOR flash; `firmware/flash-worklet.js` sends the page every changed 4 KiB sector, kept in IndexedDB. SLOOP has no browser build of its own: `firmware/sloop_web.c` is Felucca's (`web/emu/felucca_web.c`) fitted to SLOOP's sources, without changing any of them. Melodee similarly uses `firmware/melodee_web.c`: the real DSP, UI and NOR persistence, with its supported one-core audio path. It does not emulate the second hardware CPU, PLL clock switching or USB audio. MAKU uses its own browser build, with a fresh world seed each launch. The emulator cannot load FM-1 `.fwsc` update packages, which hold machine code for the instrument's processor.
 
-Our small MIT patch adds flash access, an erase/program revision counter and fresh host entropy for the emulated hardware RNG (including MAKU worlds). Changed 4 KiB sectors are stored separately for each firmware in IndexedDB `fm1-hardware`. A flush before switching waits for pending flash writes. Local packages get a namespace based on their SHA-256, so opening a different file does not overwrite another file's saved work.
+## Building
 
-On the first launch after migration, Felucca-family NOR sectors are copied from the old `fm1-flash` database. X0X / FiMba-1 / AMB-1 objects in localStorage are wrapped in their actual A/B storage headers with CRC32. The original browser data is retained. An explicit marker prevents an erased hardware save from being re-imported on the next launch. Each firmware's own SAVE / autosave rules still apply; work not saved by the firmware is not a snapshot of CPU RAM.
-
-This remains an emulator, with the hardware support provided by fm1-emu. USB devices are not forwarded to real hardware. Additional catalog firmware can require features the emulator has not implemented. On loading or runtime errors the screen reports the problem and Menu remains available.
-
-## Build and verify
-
-Requires Git, Python 3, Node.js for tests, and Rust with the `wasm32-unknown-unknown` target. On macOS the upstream build prefers rustup's stable toolchain (Homebrew rustc alone lacks that target).
+You need Git, [Emscripten](https://emscripten.org) (`emcc`), and Python 3 with Pillow and fontTools; Pillow needs its text layout (raqm), which on macOS comes with `brew install fribidi`.
 
 ```sh
-rustup target add wasm32-unknown-unknown
-firmware/build.sh           # builds the pinned emulator; verifies/downloads seven .fwsc files
-python3 assemble.py         # writes app.js, dist/, offline cache and source archives
-node firmware/smoke.mjs     # boots all seven hardware packages, tests audio/input/JIT/flash restore
-node firmware/formats.mjs   # sample format against upstream encoder; migrated save CRCs
-python3 -m http.server 4180 --directory dist
+git clone git@github.com:hb3p8/fm1-mobile-emu.git && cd fm1-mobile-emu
+python3 -m venv firmware/.venv
+firmware/.venv/bin/pip install Pillow fonttools
+firmware/build.sh            # clones the seven firmwares into firmware/checkouts/ and builds them into firmware/out/
+python3 assemble.py          # writes dist/: the page, the firmwares, sw.js, the source archives
+python3 -m http.server 4180 --directory dist --bind 127.0.0.1
 ```
 
-`firmware/emulator.json` pins the upstream engine commit. `firmware/emulator.patch` adds the persistence revision; `firmware/mobile.rs` exports the flash bridge. The build applies that patch and includes the bridge. `firmware/catalog.json` is the extended upstream catalog with verified moved URLs. The seven corresponding GPL source archives in `dist/src/` are retained with the binary releases. `assets/` contains the panel font and its notices.
+Open <http://localhost:4180>. Sound needs a secure page, so a phone on the same Wi-Fi cannot use a plain `http://192.168…` address; use the published site, or a tunnel to this server (for example `cloudflared tunnel --url http://localhost:4180`).
 
-| File | Purpose |
-|---|---|
-| `firmwares.js`, `power.js` | Main cards, More/search, package loading, audio and persistence |
-| `panel.js`, `input.js`, `mobile.js` | Responsive controls, hardware input mapping, gestures and PWA updates |
-| `screen.js` | Pixel and xBR rendering of the hardware LCD's RGB565 frame |
-| `flash.js`, `loops.js` | Old save conversion, IMA sample format and import UI |
-| `firmware/worklet.js` | Hardware emulator, JIT, input debounce, screen/LED and dirty flash messages |
-| `assemble.py`, `sw.js` | Static bundle, offline cache and source archives |
+`firmware/build.sh x0x felucca` builds only those. The builds are reproducible: the same commits give the same `.wasm` files and the same source archives byte for byte, so only real changes show up in Git. `firmware/.venv/bin/python make_icons.py` redraws the PNG icons after a change to `icon.svg`.
 
-GitHub Actions publishes the committed `dist/` on pushes to `main`. Existing installations offer **Update ready → Reload** in Menu when sound is running; an idle page switches automatically.
+## Updating a firmware
 
-## Credits and licensing
+1. Find the commit to use in the firmware's repository (usually its latest release) and put it in `firmware/sources.txt`.
+2. `firmware/build.sh <id>`: moves the checkout to that commit, regenerates its tables, fonts and samples, and builds it. It prints the version it found (from the firmware's own sources).
+3. `python3 assemble.py`.
+4. `node firmware/smoke.mjs` verifies the shipped worklets and WebAssembly: boot, screens, audio, input and saved work restore. Try it locally: start it, play, save something, reload and check it is still there. A firmware that changes its storage format can ignore or reset older saved work; its release notes say so.
+5. Commit everything, including `dist/`, and push. GitHub Pages publishes it, and installed copies pick it up at their next launch with a connection.
 
-App: GPL-3.0-only (`LICENSE`). CPU emulator: MIT, Copyright (c) 2026 Joakim Eriksson (`dist/engine/LICENSE.txt`). Input handling, loop UI and storage formats derive from Charles Vestal's X0X (GPL-3.0-only), built on Felucca by Leo Kuroshita / Hügelton Instruments. Seven main firmwares: X0X and AMB-1 by Charles Vestal; Felucca by Hügelton Instruments; SLOOP by isod89; FiMba-1 by Adam Sowers; Melodee by keremimo; MAKU by okumurari. The extended catalog lists its authors and repositories. xBR filter by Hyllian. Barlow font notices in `assets/`.
+What can need attention:
 
-App, emulator and the seven corresponding firmware source archives are linked from Menu. This fan project is not affiliated with M-VAVE or the firmware authors. M-VAVE and FM-1 are their owners' trademarks.
+- **X0X:** `assemble.py` reuses parts of X0X's page script (`web/emu/index.html`) and edits a few of its lines; it stops with "upstream changed: …" when one of them has moved. Update the matching `tail.replace(...)` line.
+- **SLOOP:** `firmware/sloop_web.c` follows SLOOP's `firmware/src/felucca.c` (the order of the sources), `main.c` (the boot steps and the main loop) and the hardware functions they call. When a new SLOOP adds a source file, a boot step or a hardware call, `build.sh sloop` fails to compile or the screen stays dark: compare those files with the previous commit and mirror the change, as Felucca's own `web/emu/felucca_web.c` does for Felucca.
+- **Felucca, FiMba-1:** their browser builds are their own (`web/emu/build.sh`); if one changes the exports the worklets use (`web_*`), compare with `firmware/flash-worklet.js` or the firmware's own `worklet.js`.
+- **Generated headers:** `build.sh` regenerates them whenever the commit changes; to force it, delete the checkout's `build/` directory.
+
+## Adding a firmware
+
+It needs a browser build of its own source: a host simulator compiled to a standalone `.wasm` with the X0X-style exports (`web_render`, `web_buttons`, `web_keys`, `web_enc`, `web_master`, `web_fb`, `web_lit_buttons`, `web_store*` …) or the Felucca-style ones (`web_nor*`, `web_screen`, `web_flash_writes_count` …). Then add a line to `firmware/sources.txt`, a `case` to `firmware/build.sh`, an entry to `firmwares.js` (name, kind, files, MASTER range) and its files to `FW_FILES` in `assemble.py`.
+
+## Publishing
+
+`.github/workflows/pages.yml` publishes the committed `dist/` to GitHub Pages on every push to `main` (Settings > Pages > Source: GitHub Actions). All paths are relative, so the site works from any folder.
+
+## Licence and credits
+
+GPL-3.0-only (`LICENSE`), as every firmware here. `dist/source.tar.gz` is this app's source; `dist/src/<firmware>.tar.gz` holds each firmware's source tree exactly as built, and both are linked from the menu.
+
+- Firmwares: X0X by Charles Vestal, Felucca by Leo Kuroshita / Hügelton Instruments, SLOOP by isod89, FiMba-1 by Adam Sowers; see each source tree's `LICENSING.md` for the parts they build on.
+- The browser emulator design (the device clock driven by the audio worklet) is X0X's, after an idea by Groove OS; the Felucca-family worklet and `sloop_web.c` follow Felucca's browser build.
+- Screen filter: xBR level 2 by Hyllian (MIT). The look follows AudioKit Synth One. Font: Barlow Semi Condensed (SIL OFL 1.1).
