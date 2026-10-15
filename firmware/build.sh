@@ -5,6 +5,7 @@
 #   felucca  hugelton/Felucca        its own web/emu build (felucca.wasm; app/firmware/flash-worklet.js plays it)
 #   sloop    isod89/sloop-fm1        no browser build upstream: app/firmware/sloop_web.c (felucca.wasm's design)
 #   fimba    jadamsowers/fm1-fimba   its own web/emu build (kalimba.wasm + worklet.js)
+# HYP-1, GHOULBOX and ChoralRoot use their own upstream source simulators as well.
 # The checkouts live in firmware/checkouts/ (sources.txt: directory, repository, pinned commit; git-ignored)
 # and are cloned when missing, or moved to the pinned commit. Needs emcc, git and Python 3 with Pillow (with
 # raqm; on macOS: brew install fribidi) and fontTools:
@@ -20,7 +21,7 @@ PY=${PYTHON:-$HERE/.venv/bin/python}
 PATH=$(dirname "$PY"):$PATH
 command -v emcc >/dev/null 2>&1 || { echo "firmware: no emcc (Emscripten)"; exit 1; }
 "$PY" -c 'import PIL, fontTools' || { echo "firmware: $PY needs Pillow and fontTools"; exit 1; }
-WANT=${*:-"x0x felucca sloop fimba melodee amb maku"}
+WANT=${*:-"x0x felucca sloop fimba melodee amb hyp1 ghoulbox choralroot maku"}
 EMCC_FLAGS="-O2 -ffp-contract=off -std=gnu99 -w --no-entry -sSTANDALONE_WASM -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=33554432 -sFILESYSTEM=0"
 
 gen() {   # generator script and output header, in the checkout, unless the header is there
@@ -32,12 +33,13 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
     src="$HERE/checkouts/$dir"
     [ -d "$src/.git" ] || git clone -q "$repo" "$src"
     if [ "$(git -C "$src" rev-parse HEAD)" != "$commit" ]; then
-        git -C "$src" fetch -q origin
+        git -C "$src" fetch -q origin "$commit"
         git -C "$src" checkout -q "$commit"
         rm -rf "$src/build"
     fi
+    [ ! -f "$src/.gitmodules" ] || git -C "$src" submodule update --init --recursive
     mkdir -p "$OUT/$id"
-    VERSION=$("$PY" -c 'import json,sys; print(json.load(open(sys.argv[1]))[sys.argv[2]]["tag"].removeprefix("v"))' "$HERE/releases.json" "$id")
+    VERSION=$("$PY" -c 'import json,sys; r=json.load(open(sys.argv[1]))[sys.argv[2]]; print(r.get("version") or r["tag"].removeprefix("v"))' "$HERE/releases.json" "$id")
     cd "$src"
     case $id in
     x0x)
@@ -70,6 +72,22 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
     amb)
         EN_VERSION="$VERSION" sh web/emu/build.sh >/dev/null
         cp build/emu/amb.wasm build/emu/worklet.js "$OUT/$id/"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    hyp1)
+        EN_VERSION="$VERSION" sh web/emu/build.sh >/dev/null
+        cp build/emu/amb.wasm "$OUT/$id/hyp1.wasm"
+        cp build/emu/worklet.js "$OUT/$id/"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    ghoulbox)
+        "$PY" -c 'import runpy; runpy.run_path("tools/build.py", run_name="build_tools")["generate"]()' >/dev/null
+        EMU_PREVIEW=0 sh web/emu/build.sh >/dev/null
+        cp build/emu/felucca.wasm "$OUT/$id/ghoulbox.wasm"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    choralroot)
+        # Only the generated assets: the normal build also invokes the hardware toolchain.
+        "$PY" -c 'import runpy; runpy.run_path("tools/build.py", run_name="build_tools")["generate"]()' >/dev/null
+        CR_VERSION="$VERSION" sh tools/emu/web/build_web.sh >/dev/null
+        cp build/emu-web/choralroot.wasm "$OUT/$id/"
         echo "$VERSION" > "$OUT/$id/version" ;;
     maku)
         mkdir -p build/gen

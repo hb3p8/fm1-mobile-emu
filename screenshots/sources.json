@@ -36,6 +36,24 @@
     "bytes": 9592
   },
   {
+    "id": "hyp1",
+    "url": "https://fm1.designburgapps.com/img/hyp1.png",
+    "sha256": "0934bcae7adb2a40472f5f93deb06ce53b9205439d9c26251dfca9bdf16560f1",
+    "bytes": 9887
+  },
+  {
+    "id": "ghoulbox",
+    "url": "https://fm1.designburgapps.com/img/ghoulbox.png",
+    "sha256": "de7a6284069f81643a6c2909f7df58340b69abb5914bebe5dc14e691d9e1630a",
+    "bytes": 65854
+  },
+  {
+    "id": "choralroot",
+    "url": "https://fm1.designburgapps.com/img/choralroot.png",
+    "sha256": "f243c2d9c64b0fa1fb2debd76af81c80989e845e75f2f031db01c255d1d58761",
+    "bytes": 22526
+  },
+  {
     "id": "maku",
     "url": "https://fm1.designburgapps.com/img/maku.png",
     "sha256": "3b6825eeac65afd83112dcf9e43219162c104f23dea4fa3f692ba8ac2b32c063",

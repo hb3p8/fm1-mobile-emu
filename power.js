@@ -110,8 +110,8 @@ async function switchOn() {
         }
       };
     });
-    const load = FW.kind === "flash" ? { sectors: saved, seed: crypto.getRandomValues(new Uint32Array(1))[0] } : { store: saved };
-    node.port.postMessage({ type: "load", wasm, master, ...load }, [wasm]);
+    const load = FW.kind === "flash" ? { sectors: saved } : { store: saved };
+    node.port.postMessage({ type: "load", wasm, master, seed: crypto.getRandomValues(new Uint32Array(1))[0], ...load }, [wasm]);
     await ready;
     if (FW.loops) [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
     document.getElementById("audio-toggle").hidden = false;
@@ -141,7 +141,7 @@ document.getElementById("reset").addEventListener("click", async (event) => {
 
 // ---------------------------------------------------------------- choosing the firmware (Menu)
 (function firmwareMenu() {
-  const list = document.getElementById("firmwares");
+  const list = document.getElementById("firmwares"), more = document.getElementById("more-firmwares");
   for (const [id, f] of Object.entries(FIRMWARES)) {
     const row = document.createElement("button");
     row.type = "button";
@@ -160,8 +160,10 @@ document.getElementById("reset").addEventListener("click", async (event) => {
       try { localStorage.setItem(FIRMWARE_KEY, id); } catch {}
       location.reload();
     });
-    list.append(row);
+    (f.more ? more : list).append(row);
   }
+  document.getElementById("more-count").textContent = more.children.length;
+  if (FW.more) document.getElementById("more").open = true;
   for (const el of document.querySelectorAll(".fw-tag")) el.textContent = FW.tag;
   document.querySelector(".breaks").hidden = !FW.loops;
   const manual = document.getElementById("fw-manual"), source = document.getElementById("fw-source");

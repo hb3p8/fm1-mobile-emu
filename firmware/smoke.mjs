@@ -44,18 +44,20 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
   function tap(bit){send({type:'buttons',mask:1<<bit});render(80);send({type:'buttons',mask:0});render(80);}
   render(1200);
   assert.ok(frame && new Set(frame).size>3,`${id}: blank firmware screen`);
-  send({type:'keys',mask:1<<7});render(400);send({type:'keys',mask:0});render(300);
+  send({type:'keys',mask:id==='choralroot' ? (1<<5)|(1<<9) : 1<<7});render(400);send({type:'keys',mask:0});render(300);
   tap(10);render(2000);tap(10);render(200); // X0X's white keys edit steps; PLAY makes them sound.
   assert.ok(peak>0.001 && peak<1.5,`${id}: audio peak ${peak}`);
   send({type:'enc',role:3,n:1});render(100);
   assert.ok(frames>1,`${id}: screen never updates`);
-  const before=processor.ex.web_flash_writes_count?.() ?? processor.ex.web_store_writes();
+  const writes=()=>processor.ex.web_flash_writes_count?.() ?? processor.ex.web_flash_dirty?.() ?? processor.ex.web_store_writes();
+  const before=writes();
   if(id==='maku')tap(11); // MAKU REC likes its world and stores it.
   else if(id==='melodee') {tap(7);tap(13);tap(13);tap(13);} // USER slot, Save here sheet, name, write.
+  else if(id==='hyp1') {tap(5);tap(7);} // Global > SAVE stores the piece.
   else {tap(7);tap(13);tap(13);} // SAVE, confirm (preset slot / overwrite).
   render(1600);
-  const after=processor.ex.web_flash_writes_count?.() ?? processor.ex.web_store_writes();
-  if(['melodee','maku'].includes(id))assert.ok(after>before,`${id}: SAVE did not reach NOR flash`);
+  const after=writes();
+  if(['melodee','maku','hyp1','choralroot','ghoulbox'].includes(id))assert.ok(after>before,`${id}: SAVE did not reach storage`);
   // Re-open a firmware after the page's persisted writes: boot must still draw and render.
   const restoredReady = new Promise((res,rej)=> {resolveReady=res;rejectReady=rej;});
   const restored=new Processor();
@@ -64,7 +66,7 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
   await restoredReady;clearTimeout(restoredTimeout);
   assert.ok(restored.ex,`${id}: saved work could not be restored`);
   if(fw.kind==='flash') {
-    const nor=new Uint8Array(restored.ex.memory.buffer,restored.ex.web_nor(),restored.ex.web_nor_size());
+    const nor=new Uint8Array(restored.nor(restored.ex));
     for(const [offset,bytes] of Object.entries(sectors)) {
       const expected=bytes ? new Uint8Array(bytes) : new Uint8Array(4096).fill(255);
       assert.deepEqual(nor.slice(+offset,+offset+4096),expected,`${id}: saved sector ${offset} was not restored`);

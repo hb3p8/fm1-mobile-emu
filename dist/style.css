@@ -277,3 +277,8 @@ a { color: var(--accent-hi); }
   .brand { font-size: 16px; }
   .tool { font-size: 17px; padding: 0 12px; }
 }
+
+.more-firmwares { margin-top: 12px; }
+.more-firmwares summary { cursor: pointer; padding: 12px 14px; border: 1px solid #48484c; border-radius: 6px; font-weight: 600; }
+.more-firmwares summary > span { float: right; font-size: 13px; font-weight: 400; color: var(--muted); }
+.more-firmwares:not([open]) > :not(summary) { display: none; }

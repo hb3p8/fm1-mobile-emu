@@ -1,4 +1,4 @@
-const FIRMWARE_BUILDS = {"x0x": {"version": "1.0.6", "commit": "47f8e4c4ad602591b81c21bc5480db7a94f6d6af", "archive": "src/x0x.tar.gz", "prerelease": false, "release": "https://github.com/charlesvestal/fm1-x0x/releases/tag/v1.0.6", "screenshot": "screenshots/x0x.png"}, "felucca": {"version": "1.6", "commit": "1727537624390cc3f9c7dff2456b43b3a8edb005", "archive": "src/felucca.tar.gz", "prerelease": false, "release": "https://github.com/hugelton/Felucca/releases/tag/v1.6", "screenshot": "screenshots/felucca.png"}, "sloop": {"version": "2.6", "commit": "d30d6553353373cf5506b9ed285fc4a2aa0c30ef", "archive": "src/sloop.tar.gz", "prerelease": false, "release": "https://github.com/isod89/sloop-fm1/releases/tag/v2.6", "screenshot": "screenshots/sloop.png"}, "fimba": {"version": "0.6.1", "commit": "0485ed0d387ce78216428c7b19f97d77bbe10b4d", "archive": "src/fimba.tar.gz", "prerelease": true, "release": "https://github.com/jadamsowers/fm1-fimba/releases/tag/v0.6.1", "screenshot": "screenshots/fimba.png"}, "melodee": {"version": "1.4.0-rc.1", "commit": "fbc69717d9855542f6b109616ab8b0ad28783777", "archive": "src/melodee.tar.gz", "prerelease": true, "release": "https://github.com/keremimo/melodee/releases/tag/v1.4.0-rc.1", "screenshot": "screenshots/melodee.png"}, "amb": {"version": "1.1", "commit": "7e4d497ab52b3d4e1d0e9a228bc302a6e25f018a", "archive": "src/amb.tar.gz", "prerelease": false, "release": "https://github.com/charlesvestal/fm1-amb/releases/tag/v1.1", "screenshot": "screenshots/amb.png"}, "maku": {"version": "0.1", "commit": "db910aabfc979f172db87817eb9b377990ac2298", "archive": "src/maku.tar.gz", "prerelease": false, "release": "https://github.com/okumurari2/maku/releases/tag/v0.1", "screenshot": "screenshots/maku.png"}};
+const FIRMWARE_BUILDS = {"x0x": {"version": "1.1.0", "commit": "27f6fac7e07ce97b5de158b45aec99f59a9e23fd", "archive": "src/x0x.tar.gz", "prerelease": false, "release": "https://github.com/charlesvestal/fm1-x0x/releases/tag/v1.1.0", "screenshot": "screenshots/x0x.png"}, "felucca": {"version": "1.6.1", "commit": "a53ecf428c29c780108fd70a31b71a32a6b5c313", "archive": "src/felucca.tar.gz", "prerelease": false, "release": "https://github.com/hugelton/Felucca/releases/tag/v1.6.1", "screenshot": "screenshots/felucca.png"}, "sloop": {"version": "2.6", "commit": "d30d6553353373cf5506b9ed285fc4a2aa0c30ef", "archive": "src/sloop.tar.gz", "prerelease": false, "release": "https://github.com/isod89/sloop-fm1/releases/tag/v2.6", "screenshot": "screenshots/sloop.png"}, "fimba": {"version": "0.6.1", "commit": "0485ed0d387ce78216428c7b19f97d77bbe10b4d", "archive": "src/fimba.tar.gz", "prerelease": true, "release": "https://github.com/jadamsowers/fm1-fimba/releases/tag/v0.6.1", "screenshot": "screenshots/fimba.png"}, "melodee": {"version": "1.4.0", "commit": "d117a6f25d5eb6232cd101a697cc9892aa8f8942", "archive": "src/melodee.tar.gz", "prerelease": false, "release": "https://github.com/keremimo/melodee/releases/tag/v1.4.0", "screenshot": "screenshots/melodee.png"}, "amb": {"version": "1.2", "commit": "72d3bda42c03542c1c2651b11e87fcb8c19622ca", "archive": "src/amb.tar.gz", "prerelease": false, "release": "https://github.com/charlesvestal/fm1-amb/releases/tag/v1.2", "screenshot": "screenshots/amb.png"}, "maku": {"version": "0.1", "commit": "db910aabfc979f172db87817eb9b377990ac2298", "archive": "src/maku.tar.gz", "prerelease": false, "release": "https://github.com/okumurari2/maku/releases/tag/v0.1", "screenshot": "screenshots/maku.png"}, "hyp1": {"version": "1.5.1", "commit": "88df8d57f53d13c358f410e00e12f164be41e4e5", "archive": "src/hyp1.tar.gz", "prerelease": false, "release": "https://rustypawz.github.io/fm1-HYP1/", "screenshot": "screenshots/hyp1.png"}, "ghoulbox": {"version": "2.1", "commit": "eaf04bdc67baed36113cd1e71636e7e059299086", "archive": "src/ghoulbox.tar.gz", "prerelease": false, "release": "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth/releases/tag/ghoulbox-v2.1", "screenshot": "screenshots/ghoulbox.png"}, "choralroot": {"version": "0.22-beta1", "commit": "776c740b14f191dd4d991167f647557a6e55c3ab", "archive": "src/choralroot.tar.gz", "prerelease": true, "release": "https://github.com/Quixotic7/ChoralRootFM1/releases/tag/v0.22-beta1", "screenshot": "screenshots/choralroot.png"}};
 // SPDX-License-Identifier: GPL-3.0-only
 // The firmwares this page runs: each is that firmware's own C code built for the browser (firmware/build.sh).
 // "store" ones (X0X's lineage) keep numbered save objects in localStorage; "flash" ones (Felucca's lineage)
@@ -47,12 +47,33 @@ const FIRMWARES = {
     kind: "store", wasm: "fw/amb/amb.wasm", worklet: "fw/amb/worklet.js", processor: "amb",
     store: "amb-emu-store", masterMax: 4096, masterDefault: 2800,
   },
+  hyp1: {
+    name: "HYP-1", tag: "HYP-1", by: "RedtailWorks, after AMB-1", repo: "https://github.com/RustyPawz/fm1-HYP1",
+    about: "Hypnotic techno and acid: generative voices, a 303 line and drums you sequence.",
+    manual: "https://rustypawz.github.io/fm1-HYP1/manual/",
+    kind: "store", wasm: "fw/hyp1/hyp1.wasm", worklet: "fw/hyp1/worklet.js", processor: "amb",
+    store: "hyp1-emu-store", masterMax: 4096, masterDefault: 2800,
+  },
+  ghoulbox: {
+    name: "GHOULBOX", tag: "GHOULBOX", by: "Jason Persinger, after Felucca", repo: "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth",
+    about: "Dungeon synth: cathedral reverb, tape, choirs, organs and a hurdy-gurdy.",
+    manual: "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth#readme",
+    kind: "flash", wasm: "fw/ghoulbox/ghoulbox.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "ghoulbox", more: true, masterMax: 1023, masterDefault: 700,
+  },
+  choralroot: {
+    name: "ChoralRoot", tag: "CHORALROOT", by: "Quixotic7", repo: "https://github.com/Quixotic7/ChoralRootFM1",
+    about: "An Orchid-style chord instrument: roots, chord shapes, voicings, bass and a looper.",
+    manual: "https://github.com/Quixotic7/ChoralRootFM1#readme",
+    kind: "flash", wasm: "fw/choralroot/choralroot.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "choralroot", more: true, masterMax: 1023, masterDefault: 700,
+  },
   maku: {
     name: "MAKU", tag: "MAKU", by: "okumurari", repo: "https://github.com/okumurari2/maku",
     about: "An always-on ambience machine: four parts, random worlds, drift and saved favourites.",
     manual: "https://github.com/okumurari2/maku/blob/main/AMBIENT.md",
     kind: "flash", wasm: "fw/maku/maku.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
-    store: "maku", masterMax: 1023, masterDefault: 700,
+    store: "maku", more: true, masterMax: 1023, masterDefault: 700,
   },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit
@@ -728,8 +749,8 @@ async function switchOn() {
         }
       };
     });
-    const load = FW.kind === "flash" ? { sectors: saved, seed: crypto.getRandomValues(new Uint32Array(1))[0] } : { store: saved };
-    node.port.postMessage({ type: "load", wasm, master, ...load }, [wasm]);
+    const load = FW.kind === "flash" ? { sectors: saved } : { store: saved };
+    node.port.postMessage({ type: "load", wasm, master, seed: crypto.getRandomValues(new Uint32Array(1))[0], ...load }, [wasm]);
     await ready;
     if (FW.loops) [0, 1, 2].forEach((k) => { if (slots[k]) slotSend(k); });   // the loops kept in this browser
     document.getElementById("audio-toggle").hidden = false;
@@ -759,7 +780,7 @@ document.getElementById("reset").addEventListener("click", async (event) => {
 
 // ---------------------------------------------------------------- choosing the firmware (Menu)
 (function firmwareMenu() {
-  const list = document.getElementById("firmwares");
+  const list = document.getElementById("firmwares"), more = document.getElementById("more-firmwares");
   for (const [id, f] of Object.entries(FIRMWARES)) {
     const row = document.createElement("button");
     row.type = "button";
@@ -778,8 +799,10 @@ document.getElementById("reset").addEventListener("click", async (event) => {
       try { localStorage.setItem(FIRMWARE_KEY, id); } catch {}
       location.reload();
     });
-    list.append(row);
+    (f.more ? more : list).append(row);
   }
+  document.getElementById("more-count").textContent = more.children.length;
+  if (FW.more) document.getElementById("more").open = true;
   for (const el of document.querySelectorAll(".fw-tag")) el.textContent = FW.tag;
   document.querySelector(".breaks").hidden = !FW.loops;
   const manual = document.getElementById("fw-manual"), source = document.getElementById("fw-source");

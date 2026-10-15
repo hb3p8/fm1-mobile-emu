@@ -46,12 +46,33 @@ const FIRMWARES = {
     kind: "store", wasm: "fw/amb/amb.wasm", worklet: "fw/amb/worklet.js", processor: "amb",
     store: "amb-emu-store", masterMax: 4096, masterDefault: 2800,
   },
+  hyp1: {
+    name: "HYP-1", tag: "HYP-1", by: "RedtailWorks, after AMB-1", repo: "https://github.com/RustyPawz/fm1-HYP1",
+    about: "Hypnotic techno and acid: generative voices, a 303 line and drums you sequence.",
+    manual: "https://rustypawz.github.io/fm1-HYP1/manual/",
+    kind: "store", wasm: "fw/hyp1/hyp1.wasm", worklet: "fw/hyp1/worklet.js", processor: "amb",
+    store: "hyp1-emu-store", masterMax: 4096, masterDefault: 2800,
+  },
+  ghoulbox: {
+    name: "GHOULBOX", tag: "GHOULBOX", by: "Jason Persinger, after Felucca", repo: "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth",
+    about: "Dungeon synth: cathedral reverb, tape, choirs, organs and a hurdy-gurdy.",
+    manual: "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth#readme",
+    kind: "flash", wasm: "fw/ghoulbox/ghoulbox.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "ghoulbox", more: true, masterMax: 1023, masterDefault: 700,
+  },
+  choralroot: {
+    name: "ChoralRoot", tag: "CHORALROOT", by: "Quixotic7", repo: "https://github.com/Quixotic7/ChoralRootFM1",
+    about: "An Orchid-style chord instrument: roots, chord shapes, voicings, bass and a looper.",
+    manual: "https://github.com/Quixotic7/ChoralRootFM1#readme",
+    kind: "flash", wasm: "fw/choralroot/choralroot.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "choralroot", more: true, masterMax: 1023, masterDefault: 700,
+  },
   maku: {
     name: "MAKU", tag: "MAKU", by: "okumurari", repo: "https://github.com/okumurari2/maku",
     about: "An always-on ambience machine: four parts, random worlds, drift and saved favourites.",
     manual: "https://github.com/okumurari2/maku/blob/main/AMBIENT.md",
     kind: "flash", wasm: "fw/maku/maku.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
-    store: "maku", masterMax: 1023, masterDefault: 700,
+    store: "maku", more: true, masterMax: 1023, masterDefault: 700,
   },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit

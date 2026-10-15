@@ -52,7 +52,7 @@ for fid, directory, repo, commit in SOURCES:
     assert (out / 'commit').read_text().strip() == commit, f'{fid}: run firmware/build.sh (built from another commit)'
     builds[fid] = {'version': (out / 'version').read_text().strip(), 'commit': commit,
                    'archive': f'src/{fid}.tar.gz', 'prerelease': releases[fid]['prerelease'],
-                   'release': f"https://github.com/{releases[fid]['repo']}/releases/tag/{releases[fid]['tag']}",
+                   'release': releases[fid]['release'],
                    'screenshot': f'screenshots/{fid}.png'}
 app_js = ('const FIRMWARE_BUILDS = ' + json.dumps(builds) + ';\n' + (HERE/'firmwares.js').read_text() + '\n' +
           (HERE/'panel.js').read_text() + '\n' + (HERE/'screen.js').read_text() + '\nlet audioContext = null;\n' + tail + '\n' +
@@ -72,7 +72,8 @@ for name in ['index.html','style.css','app.js','manifest.webmanifest']+ICONS:
     shutil.copy2(HERE/name,dist/name)
 FW_FILES = {'x0x': ['x0x.wasm', 'worklet.js'], 'felucca': ['felucca.wasm'], 'sloop': ['sloop.wasm'],
             'fimba': ['kalimba.wasm', 'worklet.js'], 'melodee': ['melodee.wasm'],
-            'amb': ['amb.wasm', 'worklet.js'], 'maku': ['maku.wasm']}
+            'amb': ['amb.wasm', 'worklet.js'], 'maku': ['maku.wasm'], 'hyp1': ['hyp1.wasm', 'worklet.js'],
+            'ghoulbox': ['ghoulbox.wasm'], 'choralroot': ['choralroot.wasm']}
 firmware_files = ['fw/flash-worklet.js']
 (dist/'fw').mkdir()
 shutil.copy2(HERE/'firmware/flash-worklet.js', dist/'fw/flash-worklet.js')

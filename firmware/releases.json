@@ -2,25 +2,28 @@
   "x0x": {
     "id": "x0x",
     "repo": "charlesvestal/fm1-x0x",
-    "tag": "v1.0.6",
-    "commit": "47f8e4c4ad602591b81c21bc5480db7a94f6d6af",
-    "published": "2026-10-11T06:15:54Z",
+    "tag": "v1.1.0",
+    "commit": "27f6fac7e07ce97b5de158b45aec99f59a9e23fd",
+    "published": "2026-10-15T16:33:19Z",
     "prerelease": false,
     "assets": [
-      "x0x-1.0.6.fwsc"
-    ]
+      "x0x-1.1.0.fwsc"
+    ],
+    "version": "1.1.0",
+    "release": "https://github.com/charlesvestal/fm1-x0x/releases/tag/v1.1.0"
   },
   "felucca": {
     "id": "felucca",
     "repo": "hugelton/Felucca",
-    "tag": "v1.6",
-    "commit": "1727537624390cc3f9c7dff2456b43b3a8edb005",
-    "published": "2026-10-13T07:12:03Z",
+    "tag": "v1.6.1",
+    "commit": "a53ecf428c29c780108fd70a31b71a32a6b5c313",
+    "published": "2026-10-14T15:36:24Z",
     "prerelease": false,
     "assets": [
-      "felucca-1.6-app.bin",
-      "felucca-1.6.fwsc"
-    ]
+      "felucca-1.6.1.fwsc"
+    ],
+    "version": "1.6.1",
+    "release": "https://github.com/hugelton/Felucca/releases/tag/v1.6.1"
   },
   "sloop": {
     "id": "sloop",
@@ -30,9 +33,10 @@
     "published": "2026-10-11T01:13:03Z",
     "prerelease": false,
     "assets": [
-      "sloop-2.6.fwsc",
-      "sloop-editor.html"
-    ]
+      "sloop-2.6.fwsc"
+    ],
+    "version": "2.6",
+    "release": "https://github.com/isod89/sloop-fm1/releases/tag/v2.6"
   },
   "fimba": {
     "id": "fimba",
@@ -42,41 +46,36 @@
     "published": "2026-10-13T03:08:33Z",
     "prerelease": true,
     "assets": [
-      "fimba-0.6.1.fwsc",
-      "FiMba-1.html"
-    ]
+      "fimba-0.6.1.fwsc"
+    ],
+    "version": "0.6.1",
+    "release": "https://github.com/jadamsowers/fm1-fimba/releases/tag/v0.6.1"
   },
   "melodee": {
     "id": "melodee",
     "repo": "keremimo/melodee",
-    "tag": "v1.4.0-rc.1",
-    "commit": "fbc69717d9855542f6b109616ab8b0ad28783777",
-    "published": "2026-10-13T16:40:06Z",
-    "prerelease": true,
+    "tag": "v1.4.0",
+    "commit": "d117a6f25d5eb6232cd101a697cc9892aa8f8942",
+    "published": "2026-10-15T20:01:12Z",
+    "prerelease": false,
     "assets": [
-      "BUILD_INFO.json",
-      "fm1-recover-1.4.0-rc.1-linux-x64.zip",
-      "fm1-recover-1.4.0-rc.1-macos-arm64.zip",
-      "fm1-recover-1.4.0-rc.1-macos-x64.zip",
-      "fm1-recover-1.4.0-rc.1-windows-x64.zip",
-      "melodee-1.4.0-rc.1-1core-app.bin",
-      "melodee-1.4.0-rc.1-1core.fwsc",
-      "melodee-1.4.0-rc.1-app.bin",
-      "melodee-1.4.0-rc.1-licenses.zip",
-      "melodee-1.4.0-rc.1.fwsc",
-      "SHA256SUMS"
-    ]
+      "melodee-1.4.0.fwsc"
+    ],
+    "version": "1.4.0",
+    "release": "https://github.com/keremimo/melodee/releases/tag/v1.4.0"
   },
   "amb": {
     "id": "amb",
     "repo": "charlesvestal/fm1-amb",
-    "tag": "v1.1",
-    "commit": "7e4d497ab52b3d4e1d0e9a228bc302a6e25f018a",
-    "published": "2026-10-10T07:25:53Z",
+    "tag": "v1.2",
+    "commit": "72d3bda42c03542c1c2651b11e87fcb8c19622ca",
+    "published": "2026-10-15T16:43:46Z",
     "prerelease": false,
     "assets": [
-      "amb-1.1.fwsc"
-    ]
+      "amb-1.2.fwsc"
+    ],
+    "version": "1.2",
+    "release": "https://github.com/charlesvestal/fm1-amb/releases/tag/v1.2"
   },
   "maku": {
     "id": "maku",
@@ -86,12 +85,48 @@
     "published": "2026-10-11T13:59:12Z",
     "prerelease": false,
     "assets": [
-      "ATTRIBUTION.txt",
-      "LICENSE",
-      "LICENSING.md",
-      "maku-0.1-app.bin",
-      "maku-0.1.fwsc",
-      "SHA256SUMS"
+      "maku-0.1.fwsc"
+    ],
+    "version": "0.1",
+    "release": "https://github.com/okumurari2/maku/releases/tag/v0.1"
+  },
+  "hyp1": {
+    "id": "hyp1",
+    "repo": "RustyPawz/fm1-HYP1",
+    "tag": null,
+    "commit": "88df8d57f53d13c358f410e00e12f164be41e4e5",
+    "published": "2026-10-15T19:20:28Z",
+    "prerelease": false,
+    "version": "1.5.1",
+    "release": "https://rustypawz.github.io/fm1-HYP1/",
+    "assets": [
+      "hyp1-1.5.1.fwsc"
+    ]
+  },
+  "ghoulbox": {
+    "id": "ghoulbox",
+    "repo": "jasonpersinger/ghoulbox-fm1-dungeon-synth",
+    "tag": "ghoulbox-v2.1",
+    "commit": "eaf04bdc67baed36113cd1e71636e7e059299086",
+    "published": "2026-10-12T20:10:47Z",
+    "prerelease": false,
+    "version": "2.1",
+    "release": "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth/releases/tag/ghoulbox-v2.1",
+    "assets": [
+      "ghoulbox-2.1.fwsc"
+    ]
+  },
+  "choralroot": {
+    "id": "choralroot",
+    "repo": "Quixotic7/ChoralRootFM1",
+    "tag": "v0.22-beta1",
+    "commit": "776c740b14f191dd4d991167f647557a6e55c3ab",
+    "published": "2026-10-15T09:57:13Z",
+    "prerelease": true,
+    "version": "0.22-beta1",
+    "release": "https://github.com/Quixotic7/ChoralRootFM1/releases/tag/v0.22-beta1",
+    "assets": [
+      "choralroot-0.22-beta1.fwsc"
     ]
   }
 }
