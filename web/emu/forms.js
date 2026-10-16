@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import{SCALES,SCALE_NAMES,NOTES,QUALITIES,family,materialize,noteName,roleName,validateForm}from'./forms-core.mjs';
 const $=id=>document.getElementById(id),clone=x=>structuredClone(x);
+const loadingControls=[...document.querySelectorAll('button,input,select')];loadingControls.forEach(e=>e.disabled=true);
 let library,savedJSON,revision,token,builtRevision,bankKey='romance',selectedId,selectedNote=-1,undoStack=[],redoStack=[],busy=false,audio,node,loadingAudio,startTime=0,playing=false,playDuration=0,raf=0;
 const bank=()=>library.banks[bankKey],form=()=>bank().forms.find(f=>f.id===selectedId),dirty=()=>JSON.stringify(library)!==savedJSON;
 function option(value,label){const o=document.createElement('option');o.value=value;o.textContent=label;return o}
@@ -14,6 +15,7 @@ function ensureSelection(){if(!form())selectedId=bank().forms[0]?.id;selectedNot
 function context(){return{root:+$('root').value,mask:+$('quality').value,scale:SCALES[+$('scale').value],nextRoot:+$('nextRoot').value}}
 function update(mutator,{full=true}={}){if(busy)return;checkpoint();try{mutator();const target=form().notes[selectedNote];form().notes.sort((a,b)=>a.at-b.at);selectedNote=form().notes.indexOf(target);validateForm(form());notice('');stopPreview();renderList();if(full)renderEditor();else{renderRoll();status()}}catch(e){library=JSON.parse(undoStack.pop());notice(e.message);renderEditor();status()}}
 function renderList(){
+ if(!library)return;
  const q=$('search').value.trim().toLowerCase(),part=$('partFilter').value,fam=$('familyFilter').value,len=$('lengthFilter').value,feel=$('feelFilter').value;
  const filtered=bank().forms.filter(f=>(!q||(f.name+' '+f.id).toLowerCase().includes(q))&&(!part||f.part===part)&&(fam===''||f.family===+fam)&&(!len||f.length===+len)&&(feel===''||f.feel===+feel));
  $('formList').replaceChildren();filtered.forEach(f=>{const i=bank().forms.indexOf(f),b=document.createElement('button');b.className='form-item'+(f.id===selectedId?' selected':'');b.setAttribute('aria-label',`Форма ${i+1}: ${f.name}`);b.setAttribute('aria-pressed',String(f.id===selectedId));const title=document.createElement('strong'),num=document.createElement('span');num.className='number';num.textContent=String(i+1).padStart(3,'0');title.append(num,document.createTextNode(f.name));const small=document.createElement('small');small.textContent=`${f.part==='bass'?'Бас':'Пианино'} · ${f.length/24} доли · ${['maj','min','dom','dim'][f.family]} · ${f.feel?'walk':'2-feel'} · ${f.notes.length} нот`;b.append(title,small);b.onclick=()=>select(f.id);$('formList').append(b)});
@@ -47,7 +49,7 @@ function renderNotes(){
 async function request(url,method='GET',body){const response=await fetch(url,{method,headers:body?{'Content-Type':'application/json','X-Jazz-Token':token,'If-Match':revision}:{},body:body?JSON.stringify(body):undefined,cache:'no-store'});let data;try{data=await response.json()}catch{throw Error('Редактору нужен локальный сервер: python3 tools/jazz_server.py. Статический сервер не сохраняет библиотеку.')}if(!response.ok)throw Error(data.error+(data.log?'\n'+data.log:''));return data}
 async function save(){for(const b of Object.values(library.banks))for(const f of b.forms)validateForm(f);const data=await request('/api/library','PUT',library);revision=data.revision;savedJSON=JSON.stringify(library);notice('Изменения записаны в библиотеку проекта. Теперь можно собрать веб-билд.',false);status()}
 async function action(fn){if(busy)return;busy=true;const inputs=[...document.querySelectorAll('button,input,select')],states=inputs.map(e=>e.disabled);inputs.forEach(e=>e.disabled=true);status();try{await fn()}catch(e){notice(e.message)}finally{inputs.forEach((e,i)=>e.disabled=states[i]);busy=false;status()}}
-$('bank').onchange=()=>{stopPreview();bankKey=$('bank').value;selectedId=bank().forms[0]?.id;renderList();renderEditor(true)};
+$('bank').onchange=()=>{if(!library)return;stopPreview();bankKey=$('bank').value;selectedId=bank().forms[0]?.id;renderList();renderEditor(true)};
 for(const id of['search','partFilter','familyFilter','lengthFilter','feelFilter'])$(id).addEventListener(id==='search'?'input':'change',renderList);
 const commitName=()=>{const value=$('name').value;if(value!==form().name)update(()=>{form().name=value})};$('name').addEventListener('change',commitName);$('name').addEventListener('blur',commitName);
 for(const k of['part','family','length','feel'])$(k).onchange=()=>{const value=k==='part'?$(k).value:+$(k).value;update(()=>{const f=form();f[k]=value;if(k==='part')f.kind=f.part==='bass'?4:4})};
@@ -76,4 +78,4 @@ $('play').onclick=async()=>{if(playing){stopPreview();return}try{
  const animate=()=>{if(!playing)return;const t=audio.currentTime-startTime;if(t>playDuration){playing=false;$('play').textContent='▶ Прослушать';$('playhead')?.setAttribute('visibility','hidden');return}const line=$('playhead');if(line){line.setAttribute('visibility','visible');const x=55+Math.min(1,t/playDuration)*828;line.setAttribute('x1',x);line.setAttribute('x2',x)}raf=requestAnimationFrame(animate)};raf=requestAnimationFrame(animate)
  }catch(e){notice(e.message)}finally{$('play').disabled=false}};
 window.addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}});
-try{const data=await request('/api/library');library=data.library;revision=data.revision;token=data.token;builtRevision=data.builtRevision;savedJSON=JSON.stringify(library);selectedId=bank().forms[0]?.id;renderList();renderEditor(true)}catch(e){notice(e.message);$('saveState').textContent='Нет подключения к библиотеке';for(const b of document.querySelectorAll('button'))b.disabled=true}
+try{const data=await request('/api/library');library=data.library;revision=data.revision;token=data.token;builtRevision=data.builtRevision;savedJSON=JSON.stringify(library);bankKey=$('bank').value;selectedId=bank().forms[0]?.id;loadingControls.forEach(e=>e.disabled=false);renderList();renderEditor(true)}catch(e){notice(e.message);$('saveState').textContent='Нет подключения к библиотеке';for(const b of document.querySelectorAll('button,input,select'))b.disabled=true}
