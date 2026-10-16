@@ -1,0 +1,71 @@
+{
+  "library": "VSCO 2 Community Edition",
+  "authors": "Versilian Studios; recorded by Sam Gossner and Simon Dalzell; sample cutting Elan Hickler / Soundemote",
+  "license": "CC0-1.0",
+  "commit": "440300901dfe9275fd84e0b7763af1f8443ae62e",
+  "sample_rate": 22050,
+  "frames": 2117,
+  "processing": "Mono sum via ffmpeg; trim leading sub-threshold silence (up to 20 ms, 2% peak); 65 Hz high-pass; normalize to 0.8 peak; 1 ms fade-in and 18 ms fade-out; 16-bit PCM. Source octave labels are one below scientific pitch.",
+  "zones": [
+    {
+      "root_midi": 28,
+      "files": [
+        {
+          "file": "attack-e1-1.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_E0_v3_rr1.wav",
+          "source_sha256": "790d1a480a0f38216d30ad6e9152bd26a744d9d651a7e822e1fe58883a9c673f"
+        },
+        {
+          "file": "attack-e1-2.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_E0_v3_rr2.wav",
+          "source_sha256": "f533b634b7f87d75234737b4acbf7bf6f9587f71ee93c12b0bda65bea3e40333"
+        }
+      ]
+    },
+    {
+      "root_midi": 34,
+      "files": [
+        {
+          "file": "attack-bb1-1.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_A#0_v3_rr1.wav",
+          "source_sha256": "ffdcf783332627d78bb09c348ce5bbf64e833d529a1cfd48e05362f27a857c0a"
+        },
+        {
+          "file": "attack-bb1-2.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_A#0_v3_rr2.wav",
+          "source_sha256": "47ca23f0950ab1ad7c07fd3d4743d826985cc3b79f997c372ead51ebd538a60b"
+        }
+      ]
+    },
+    {
+      "root_midi": 40,
+      "files": [
+        {
+          "file": "attack-e2-1.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_E1_v3_rr1.wav",
+          "source_sha256": "7628daebe4a9f8524d46e6d58eee811f437e73c77eb6c21396152af58a062506"
+        },
+        {
+          "file": "attack-e2-2.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_E1_v3_rr2.wav",
+          "source_sha256": "496f50ac55ae948b2a155fd06a9bc430118b9725eb638c1673ae3c389203ae91"
+        }
+      ]
+    },
+    {
+      "root_midi": 49,
+      "files": [
+        {
+          "file": "attack-db3-1.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_C#2_v1_rr1.wav",
+          "source_sha256": "41804fc70cf82bd1c475611e315b14b1adf5effbd3369028302a681b54064b3f"
+        },
+        {
+          "file": "attack-db3-2.wav",
+          "source": "Strings/Solo Contrabass/Pizz/BKCtbss_Pizz_C#2_v1_rr2.wav",
+          "source_sha256": "326fa0536c5487af2a500423e6b6d1c2acfe005cb40268c7c2f152b6ca71517c"
+        }
+      ]
+    }
+  ]
+}

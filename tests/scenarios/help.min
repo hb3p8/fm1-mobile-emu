@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # help cards: hold a button alone a second and a card says what it does; letting go then does nothing
 wait 300
 press REC

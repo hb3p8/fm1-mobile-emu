@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # the pieces: PRESETS picks one, each remembers its settings, SAVE held resets one, all saved
 wait 500
 expect piece 0

@@ -23,6 +23,8 @@ async function boot(store = {}) {        // a fresh FM-1, given the saved object
   ex.web_master(2800); ex.web_boot();
 }
 await boot();
+ex.web_preset(0); // legacy MIN-1 behavior remains available
+
 
 let fails = 0;
 function check(ok, what) {
@@ -111,6 +113,19 @@ async function songPlays(saved) {
   return ex.web_song_state();
 }
 check(await songPlays(store) === 2, "after a reload the song plays (SEL + PLAY: songs; PLAY)");
+const legacySong=structuredClone(store);
+const take=new Uint8Array(songBytes);let at=0;
+for(let obj=2;legacySong[obj];obj++){take.set(legacySong[obj],at);at+=legacySong[obj].length;delete legacySong[obj];}
+const oldTake=new Uint8Array(take.length-4);oldTake.set(take.subarray(0,96));oldTake.set(take.subarray(98,126),96);oldTake.set(take.subarray(128),124);
+new DataView(oldTake.buffer).setUint32(0,0x31474e53,true);
+for(let off=0,obj=2;off<oldTake.length;off+=3840,obj++)legacySong[obj]=oldTake.slice(off,off+3840);
+check(await songPlays(legacySong)===2,"legacy SNG1 recording survives the bass reverb upgrade");
+// A larger legacy take crosses flash-object boundaries; command layout must stay aligned.
+const large=new Uint8Array(124+8*600),lv=new DataView(large.buffer);large.set(oldTake.subarray(0,124));lv.setUint32(4,600,true);lv.setUint32(12,100000,true);
+for(let i=0;i<600;i++){large.set(oldTake.subarray(124,132),124+i*8);lv.setUint32(124+i*8,i*24,true);}
+for(const key of Object.keys(legacySong))if(+key>=2)delete legacySong[key];
+for(let off=0,obj=2;off<large.length;off+=3840,obj++)legacySong[obj]=large.slice(off,off+3840);
+check(await songPlays(legacySong)===2,"legacy SNG1 take crossing flash-object boundaries loads and plays");
 check(await songPlays({}) === 0, "while a fresh FM-1 has none to play");
 console.log(fails ? `${fails} failed` : "all passed", "blits", ex.web_blits());
 process.exit(fails ? 1 : 0);

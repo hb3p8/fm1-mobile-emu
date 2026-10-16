@@ -9,8 +9,8 @@
 #ifndef EN_VERSION                       /* a release build passes its own (tools/build.py --release) */
 #define EN_VERSION "DEV"
 #endif
-#define PROJ_MAGIC 0x314E494Du           /* "MIN1" */
-#define PROJ_FORMAT 2u                   /* 2: twenty pieces, four models, the songs (1 had eight pieces) */
+#define PROJ_MAGIC 0x315A5A4Au           /* "JZZ1" */
+#define PROJ_FORMAT 8u                  /* 8: After Gone Forms; versions 3 through 7 migrated on load */
 #define NPIECES EN_NPIECES
 
 typedef struct {

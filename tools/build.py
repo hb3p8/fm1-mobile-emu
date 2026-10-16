@@ -41,7 +41,7 @@ CFLAGS = ["-Os", "-ffunction-sections", "-fno-builtin", "-Wall", "-Wno-unused-fu
 # build (-ffp-contract=off) computes the same samples
 FPU = ["-mcpu=r3", "-mfprev1", "-ffp-contract=off"]
 # the instrument: a separate unit at -O2
-O2_UNITS = ["dsp/min.c"]
+O2_UNITS = ["dsp/min.c", "dsp/drum909.c", "dsp/upright.c", "dsp/rings_string.c"]
 LINE = re.compile(r"^\s*([0-9a-f]+):\s+((?:[0-9a-f]{2} )+)\s*\t(.*)$")
 
 # SDK files of AC79NN_SDK_V1.2.1_2023-12-13 (the tested version)
@@ -127,6 +127,10 @@ def tc_all(*cmds):
 def generate():
     """generated headers: the font (Felucca's)"""
     GEN.mkdir(parents=True, exist_ok=True)
+    subprocess.run([sys.executable, str(SRC / "tools/gen_drum_samples.py"), str(GEN / "x0x_drum_samples.h")], check=True)
+    subprocess.run([sys.executable, str(SRC / "tools/gen_upright_samples.py"), str(GEN / "upright_attacks.h")], check=True)
+    subprocess.run([sys.executable, str(SRC / "tools/gen_romance_score.py"), str(GEN / "romance_score.h")], check=True)
+    subprocess.run([sys.executable, str(SRC / "tools/gen_after_forms.py"), str(GEN / "after_forms.h")], check=True)
     r = subprocess.run([sys.executable, str(SRC / "tools" / "gen_font.py"), str(GEN / "felucca_font.h")],
                        capture_output=True, text=True)
     sys.stdout.write(r.stdout)

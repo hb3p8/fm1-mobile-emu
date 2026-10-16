@@ -1,8 +1,11 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # IDEAS: EDIT on a page rolls one (a cycle, a figure, a line ...); SEL + EDIT goes back to the one before
 wait 500
 tap HOME
 tap EDIT
-expect par30 19
+expect par30 26
 expect undo 1
 wait 3000
 shot idea_cycle.png

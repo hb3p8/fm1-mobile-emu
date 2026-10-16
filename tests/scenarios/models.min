@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # the models: a piece of each, a look at its screen
 wait 500
 turn PRESET 8

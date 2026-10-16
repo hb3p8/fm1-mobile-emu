@@ -2,6 +2,11 @@
 /* The instrument (min.h). One compilation unit, -O2. */
 #include "min.h"
 #include "fastmath.h"
+#include "drum909.h"
+#include "upright.h"
+#include "romance_score.h"
+#include "romance_forms.h"
+#include "after_forms.h"
 
 #ifdef EN_HOST
 #define EN_POOL
@@ -11,9 +16,9 @@
 #define BARRIER() __asm__ volatile("" ::: "memory")
 
 const char *const EN_NOTE_NAME[12] = {"C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"};
-const char *const EN_INST_NAME[EN_NINST] = {"Piano", "Organ", "Flute", "Strings", "Marimba", "Sax", "Horn", "Synth"};
+const char *const EN_INST_NAME[EN_NINST] = {"Piano", "Organ", "Flute", "Strings", "Marimba", "Sax", "Horn", "Synth", "Upright", "Rings bass"};
 const char *const EN_PART_NAME[EN_NPART] = {"Upper", "Lower", "Bass", "Lead", "Chords"};
-const char *const EN_MODEL_NAME[EN_NMODELS] = {"Arpeggio", "Phase", "Patterns", "Bells"};
+const char *const EN_MODEL_NAME[EN_NMODELS] = {"Arpeggio", "Phase", "Patterns", "Bells", "Jazz"};
 
 static const en_param_t PARAMS[P_NPARAMS] = {
     {"Evolve", 0, 100, 30},   {"Build", 0, 100, 20},     {"Process", 0, 100, 20},   {"Chord", 0, 3, 1},
@@ -23,9 +28,10 @@ static const en_param_t PARAMS[P_NPARAMS] = {
     {"Lead", 0, 100, 0},      {"Lead sound", 0, 4, 0},   {"Activity", 0, 100, 30},  {"Harmony", 0, 2, 0},
     {"Chords", 0, 100, 0},    {"Ch sound", 0, 2, 0},     {"Rhythm", 0, 5, 0},       {"Room", 0, 100, 50},
     {"Tempo", 40, 200, 100},  {"Root", 0, 11, 9},        {"Keys", 0, 1, 0},         {"Hold", 0, 1, 0},
-    {"Model", 0, EN_NMODELS - 1, 0}, {"MIDI out", 0, 1, 1}, {"Cycle", 0, EN_CYC_ROLLED, 5}, {"Up oct", -1, 1, 0},
+    {"Model", 0, EN_NMODELS - 1, 0}, {"MIDI out", 0, 1, 1}, {"Cycle", 0, EN_CYC_AFTER_FORMS, 5}, {"Up oct", -1, 1, 0},
     {"Cycle idea", 0, EN_SEED_MAX, 1}, {"Upper idea", 0, EN_SEED_MAX, 1}, {"Lower idea", 0, EN_SEED_MAX, 2},
     {"Line idea", 0, EN_SEED_MAX, 3},
+    {"Pluck", 0, 100, 62}, {"Wood", 0, 100, 70}, {"Decay", 0, 100, 48}, {"Damping", 0, 100, 58}, {"Bass reverb", 0, 100, 7},
 };
 const en_param_t *en_param_info(int i) { return (i >= 0 && i < P_NPARAMS) ? &PARAMS[i] : &PARAMS[0]; }
 
@@ -91,6 +97,13 @@ static const tcyc_t CYCLES[EN_NCYCLES] = {
     {"Hero", "I bVI bVII I", 0, 4, {CH(0, Q_MAJ), CH(8, Q_MAJ), CH(10, Q_MAJ), CH(0, Q_MAJ)}},
     {"Still", "i7", 1, 1, {CH(0, Q_MIN7)}},
     {"Glow", "Iadd9", 0, 1, {CH(0, Q_ADD9)}},
+    {"Jazz triads", "ii V I", 0, 3, {CH(2,Q_MIN),CH(7,Q_MAJ),CH(0,Q_MAJ)}},
+    {"Jazz ii-V-I", "ii7 V7 Imaj7", 0, 3, {CH(2,Q_MIN7),CH(7,Q_DOM7),CH(0,Q_MAJ7)}},
+    {"Jazz voices", "ii7 V7 Imaj7", 0, 3, {CH(2,Q_MIN7),CH(7,Q_DOM7),CH(0,Q_MAJ7)}},
+    {"Secondary", "V/ii ii7 V7 Imaj7", 0, 4, {CH(9,Q_DOM7),CH(2,Q_MIN7),CH(7,Q_DOM7),CH(0,Q_MAJ7)}},
+    {"Tritone", "ii7 bII7 Imaj7", 0, 3, {CH(2,Q_MIN7),CH(1,Q_DOM7),CH(0,Q_MAJ7)}},
+    {"Two turns", "V/ii ii7 bII7 Imaj7", 0, 4, {CH(9,Q_DOM7),CH(2,Q_MIN7),CH(1,Q_DOM7),CH(0,Q_MAJ7)}},
+    {"Chromatic", "bIII7 ii7 bII7 Imaj7", 0, 4, {CH(3,Q_DOM7),CH(2,Q_MIN7),CH(1,Q_DOM7),CH(0,Q_MAJ7)}},
 };
 #undef CH
 #undef CHB
@@ -168,13 +181,28 @@ static const struct {
     {"Chapel", {25, 40, 55, 3, 50, 1, 0, 0, 45, 1, 0, 0, 35, 1, 0, 0, 60, 2, 30, 0, 25, 1, 0, 60,
                 52, 3, 0, 0, 3, 1, 9, 0, 201, 202, 203, 2020}},
 };
-const char *en_piece_name(int i) { return PIECES[(unsigned)i < EN_NPIECES ? i : 0].name; }
+static const char *const JAZZ_NAMES[10] = {"First steps","Velvet","Close voices","Secondary","Tritone","Two turns","Chromatic","Fine Romance","Romance Forms","After Gone Forms"};
+const char *en_piece_name(int i) { return i >= EN_JAZZ_FIRST && i < EN_NPIECES ? JAZZ_NAMES[i-EN_JAZZ_FIRST] : PIECES[(unsigned)i < EN_JAZZ_FIRST ? i : 0].name; }
 void en_piece(int i, int16_t *p)
 {
     int k;
     i = (unsigned)i < EN_NPIECES ? i : 0;
-    for (k = 0; k < P_NPARAMS; k++)
-        p[k] = PIECES[i].v[k];
+    for (k = 0; k < P_NPARAMS; k++) p[k] = i < EN_JAZZ_FIRST ? PIECES[i].v[k] : PARAMS[k].def;
+    if (i >= EN_JAZZ_FIRST) {
+        p[P_MODEL]=M_JAZZ; p[P_ROOT]=0; p[P_TEMPO]=104; p[P_CYCLE]=EN_JAZZ_CYCLE+i-EN_JAZZ_FIRST;
+        p[P_EVOLVE]=0; p[P_BUILD]=0; p[P_PROCESS]=65; p[P_CHORDLEN]=1;
+        p[P_UP_LEVEL]=45; p[P_LO_LEVEL]=85; p[P_BS_LEVEL]=74; p[P_LD_LEVEL]=50; p[P_CH_LEVEL]=65;
+        p[P_UP_SOUND]=0; p[P_LO_SOUND]=0; p[P_BS_SOUND]=2; p[P_LD_SOUND]=0; p[P_CH_SOUND]=0;
+        p[P_BS_STYLE]=3; p[P_LD_ACT]=56; p[P_CH_RHYTHM]=2; p[P_ROOM]=50;
+        if(i==21) p[P_CH_SOUND]=1;
+        if(i>=27) {
+            p[P_CYCLE]=(int16_t)(i==28?EN_CYC_ROMANCE_FORMS:EN_CYC_ROMANCE); p[P_ROOT]=11; p[P_TEMPO]=160;
+            p[P_PROCESS]=90; p[P_CH_RHYTHM]=4; p[P_BS_OCT]=0;
+            p[P_UP_LEVEL]=36; p[P_CH_LEVEL]=74; p[P_BS_LEVEL]=88; p[P_LD_LEVEL]=0;
+            if(i>=28) p[P_EVOLVE]=75;
+            if(i==29) {p[P_CYCLE]=EN_CYC_AFTER_FORMS;p[P_ROOT]=3;p[P_TEMPO]=140;p[P_CH_LEVEL]=78;p[P_UP_LEVEL]=44;}
+        }
+    }
 }
 
 /* ------------------------------------------------------- the pure parts --- */
@@ -262,6 +290,13 @@ static int mine_n, mine_k;
 
 int en_cycle_get(int c, int seed, int k, uint16_t *mask, uint8_t *bass)
 {
+    if(c==EN_CYC_ROMANCE || c==EN_CYC_ROMANCE_FORMS || c==EN_CYC_AFTER_FORMS) {
+        if(k>=0 && k<EN_CYC_MAX) {
+            const romance_chord_t *h=c==EN_CYC_AFTER_FORMS?&AFTER_HARMONY[k]:&ROMANCE_HARMONY[k];
+            *bass=h->root; *mask=rot12(h->mask,h->root);
+        }
+        return EN_CYC_MAX;
+    }
     if (c == EN_CYC_ROLLED) {
         uint16_t m[EN_CYC_MAX];
         uint8_t b[EN_CYC_MAX];
@@ -289,11 +324,12 @@ int en_cycle_get(int c, int seed, int k, uint16_t *mask, uint8_t *bass)
     return CYCLES[c].n;
 }
 
-const char *en_cycle_name(int c) { return c == EN_CYC_ROLLED ? "Rolled" : c >= EN_NCYCLES ? "Mine" : CYCLES[c < 0 ? 0 : c].nick; }
-const char *en_cycle_numerals(int c) { return c >= EN_NCYCLES ? "" : CYCLES[c < 0 ? 0 : c].name; }
+const char *en_cycle_name(int c) { return c==EN_CYC_AFTER_FORMS?"After Gone forms":c==EN_CYC_ROMANCE_FORMS?"Romance forms":c==EN_CYC_ROMANCE?"Romance":c == EN_CYC_ROLLED ? "Rolled" : c >= EN_NCYCLES ? "Mine" : CYCLES[c < 0 ? 0 : c].nick; }
+const char *en_cycle_numerals(int c) { return c==EN_CYC_AFTER_FORMS?"40-bar standard":c==EN_CYC_ROMANCE || c==EN_CYC_ROMANCE_FORMS?"32-bar standard":c >= EN_NCYCLES ? "" : CYCLES[c < 0 ? 0 : c].name; }
 
 int en_cycle_minor(int c, int seed)
 {
+    if(c==EN_CYC_ROMANCE || c==EN_CYC_ROMANCE_FORMS || c==EN_CYC_AFTER_FORMS) return 0;
     if (c == EN_CYC_ROLLED)                     /* a rolled cycle's key: the seed's last bit */
         return seed & 1;
     if (c >= EN_NCYCLES) {                      /* the scale on the root that holds more of its chords' tones, */
@@ -389,6 +425,8 @@ const char *en_chord_name(uint32_t mask, int bass, char *buf)
         {0x091, ""},    {0x089, "m"},     {0x891, "M7"},    {0x489, "m7"},    {0x491, "7"},  {0x049, "dim"},
         {0x111, "aug"}, {0x085, "sus2"},  {0x0A1, "sus4"},  {0x4A1, "7sus4"}, {0x449, "m7b5"}, {0x249, "dim7"},
         {0x291, "6"},   {0x289, "m6"},    {0x095, "add9"},  {0x08D, "madd9"}, {0x081, "5"},  {0x001, ""},
+        {0x895, "M9"}, {0x295, "6/9"}, {0x695, "13"}, {0x493, "7b9"},
+        {0x495, "9"}, {0x48D, "m9"}, {0x511, "7#5"}, {0x593, "7b9b13"},
     };
     const int nn = (int)(sizeof NAMES / sizeof NAMES[0]);
     int i, k, r = -1, q = -1;
@@ -513,6 +551,15 @@ void en_voice_lead(const int *from, const int *pcs, int nt, int *to, int lo, int
 const char *en_param_label(int i)
 {
     int m = par[P_MODEL];
+    if(m==M_JAZZ) {
+        if(i==P_PROCESS) return en_jazz_score_active()?"Solo swing":"Swing";
+        if(i==P_CH_SOUND) return "Voicing";
+        if(i==P_UP_LEVEL) return "Drums";
+        if(i==P_LO_LEVEL) return "Keys";
+        if(i==P_LD_LEVEL) return "Solo";
+        if(i==P_EVOLVE) return "Variation";
+        if(i==P_BUILD) return "All parts";
+    }
     switch (i) {
     case P_PROCESS: return m == M_PHASE ? "Drift" : m == M_PATTERNS ? "Spread" : m == M_BELLS ? "Phrases" : 0;
     case P_EVOLVE: return m == M_PATTERNS ? "Move on" : 0;
@@ -527,6 +574,18 @@ const char *en_param_label(int i)
 void en_param_text(int i, int v, char *b)
 {
     int p, m = par[P_MODEL];
+    if(m==M_JAZZ) {
+        if(i==P_CHORDLEN && en_jazz_score_active()) { put(b,"From MIDI"); return; }
+        if(i==P_UP_SOUND) { put(b,"X0X 909"); return; }
+        if(i==P_UP_PULSE) { put(b,"Ride"); return; }
+        if(i==P_UP_FIGURE) { put(b,"Swing kit"); return; }
+        if(i==P_LO_PULSE || i==P_LO_FIGURE) { put(b,"Play live"); return; }
+        if(i==P_BS_SOUND) { put(b,v==2?"Rings bass":v==1?"Piano":"Upright"); return; }
+        if(i==P_CH_SOUND) { put(b,v==1?"Root stack":v==2?"Shells":"Close piano"); return; }
+        if(i==P_BS_STYLE) { put(b,v==3 && en_jazz_score_active()?"MIDI line":v==0?"Long":v==1?"2-feel":"Walking"); return; }
+        if(i==P_CH_RHYTHM) { put(b,v==4 && en_jazz_score_active()?"MIDI phrases":v==0?"Hold":v==2?"16ths arp":"Swing comp"); return; }
+        if(i==P_KEYS) { put(b,"Melody"); return; }
+    }
     switch (i) {
     case P_UP_SOUND: case P_LO_SOUND: case P_BS_SOUND: case P_LD_SOUND: case P_CH_SOUND:
         for (p = 0; p < EN_NPART && SOUND_PAR[p] != i; p++)
@@ -566,7 +625,7 @@ void en_param_text(int i, int v, char *b)
 
 /* ------------------------------------------------------------ commands --- */
 enum { C_SET, C_PLAY, C_NEXT, C_SEED, C_PANIC, C_CLOCK, C_REGROW, C_HOLD, C_MINE_CLR, C_MINE_ADD, C_MINE_END,
-       C_PART, C_VERB, C_SONG };
+       C_PART, C_VERB, C_SONG, C_NOTE };
 #define QN 128u
 static uint32_t q[QN];
 static volatile uint32_t q_w, q_r;
@@ -586,6 +645,7 @@ void en_seed(uint32_t s) { post(C_SEED, 0, (int)(s & 0xFFFFu)); }
 void en_panic(void) { post(C_PANIC, 0, 0); }
 void en_clock(int msg) { post(C_CLOCK, msg, 0); }
 void en_regrow(void) { post(C_REGROW, 0, 0); }
+void en_note(int note, int velocity) { if (note >= 21 && note <= 108) post(C_NOTE,note,velocity); }
 void en_hold(uint32_t mask, int bass, int keys) { post(C_HOLD, (bass & 15) | (keys == 1 ? 16 : 0), (int)(mask & 0xFFFu)); }
 void en_mine(int n, const uint16_t *mask, const uint8_t *bass)
 {
@@ -778,7 +838,7 @@ static const float PART_PAN[EN_NPART] = {0.45f, -0.45f, 0.0f, 0.15f, 0.0f};
 /* the parts' gains at the same Level: a held chord sounds louder than notes that come and go */
 static const float PART_GAIN[EN_NPART] = {1.0f, 1.0f, 1.0f, 1.0f, 0.56f};
 
-static int modal(int inst) { return inst == I_PIANO || inst == I_MARIMBA; }
+static int modal(int inst) { return inst == I_PIANO || inst == I_MARIMBA || inst == I_UPRIGHT || inst == I_HYBRID_BASS; }
 
 static void voice_midi_off(voice_t *v)
 {
@@ -878,6 +938,13 @@ static void marimba_on(voice_t *v)
     v->nc = 1.0f - fm_expf(-FM_TWO_PI * 2500.0f * (1.0f / EN_SR));
 }
 
+static void upright_on(voice_t *v)
+{
+    int k; float f=mtof(v->note); v->nres=0;
+    for(k=1;k<=5;k++) res_add(v,f*(float)k,1.6f/(float)k,0.9f/((float)k*(float)k));
+    v->nz=0.15f; v->nzd=fm_expf(-1.0f/(0.006f*EN_SR)); v->nc=0.12f;
+}
+
 static void sub_on(voice_t *v, float att)
 {
     const patch_t *pt = &PATCH[v->inst];
@@ -934,10 +1001,16 @@ static voice_t *note_on(int p, int note, float vel, int32_t gate, float att)
     } else if (inst == I_MARIMBA) {
         v->send = MARIMBA_SEND;
         marimba_on(v);
+    } else if (inst == I_HYBRID_BASS) {
+        v->send=.035f;
+        upright_note_on((int)(v-vc)-VB[PT_BASS],note,vel,par[P_BS_PLUCK],par[P_BS_WOOD],par[P_BS_DECAY],par[P_BS_DAMP]);
+    } else if (inst == I_UPRIGHT) {
+        v->send=0.08f; upright_on(v);
     } else {
         v->send = PATCH[inst].send;
         sub_on(v, att);
     }
+    if(p==PT_BASS && par[P_MODEL]==M_JAZZ) v->send=.005f*(float)par[P_BS_REVERB];
     v->midi = (uint8_t)note;
     midi(0x90u | (uint32_t)p, (uint32_t)note, (uint32_t)(20.0f + 107.0f * fm_clampf(vel, 0.0f, 1.0f)));
     en_notes[p]++;
@@ -951,7 +1024,7 @@ static void pedal(uint32_t mask)
     int i;
     for (i = 0; i < NV; i++) {
         voice_t *v = &vc[i];
-        if (v->on && v->inst == I_PIANO && v->dampk >= 1.0f && !(mask >> (v->note % 12) & 1u))
+        if (v->on && v->inst == I_PIANO && !(par[P_MODEL]==M_JAZZ && v->part==PT_LOWER) && v->dampk >= 1.0f && !(mask >> (v->note % 12) & 1u))
             v->dampk = damp_k;
     }
 }
@@ -2026,6 +2099,15 @@ static void chords_voicing(int *to)
         if (cur_mask >> pc & 1u)
             pcs[n++] = pc;
     }
+    if(par[P_MODEL]==M_JAZZ && par[P_CH_SOUND]==1) {
+        int base=nearest(60,cur_bass,55,67),k=0,off;
+        for(off=0;off<12 && k<4;off++) if(cur_mask>>((cur_bass+off)%12)&1u) to[k++]=base+off;
+        while(k<4) { to[k]=to[k-n]+12; k++; }
+        return;
+    }
+    if(par[P_MODEL]==M_JAZZ && par[P_CH_SOUND]==2) {
+        n=0; for(i=0;i<12;i++) if(en_jazz_anchor>>i&1u) pcs[n++]=i;
+    }
     en_voice_lead(chn, pcs, n, to, 52, 74);
 }
 
@@ -2087,6 +2169,8 @@ static void chords_tick(void)
 }
 
 /* ------------------------------------------------------- the chord, the form --- */
+#include "jazz.inc"
+
 static void chord_set(uint16_t m, uint8_t b, int mid)
 {
     cur_mask = (uint16_t)(m | 1u << b);
@@ -2094,6 +2178,7 @@ static void chord_set(uint16_t m, uint8_t b, int mid)
     en_chord_mask = cur_mask;
     en_chord_bass = b;
     en_yours = yours;
+    if (model()==M_JAZZ) { pedal(cur_mask); jazz_chord(); return; }
     arp_tones(PT_UPPER);
     arp_tones(PT_LOWER);
     bass_notes();
@@ -2195,7 +2280,7 @@ static void section_begin(int first)
         var_k = -1;
         shift = 0;
         cycle_publish();
-    } else {
+    } else if(model()!=M_JAZZ) {
         cycle_vary();
     }
     building = presence_update(first) > 0;
@@ -2357,6 +2442,10 @@ static void apply(int p, int v)
     case P_BS_OCT: bass_notes(); break;
     case P_LD_ACT: case P_SEED_LD: line_compose(); break;
     case P_CH_RHYTHM: chords_free(); break;
+    case P_BS_REVERB:
+        if(model()==M_JAZZ)
+            for(i=VB[PT_BASS];i<VB[PT_BASS+1];i++)vc[i].send=.005f*(float)v;
+        break;
     case P_ROOM:
         rev_send = (float)(v * v) * 0.00012f;
         pl_decay_t = 0.45f + 0.45f * (float)v * 0.01f;
@@ -2374,10 +2463,17 @@ static void apply(int p, int v)
                 en_midi_out(0xB0u | (uint32_t)i, 123, 0);
         break;
     case P_CYCLE: case P_SEED_CYC:
+        if(p==P_SEED_CYC && en_jazz_forms_active()) {
+            jazz_forms_seed(v);
+            chord_dirty=1;
+        }
         if (p == P_CYCLE || par[P_CYCLE] == EN_CYC_ROLLED) {
+            chord_ticks=(uint32_t)CHORD_BEATS[par[P_CHORDLEN]]*EN_PPQN;
+            ctick=0;
             cycle_load();
             line_compose();
             chord_dirty = 1;
+            if(p==P_CYCLE) jazz_score_reset();
         }
         break;
     case P_UP_OCT: arp_tones(PT_UPPER); break;
@@ -2393,6 +2489,7 @@ static void apply(int p, int v)
         break;
     default: break;
     }
+    if(model()==M_JAZZ) { part_inst[PT_BASS]=par[P_BS_SOUND]==2?I_HYBRID_BASS:par[P_BS_SOUND]==1?I_PIANO:I_UPRIGHT; part_inst[PT_CHORDS]=I_PIANO; part_inst[PT_LOWER]=I_PIANO; }
     gains_target();
 }
 
@@ -2417,6 +2514,7 @@ static void quiet(void)
 static void form_restart(void)                  /* the cycle from the top, a fresh form, building again */
 {
     ticks = 0;
+    jazz_score_reset();
     ctick = 0;
     cyc_pos = 0;
     arc = -0.45f + 0.2f * frand();
@@ -2443,7 +2541,7 @@ static void play_stop(void)
     int i;
     en_playing = 0;
     for (i = 0; i < NV; i++)                     /* the held ones let go; the piano rings on */
-        if (vc[i].on && vc[i].gate < 0 && vc[i].stage != ST_REL)
+        if (vc[i].on && (vc[i].gate < 0 || en_jazz_score_active()) && vc[i].stage != ST_REL && !(model()==M_JAZZ && vc[i].part==PT_LOWER))
             voice_release(&vc[i]);
     for (i = 0; i < 4; i++)
         chv[i] = -1;
@@ -2483,7 +2581,7 @@ static int recordable(uint32_t c)
     uint32_t t = c >> 24, a = c >> 16 & 0xFFu;
     if (t == C_SET)
         return a != P_MIDI && a != P_KEYS && a != P_HOLD;
-    return t == C_NEXT || t == C_SEED || t == C_REGROW || t == C_HOLD || t == C_MINE_CLR || t == C_MINE_ADD ||
+    return t == C_NEXT || t == C_SEED || t == C_REGROW || t == C_HOLD || t == C_NOTE || t == C_MINE_CLR || t == C_MINE_ADD ||
            t == C_MINE_END || t == C_PART || t == C_VERB;
 }
 
@@ -2548,7 +2646,7 @@ static void song_cmd(int what, int piece)
 
 static void tick(void)
 {
-    int p, m = model();
+    int p, m = model(), score;
     if (en_song_state == SONG_PLAYING) {
         song_tick();
         if (stick >= song.end) {                 /* the take's end */
@@ -2566,7 +2664,16 @@ static void tick(void)
     }
     arc += (fm_clampf(arc_tgt, -1.0f, 1.0f) - arc) * tick_len * (1.0f / (30.0f * EN_SR));
     en_arc = arc;
-    if (ctick == 0u)
+    score=en_jazz_score_active();
+    if(score) {
+        if(jazz_score_prepare()) {
+            if(next_pending) { next_pending=0; jazz_score_reset(); jazz_score_prepare(); }
+            for(p=0;p<EN_NPART;p++) if(part_req[p]) {
+                present[p]=(uint8_t)(part_req[p]-1); part_req[p]=0;
+            }
+            parts_publish();
+        }
+    } else if (ctick == 0u)
         chord_begin();
     else if (chord_dirty) {                      /* the player's chord (or a new cycle, root) now */
         uint16_t cm;
@@ -2580,7 +2687,9 @@ static void tick(void)
         }
         chord_set(cm, cb, 1);
     }
-    if (m == M_PATTERNS) {
+    if (m == M_JAZZ) {
+        jazz_tick();
+    } else if (m == M_PATTERNS) {
         for (p = 0; p < 3; p++)
             player_tick(p);
     } else {
@@ -2596,9 +2705,9 @@ static void tick(void)
             phase_drift();
         lead_tick();
     }
-    if (en_part_on[PT_BASS])
+    if (m!=M_JAZZ && en_part_on[PT_BASS])
         bass_tick();
-    if (en_part_on[PT_CHORDS])
+    if (m!=M_JAZZ && en_part_on[PT_CHORDS])
         chords_tick();
     if (!en_ext)
         midi(0xF8, 0, 0);
@@ -2607,7 +2716,7 @@ static void tick(void)
     ticks++;
     stick++;
     en_song_tick = stick;
-    if (++ctick >= chord_ticks) {
+    if (++ctick >= chord_ticks && !score) {
         ctick = 0;
         chord_end();
     }
@@ -2723,6 +2832,7 @@ static void exec(uint32_t c)
             }
         break;
     }
+    case C_NOTE: jazz_manual(a,b); break;
     case C_SONG: song_cmd(a, b); break;
     }
 }
@@ -2777,13 +2887,21 @@ static void render_chunk(int32_t *out, uint32_t n, float gain)
             o0 = (uint32_t)v->wait;
             v->wait = 0;
         }
-        if (modal(v->inst)) {
+        if(v->inst==I_HYBRID_BASS) {
+            int slot=i-VB[PT_BASS];
+            float g=pg[v->part];
+            upright_render(slot,vbuf,n-o0,v->stage==ST_REL);
+            for(j=o0;j<n;j++) { float x=vbuf[j-o0]*g;mixl[j]+=x*v->gl;mixr[j]+=x*v->gr;rsend[j]+=x*v->send; }
+            v->lvl=upright_level(slot);gate_step(v,n-o0);
+            if(!upright_active(slot)){voice_midi_off(v);v->on=0;}
+        } else if (modal(v->inst)) {
             modal_render(v, o0, n - o0);
         } else {
             for (o = o0; o < n && v->on; o += 32u)
                 sub_render(v, o, n - o > 32u ? 32u : n - o);
         }
     }
+    if(model()==M_JAZZ) jazz_render(n);
     for (j = 0; j < n; j++) {
         float wl, wr, l, r;
         reverb(rsend[j] * rev_send, &wl, &wr);
@@ -2828,6 +2946,8 @@ void en_init(void)
     for (i = 0; i <= SN; i++)
         sint[i] = fm_sinf((float)i * (FM_TWO_PI / (float)SN));
     plate_init();
+    upright_init();
+    jazz_init();
     for (i = 0; i < NV; i++)
         vc[i].on = 0;
     rng = 0x9E3779B9u;                           /* everything as at power-on: the same piece, the same start */

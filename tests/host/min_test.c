@@ -251,7 +251,9 @@ static void test_parts(void)
             if (!par[LEVEL[p]])
                 continue;
             start_solo(piece, p);
-            run(24.0, &m);
+            if(par[P_MODEL]==M_JAZZ && p==PT_LOWER) {
+                int j; for(j=0;j<24;j++) { en_note(64,110); run(.5,&m); en_note(64,0); run(.5,&m); }
+            } else run(24.0, &m);
             CHECK(rms_db(&m) > -50.0 && en_notes[p] > 0, "%s's %s alone: %.1f dBFS, %u notes", en_piece_name(piece),
                   EN_PART_NAME[p], rms_db(&m), en_notes[p]);
             for (q = 0; q < EN_NPART; q++)

@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # a first look and listen: it plays from power-on (Morning); the pages; the keys take the chord
 wav first.wav
 wait 300

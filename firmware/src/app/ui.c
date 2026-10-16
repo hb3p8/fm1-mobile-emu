@@ -21,9 +21,9 @@
 #include "../dsp/fastmath.h"
 
 /* the pages, one a part (a button each); SELECT steps through them in this order */
-enum { V_FORM, V_UPPER, V_LOWER, V_BASS, V_LEAD, V_CHORDS, V_SETUP, V_SYSTEM, NVIEWS };
-static const char *const VIEW_NAME[NVIEWS] = {"Form", "Upper", "Lower", "Bass", "Lead", "Chords", "Setup", "System"};
-static const uint8_t VIEW_BTN[NVIEWS] = {B_HOME, B_ENV, B_ARP, B_LFO, B_SEQ, B_FX, B_GLO, B_GLO};
+enum { V_FORM, V_UPPER, V_LOWER, V_BASS, V_LEAD, V_CHORDS, V_SETUP, V_SYSTEM, V_BASS_TONE, V_BASS_FX, NVIEWS };
+static const char *const VIEW_NAME[NVIEWS] = {"Form", "Upper", "Lower", "Bass", "Lead", "Chords", "Setup", "System", "Bass tone", "Bass FX"};
+static const uint8_t VIEW_BTN[NVIEWS] = {B_HOME, B_ENV, B_ARP, B_LFO, B_SEQ, B_FX, B_GLO, B_GLO, B_LFO, B_LFO};
 static const uint8_t PART_BTN[EN_NPART] = {B_ENV, B_ARP, B_LFO, B_SEQ, B_FX};
 static const uint8_t PART_LEVEL[EN_NPART] = {P_UP_LEVEL, P_LO_LEVEL, P_BS_LEVEL, P_LD_LEVEL, P_CH_LEVEL};
 /* the four knobs of each page: a parameter, or one of these; and what the knob is called there */
@@ -37,6 +37,8 @@ static const uint8_t VIEW_KNOB[NVIEWS][4] = {
     {P_CH_LEVEL, P_CH_SOUND, P_CH_RHYTHM, P_ROOM},
     {P_TEMPO, P_ROOT, P_KEYS, P_HOLD},
     {P_MODEL, P_MIDI, K_LEDS, K_CPU},
+    {P_BS_PLUCK, P_BS_WOOD, P_BS_DECAY, P_BS_DAMP},
+    {P_BS_REVERB, K_NONE, K_NONE, K_NONE},
 };
 static const char *const KNOB_LABEL[NVIEWS][4] = {
     {"Evolve", "Build", "Process", "Chord"},
@@ -47,22 +49,22 @@ static const char *const KNOB_LABEL[NVIEWS][4] = {
     {"Level", "Sound", "Rhythm", "Room"},
     {"Tempo", "Root", "Keys", "Hold"},
     {"Model", "MIDI out", "Lights", "CPU"},
+    {"Pluck", "Wood", "Decay", "Damping"},
+    {"Bass reverb", "", "", ""},
 };
 
 /* the screen's colours: cool paper and a dark blue ink, a colour a part (cobalt, teal, slate, amber,
  * violet), each with a pale tint for the shapes at rest; coral for the player: the chord held, LEARN,
  * a song recording */
-#define K_BG RGB(236, 240, 242)
-#define K_PANEL RGB(250, 252, 253)
-#define K_LINE RGB(200, 210, 216)
-#define K_DIM RGB(110, 124, 134)
-#define K_TEXT RGB(22, 32, 44)
-#define K_ACC RGB(36, 99, 196)
-#define K_YOURS RGB(214, 82, 70)
-static const uint16_t PART_COL[EN_NPART] = {RGB(36, 99, 196), RGB(22, 140, 150), RGB(76, 86, 116), RGB(212, 116, 44),
-                                            RGB(128, 94, 170)};
-static const uint16_t PART_TINT[EN_NPART] = {RGB(178, 204, 236), RGB(170, 220, 222), RGB(196, 202, 216),
-                                             RGB(240, 206, 176), RGB(214, 200, 232)};
+#define K_BG RGB(22, 27, 21)
+#define K_PANEL RGB(33, 40, 29)
+#define K_LINE RGB(60, 74, 49)
+#define K_DIM RGB(149, 165, 130)
+#define K_TEXT RGB(233, 237, 217)
+#define K_ACC RGB(206, 237, 125)
+#define K_YOURS RGB(233, 168, 211)
+static const uint16_t PART_COL[EN_NPART]={RGB(190,220,134),RGB(235,170,216),RGB(145,186,160),RGB(216,232,145),RGB(165,201,113)};
+static const uint16_t PART_TINT[EN_NPART]={RGB(51,65,37),RGB(69,45,61),RGB(37,60,48),RGB(65,68,37),RGB(45,61,32)};
 
 enum { MODE_LIVE, MODE_SONGS };
 #define UNDO_N 12
@@ -83,6 +85,7 @@ static struct {
     uint32_t touch_until;
     uint32_t frame;
     uint32_t sig[3];                   /* what each band shows: redrawn when it changes */
+    uint32_t jazz_held[4];
     uint32_t midi_held[4];             /* MIDI notes held, a bit a note (they play chords as NOTES keys do) */
     uint32_t held_mask;                /* the chord sent to the engine (0: none) */
     int held_bass;
@@ -187,6 +190,7 @@ static void knob_range(int k, int *lo, int *hi)
     if (k < P_NPARAMS) {
         *lo = en_param_info(k)->lo;
         *hi = en_param_info(k)->hi;
+        if(proj.par[P_MODEL]==M_JAZZ && k==P_BS_SOUND) *hi=2;
     } else {
         *lo = 0;
         *hi = k == K_LEDS ? 2 : k == K_CPU ? 100 : 0;
@@ -316,6 +320,7 @@ static void idea(void)                         /* EDIT: a new idea for the page 
     case V_FORM:                                 /* a rolled cycle, in the same key (the seed's last bit) */
         p[0] = P_SEED_CYC;
         v[0] = (int)(idea_rnd() % 16000u) * 2 + key_minor();
+        if(en_jazz_forms_active()) { idea_apply(1,p,v,"NEW PHRASES"); break; }
         p[1] = P_CYCLE;
         v[1] = EN_CYC_ROLLED;
         idea_apply(2, p, v, "NEW CYCLE");
@@ -383,11 +388,14 @@ static void idea(void)                         /* EDIT: a new idea for the page 
 }
 
 /* ------------------------------------------------------------- chords --- */
-static int cycle_valid(int c) { return c != EN_CYC_MINE || proj.slot[proj.piece].mine_n >= 2; }
+static int cycle_valid(int c) {
+    return (c != EN_CYC_MINE || proj.slot[proj.piece].mine_n >= 2) &&
+           (c < EN_CYC_ROMANCE || proj.par[P_MODEL]==M_JAZZ);
+}
 
 static void set_cycle(int c)                    /* ALGORITHM: the library's cycles, Mine (if learned), Rolled */
 {
-    int n = EN_CYC_ROLLED + 1, step = c > proj.par[P_CYCLE] ? 1 : -1, i;
+    int n = EN_CYC_AFTER_FORMS + 1, step = c > proj.par[P_CYCLE] ? 1 : -1, i;
     for (i = 0; i < n; i++, c += step) {
         c = (c % n + n) % n;
         if (cycle_valid(c))
@@ -435,6 +443,20 @@ static void learn_end(void);
 static void chord_update(void)
 {
     int bass, low;
+    if(proj.par[P_MODEL]==M_JAZZ) {
+        uint32_t wanted[4]; int n,k;
+        for(k=0;k<4;k++) wanted[k]=ui.midi_held[k];
+        for(k=0;k<NKEYS;k++) if(ui.keys>>k&1u) {
+            n=53+k+12*proj.par[P_UP_OCT];
+            if(n>=21 && n<=108) wanted[n>>5]|=1u<<(n&31);
+        }
+        for(n=21;n<=108;n++) {
+            uint32_t bit=1u<<(n&31); int k=n>>5;
+            if((wanted[k]^ui.jazz_held[k])&bit) en_note(n,(wanted[k]&bit)?108:0);
+        }
+        for(k=0;k<4;k++) ui.jazz_held[k]=wanted[k];
+        return;
+    }
     uint32_t mask = keys_chord(ui.keys, &bass, &low), send;
     int hold = proj.par[P_HOLD], easy = !proj.par[P_KEYS];
     if (mask) {
@@ -691,6 +713,10 @@ static void button(int b)
         set_view(ui.view == V_SETUP ? V_SYSTEM : V_SETUP);
         return;
     }
+    if(b==B_LFO && proj.par[P_MODEL]==M_JAZZ) {
+        if(ui.view==V_BASS) {set_view(V_BASS_TONE);return;}
+        if(ui.view==V_BASS_TONE) {set_view(V_BASS_FX);return;}
+    }
     for (v = 0; v < NVIEWS; v++)                 /* a page's button: its page */
         if (VIEW_BTN[v] == b) {
             set_view(v);
@@ -721,7 +747,8 @@ static void button(int b)
         {
             char t[8];
             en_param_text(P_UP_OCT, proj.par[P_UP_OCT], t);
-            say("UPPER OCTAVE", t);
+            say(proj.par[P_MODEL]==M_JAZZ?"KEYBOARD OCTAVE":"UPPER OCTAVE", t);
+            if(proj.par[P_MODEL]==M_JAZZ) chord_update();
         }
         break;
     case B_SAVE: {
@@ -843,7 +870,7 @@ static void input(void)
             }
         } else {
             int v = (int)ui.view + (e > 0 ? 1 : -1);
-            if (v >= 0 && v < NVIEWS)
+            if (v >= 0 && v < (proj.par[P_MODEL]==M_JAZZ?NVIEWS:V_BASS_TONE))
                 set_view(v);
         }
         ui.turn_t = plat_ms();
@@ -1197,6 +1224,15 @@ static void draw_formline(void)
         cv_text(230 - text_w(&FONT_XS, "REC: DONE"), 34, &FONT_XS, "REC: DONE", K_DIM);
         return;
     }
+    if(knob_get(P_MODEL)==M_JAZZ) {
+        if(en_jazz_score_active()) {
+            e=itoa_u(en_jazz_bar,puts_(t,"BAR ")); e=puts_(e,"/32  TAKE ");
+            e=itoa_u(en_jazz_chorus,e); puts_(e,en_jazz_walking?" WALK":" 2-FEEL");
+            cv_text(6,34,&FONT_XS,t,K_ACC); return;
+        }
+        e=puts_(t,"MELODY: "); puts_(e,en_jazz_scale_name());
+        cv_text(6,34,&FONT_XS,t,K_ACC); return;
+    }
     e = puts_(t, EN_MODEL_NAME[knob_get(P_MODEL)]);
     e = puts_(e, "  ROUND ");
     e = itoa_u((uint32_t)en_cyc_rep + 1u, e);
@@ -1241,6 +1277,21 @@ static void draw_lanes(void)
         int on = en_part_on[p], g = q16(en_part_glow[p]);
         uint16_t col = PART_COL[p], tint = PART_TINT[p];
         char t[24], w[16];
+        if(m==M_JAZZ) {
+            static const char *const names[5]={"DRUMS","KEYS","BASS","SOLO","PIANO"};
+            static const char *const ways[5]={"909 RIDE + HAT","PLAY THE GREEN KEYS","WALKING QUARTERS","SWING PHRASES","SYNCOPATED COMP"};
+            cv_text(6,y,&FONT_XS,names[p],on?col:K_DIM);
+            cv_disc(56,cy,2+g/6,on?col:K_LINE);
+            const char *way=p==PT_CHORDS && knob_get(P_CH_RHYTHM)==2?"PIANO 16THS ARP":p==PT_BASS && knob_get(P_BS_SOUND)==2?"RINGS + SAMPLE":p==PT_BASS && knob_get(P_BS_SOUND)==1?"PIANO WALKING":ways[p];
+            if(en_jazz_score_active()) {
+                if(p==PT_UPPER) way=en_jazz_walking?"RIDE + HAT":"HAT + RIM";
+                if(p==PT_CHORDS && knob_get(P_CH_RHYTHM)==4) way="MIDI PHRASES";
+                if(p==PT_BASS && knob_get(P_BS_STYLE)==3) way=en_jazz_walking?"MIDI WALKING":"MIDI TWO-FEEL";
+                if(en_jazz_forms_active() && (p==PT_BASS || p==PT_CHORDS)) way=en_jazz_form_name(p);
+            }
+            cv_text(66,y,&FONT_XS,knob_get(PART_LEVEL[p])?way:"OFF",on?K_TEXT:K_DIM);
+            continue;
+        }
         caps(t, EN_PART_NAME[p], sizeof t);
         cv_text(6, y, &FONT_XS, t, on ? col : K_DIM);
         cv_disc(56, cy, on ? 2 + g / 6 : 1, on ? mix(tint, col, 6 + g * 10 / 16) : K_LINE);
@@ -1422,7 +1473,10 @@ static void draw_knobs(void)
         char t[12];
         int k;
         int32_t xd = 237 - NVIEWS * 6, xt;
-        caps(t, VIEW_NAME[ui.view], sizeof t);
+        if(knob_get(P_MODEL)==M_JAZZ && ui.view==V_UPPER) caps(t,"Drums",sizeof t);
+        else if(knob_get(P_MODEL)==M_JAZZ && ui.view==V_LOWER) caps(t,"Keys",sizeof t);
+        else if(knob_get(P_MODEL)==M_JAZZ && ui.view==V_LEAD) caps(t,"Solo",sizeof t);
+        else caps(t, VIEW_NAME[ui.view], sizeof t);
         xt = xd - 5 - text_w(&FONT_XS, t);
         cv_rect(4, 5, xt - 9, 1, K_LINE);
         cv_text(xt, -1, &FONT_XS, t, K_ACC);
@@ -1479,7 +1533,9 @@ static void leds(void)
         b |= 1u << VIEW_BTN[ui.view];
         if (proj.leds) {
             for (i = 0; i < NKEYS; i++) {
-                if (proj.par[P_KEYS]) {
+                if(proj.par[P_MODEL]==M_JAZZ) {
+                    if(en_jazz_scale>>((53u+i)%12u)&1u) k|=1u<<i;
+                } else if (proj.par[P_KEYS]) {
                     if (m >> ((5u + i) % 12u) & 1u)
                         k |= 1u << i;
                 } else {

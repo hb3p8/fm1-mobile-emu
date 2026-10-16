@@ -86,3 +86,33 @@ __attribute__((used, visibility("default"))) void web_store_set_len(uint32_t obj
 __attribute__((used, visibility("default"))) uint32_t web_store_writes(void) { return store_writes; }
 __attribute__((used, visibility("default"))) uint32_t web_nobj(void) { return OBJ_NOBJ; }
 __attribute__((used, visibility("default"))) uint32_t web_store_max(void) { return PLAT_STORE_MAX; }
+
+/* Jazz Box browser controls operate the device app, never a second JS synth. */
+__attribute__((used, visibility("default"))) void web_param(int p,int v) { if(p>=0 && p<P_NPARAMS) knob_set(p,v); }
+__attribute__((used, visibility("default"))) void web_preset(int i) { if(i>=0 && i<EN_NPIECES) set_piece(i); }
+__attribute__((used, visibility("default"))) void web_transport(void) { button(B_PLAY); }
+__attribute__((used, visibility("default"))) uint32_t web_scale(void) { return en_jazz_scale; }
+__attribute__((used, visibility("default"))) uint32_t web_anchors(void) { return en_jazz_anchor; }
+__attribute__((used, visibility("default"))) uint32_t web_playing(void) { return en_playing; }
+__attribute__((used, visibility("default"))) uint32_t web_position(void) { return en_cyc_pos; }
+__attribute__((used, visibility("default"))) uint32_t web_cycle_count(void) { return en_cyc_n; }
+__attribute__((used, visibility("default"))) const char *web_chord_at(int i) {
+    static char name[24];
+    if(i<0 || i>=en_cyc_n) return "";
+    en_chord_name(en_cyc_mask[i],en_cyc_bass[i],name); return name;
+}
+__attribute__((used, visibility("default"))) const char *web_scale_name(void) { return en_jazz_scale_name(); }
+__attribute__((used, visibility("default"))) const int16_t *web_params(void) { return en_params(); }
+__attribute__((used, visibility("default"))) uint32_t web_params_count(void) { return P_NPARAMS; }
+__attribute__((used, visibility("default"))) uint32_t web_part_notes(int p) { return p>=0 && p<EN_NPART ? en_notes[p] : 0; }
+__attribute__((used, visibility("default"))) uint32_t web_yours(void) { return en_yours; }
+__attribute__((used, visibility("default"))) uint32_t web_score_active(void) { return (uint32_t)en_jazz_score_active(); }
+__attribute__((used, visibility("default"))) uint32_t web_score_bar(void) { return en_jazz_bar; }
+__attribute__((used, visibility("default"))) uint32_t web_score_chorus(void) { return en_jazz_chorus; }
+__attribute__((used, visibility("default"))) uint32_t web_score_walking(void) { return en_jazz_walking; }
+__attribute__((used, visibility("default"))) uint32_t web_forms_active(void) { return (uint32_t)en_jazz_forms_active(); }
+__attribute__((used, visibility("default"))) uint32_t web_form_count(void) { return (uint32_t)en_jazz_form_count(); }
+__attribute__((used, visibility("default"))) uint32_t web_form_bass(void) { return en_jazz_form_bass; }
+__attribute__((used, visibility("default"))) uint32_t web_form_piano(void) { return en_jazz_form_piano; }
+__attribute__((used, visibility("default"))) const char *web_form_bass_name(void) { return en_jazz_form_name(PT_BASS); }
+__attribute__((used, visibility("default"))) const char *web_form_piano_name(void) { return en_jazz_form_name(PT_CHORDS); }

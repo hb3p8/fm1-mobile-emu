@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # MIDI in: notes held (any channel) are a chord, as the keys are; let go, the cycle at its next chord.
 # MIDI out: each part's notes on its channel
 wait 500

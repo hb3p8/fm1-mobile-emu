@@ -1,3 +1,139 @@
+# Jazz Box for M-VAVE FM-1
+
+Jazz preset 10: **After You've Gone Forms**. A 40-bar chart in Eb at 140 BPM,
+with 256 reusable bass/accompaniment forms extracted only after separating
+the mixed piano track's right-hand melody/harmonisation. The arrangement's
+source melody is excluded and there is no fixed-original preset. Three
+40-bar source drum choruses provide the kit loop. The detailed generator
+report and separated MIDI are in build/gen/after_forms.txt and
+build/gen/after_separated.mid. New phrase button / HOME → EDIT changes the
+form choices. Saves migrate from project format 7 to 8, preserving settings.
+
+
+A local adaptation of Reytian's MIN-1. A self-playing jazz quartet, with an
+independent live piano keyboard. The C engine, hardware panel, host simulator
+and WebAssembly emulator share the same musical code.
+
+- Seven progressions: ii-V-I triads, seventh chords, close voicings, secondary
+  dominant, tritone substitution, combined substitutions, chromatic descent.
+- **Fine Romance Trio** (preset 28 / web option 08): a 128-bar bass, piano and
+  drum score from the user's MIDI, with a 32-bar harmonic chart, 160 BPM and
+  the bass in its original low register. Preserves all 2971 notes/hits and their velocities;
+  starts/gates are rounded to the 24 PPQN engine grid. Two-feel/hat changes to
+  walking/ride in bars 33–48 and 97–112. Separate melody, strings and guitar
+  are omitted; the generative solo starts muted, leaving the keyboard free.
+- **Romance Forms** (preset 29 / web option 09): the same chord chart, drums
+  and two-feel/walking sections. Recombines 59 bass and 105 piano forms
+  extracted from the source. Each 2/4-beat chord chooses new forms of the
+  matching length/feel; piano also matches the chord family. Pitch functions
+  (1/3/5/7/9/11/13), chromatic neighbours and next-root approaches are remapped
+  to the current/next harmony, with whole-phrase register adjustment. Immediate
+  form repeats are excluded and the previous chorus's choice is downweighted.
+- Piano: fast sixteenth-note arpeggios by default, with Morning's velocity curve
+  and Room=50. Syncopated comping and held chords remain selectable.
+- Walking bass with chromatic approach notes and differentiated accents (also
+  long / two-feel), switchable between Rings, original Upright and Piano.
+- Rings bass: eight real CC0 VSCO 2 pizzicato attacks (four registers, two
+  alternate takes) excite the ported Rings string kernel. The old independent
+  synthetic pluck and dry sample mix have been removed. Three broad body
+  resonators follow the string output.
+  Pluck, Wood, Decay and Damping controls; three voices for overlapping tails.
+  The recordings occupy 33,872 bytes in flash; string buffers use 24 KiB.
+- X0X's 909 engine: sampled ride and hats, modelled kick and snare.
+- Generative sax/flute solo: scale-aware swing phrases, anchor tones and rests.
+- Live polyphonic piano from the FM-1 keys / MIDI / browser keyboard. Playing
+  does not replace the ensemble harmony. The soloist yields to the player and
+  returns a bar after the last released note.
+- Scale LEDs on the device; brighter anchor tones in the browser. Black/green
+  screen and panel. The web mixer controls the C engine rather than a JS synth.
+
+## Build and run the web emulator
+
+Prerequisites: Emscripten, Python with Pillow, C/C++ compilers for host tests.
+
+```sh
+sh web/emu/build.sh
+python3 -m http.server 8080 --directory build/emu
+```
+
+Open http://127.0.0.1:8080 and click **Switch on / Enable Jazz Box**.
+On this Mac, Emscripten needs a newer Python than the system Python:
+
+```sh
+EMSDK_PYTHON=/opt/homebrew/bin/python3 sh web/emu/build.sh
+```
+
+Output: `build/emu/index.html`, `min.wasm`, `worklet.js`. This is a WebAssembly
+build, not an installable device package. Hardware flashing is separate; see
+BUILDING.md. Do not flash a web build.
+
+## Play
+
+Browser: A S D F G H J K = C4-C5; W E T Y U = black keys. Z/X changes octave.
+Space starts/stops. The original device's 27-key F3-G5 geometry is preserved.
+ENV = drums, ARP = live keys, LFO = bass, SEQ = solo, FX = piano. KNOB1 changes
+the selected part's level. HOME/KNOB3 controls swing. The browser adds direct
+progression/key/tempo, piano rhythm and mixer controls. In the piano page,
+Rhythm=2 selects the new sixteenth arpeggio; Rhythm=3 selects swing comping.
+On the bass page, Sound=0/1/2 selects Upright/Piano/Rings. Press LFO again
+to open Bass tone: KNOB1–4 = Pluck, Wood, Decay, Damping. Press LFO once more
+for Bass FX: KNOB1 = Bass reverb (0–100; send to the shared room). This works
+with Rings, Upright and Piano, is saved per preset, and updates ringing voices.
+The web panel has a separate bass reverb slider. Existing saved projects and
+forty-parameter songs migrate while preserving their previous bass send. The web panel exposes
+the same controls. Tone changes apply to the next pluck. Version-3 Jazz Box
+saves and version-4/5 saves are migrated to version 6 while preserving preset
+settings, learned cycles and songs. Mine/Rolled keep their old cycle IDs.
+
+Fine Romance selects the appended Romance score cycle. Piano Rhythm=4 plays
+the imported phrases; other rhythm settings substitute procedural comping.
+Bass Style=3 plays the imported line (0/1/2 substitute long/two-feel/walking).
+Tempo and Root transpose/stretch the whole trio; Bass Octave affects only the
+bass. HOME/KNOB3 controls the optional generated solo's swing in score mode;
+the trio keeps its recorded timing. The screen shows bar/chorus and an
+eight-chord window of the full form; scale lights include diminished and
+altered scales, with contextual Phrygian/Aeolian over iii/vi minor chords.
+The score is compiled as about 24 KiB of const tables, with no runtime MIDI
+parser, file I/O or dynamic allocation. See `assets/scores/README.txt` for
+musical data provenance, omissions and timing precision.
+
+Romance Forms keeps the original preset separately. The web shows the current
+bass/piano form IDs and families. **New phrase variant**, or HOME → EDIT on
+the hardware panel, changes the phrase seed without changing the progression.
+Variation controls how strongly the previous chorus's choice is avoided.
+Each pass continues the phrase RNG; recorded takes retain deterministic seeds.
+Manual playing/muting does not consume the phrase RNG. Bass remains in the
+low register. `tools/gen_romance_forms.py` produces the const form bank and
+`build/gen/romance_forms.txt`, a Russian analysis/catalogue with source bars,
+original notes, functional degrees, rhythm and octave positions.
+
+Green LEDs identify a suggested scale for the current chord. Bright green
+identifies anchor tones; pink is the player's input. Dorian is used on minor
+sevenths, Ionian on major sevenths, Mixolydian on V7, Lydian dominant on tritone
+substitutes and Phrygian dominant on A7 leading to Dm. These are choices, not
+restrictions: all keys remain playable.
+
+The default recipe is **Chromatic**, Eb7 - Dm7 - Db7 - Cmaj7, at 104 BPM.
+Original MIN-1 presets and models are retained after/before the jazz recipes.
+Jazz Box uses a separate browser storage key and project format.
+
+## Validate
+
+```sh
+EMSDK_PYTHON=/opt/homebrew/bin/python3 tests/run_tests.sh
+```
+
+`tests/host/jazz_test.c` checks every progression in 12 keys, all four generated
+parts, scale/anchor masks, manual note input independent of harmony, and release.
+`upright_test.c` checks tuning, finite output, extreme controls and release tails.
+`rings_reference_test.cpp` compares the portable C signal path with unmodified
+Rings/stmlib Hermite, FIR and SVF components using identical coefficients.
+The WASM tests also verify bass/rhythm/tone controls and old-save migration.
+The legacy simulator scenarios explicitly select Morning before testing MIN-1
+behavior. X0X source attribution and GPL-3.0-only notices are in LICENSING.md.
+
+---
+
 # MIN-1 for the M-VAVE FM-1
 
 *Minimalist music for everyone, by Reytian. Inspired by [FM1-AMB](https://github.com/charlesvestal/fm1-amb) and Philip Glass.*

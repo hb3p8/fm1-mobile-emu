@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # EASY keys and HOLD: a white key is a chord of the key; with HOLD a chord stays when let go, until the
 # same keys are played again
 wait 500

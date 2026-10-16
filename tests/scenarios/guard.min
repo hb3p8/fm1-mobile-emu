@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # the overload guard: a block reported over 90% brings it on; 3 s under 65% take it off again
 wait 500
 expect guard 0

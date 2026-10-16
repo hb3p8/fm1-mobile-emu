@@ -53,6 +53,12 @@ class Min extends AudioWorkletProcessor {
       this.port.postMessage({ type: "ready" });
     } else if (!this.ex) {
       return;
+    } else if (m.type === "param") {
+      this.ex.web_param(m.param,m.value);
+    } else if (m.type === "preset") {
+      this.ex.web_preset(m.value);
+    } else if (m.type === "transport") {
+      this.ex.web_transport();
     } else if (m.type === "buttons") {
       this.ex.web_buttons(m.mask >>> 0);
     } else if (m.type === "keys") {
@@ -90,6 +96,11 @@ class Min extends AudioWorkletProcessor {
     const blits = ex.web_blits();
     const msg = { type: "frame", buttons: ex.web_lit_buttons() >>> 0, keys: ex.web_lit_keys() >>> 0, peak: this.peak,
                   song: ex.web_song_state() };      // 0 none, 1 recording, 2 playing
+    const cstr=(p)=>{const b=new Uint8Array(this.mem.buffer,p,64);let s="";for(let i=0;i<b.length&&b[i];i++)s+=String.fromCharCode(b[i]);return s};
+    msg.jazz={scale:ex.web_scale(),anchors:ex.web_anchors(),playing:ex.web_playing(),position:ex.web_position(),scaleName:cstr(ex.web_scale_name()),params:Array.from(new Int16Array(this.mem.buffer,ex.web_params(),ex.web_params_count())),chords:[]};
+    msg.jazz.score={active:ex.web_score_active(),bar:ex.web_score_bar(),chorus:ex.web_score_chorus(),walking:ex.web_score_walking()};
+    msg.jazz.forms={active:ex.web_forms_active(),count:ex.web_form_count(),bass:ex.web_form_bass(),piano:ex.web_form_piano(),bassName:cstr(ex.web_form_bass_name()),pianoName:cstr(ex.web_form_piano_name())};
+    for(let i=0;i<ex.web_cycle_count();i++)msg.jazz.chords.push(cstr(ex.web_chord_at(i)));
     this.peak = 0;
     if (this.frames >= 44100) {                       // the share of real time spent running the device
       msg.load = Math.round(100 * this.busy / (this.frames / 44.1));

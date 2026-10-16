@@ -13,7 +13,7 @@ alpha 0..15.
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, features
 
 FONTS = Path(__file__).resolve().parents[1] / "assets" / "fonts"
 # (name, file, px, scale, pixel, first, last): pixel fonts are rendered without
@@ -144,7 +144,7 @@ def render(ttf, px, scale, pixel, first, last):
         names = [a["name"] if isinstance(a["name"], str) else a["name"].decode() for a in font.get_variation_axes()]
         font.set_variation_by_axes([float(axes.get(n.lower()[:4], axes.get(n, 0)) or a["default"])
                                     for n, a in zip(names, font.get_variation_axes())])
-    feats = None if pixel else ["tnum"]
+    feats = None if pixel or not features.check("raqm") else ["tnum"]
     asc, desc = font.getmetrics()
     top = max(0, font.getbbox("A8|(", features=feats)[1] - 1)
     h = asc + desc - top

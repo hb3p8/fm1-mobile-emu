@@ -40,3 +40,46 @@ not affiliated with, endorsed by or supported by any of them, nor by Charles Ves
 ## Radio
 
 MIN-1 never enables the Bluetooth / Wi-Fi radio of the hardware.
+
+## Jazz Box adaptation
+
+Jazz Box adds the orchestration in `firmware/src/dsp/jazz.inc`, live melody input,
+scale LEDs and the dark green interface, under GPL-3.0-only.
+
+The **Fine Romance** score is derived from the user's supplied
+`assets/scores/a_fine_romance_mw.mid`, which credits Mel Webb for the MIDI
+arrangement. This musical data is separate from the software licence; no
+open-source licence is asserted for the composition or arrangement. See
+`assets/scores/README.txt` for the exact extraction and timing changes.
+The chord-relative bank for **Romance Forms** is derived from the same
+user-supplied material; its musical ownership is unchanged by abstraction or
+recombination. The extraction/planning code is GPL-3.0-only.
+
+The unchanged files `firmware/src/dsp/{drum909.c,drum909.h,drum909_dsp.h,x0x_param.h}`,
+`tools/gen_drum_samples.py` and `assets/909/` were copied from Charles Vestal's
+[X0X](https://github.com/charlesvestal/fm1-x0x) at commit
+`2e31c517ded3732c58b845eb0c800fe018004b8d`. The 909 engine is derived from
+9W9 / ER-99 (Matthew Cieplak); the ride, crash and hi-hat sample attribution is
+preserved in `assets/909/README.txt`. Generated tables and sample headers are
+recreated during each build. Original MIN-1 and platform notices remain intact.
+
+The hybrid bass DSP in `firmware/src/dsp/upright.{c,h}` is GPL-3.0-only.
+Its eight compact attack recordings in `assets/upright/` are derived from
+[VSCO 2 Community Edition](https://github.com/sgossner/VSCO-2-CE) at commit
+`440300901dfe9275fd84e0b7763af1f8443ae62e`, under CC0-1.0. Recorded by Sam
+Gossner and Simon Dalzell (Versilian Studios); sample cutting by Elan Hickler /
+Soundemote. The CC0 dedication, source paths, original SHA256 hashes, pitch
+mapping and preparation notes are included beside the derived recordings.
+
+The fixed-note, non-dispersive Rings string path in
+`firmware/src/dsp/rings_string.{c,h}` is adapted under MIT from Emilie Gillet's
+[Rings](https://github.com/pichenettes/eurorack) at
+`f4cfa7697095a28d292bff758beb51deb49b5a86` and
+[stmlib](https://github.com/pichenettes/stmlib) at
+`e3bd7c9cc00e4364166f9905c0509b6ffd0535ec`. Copyright and permission notices
+are retained in the source and `assets/upright/RINGS-LICENSE.txt`. Changes:
+portable C, 44.1 kHz, note-on coefficient preparation, external delay storage;
+no dispersion, CV interpolation, auxiliary output or sub-audio resampling.
+The original unmodified headers in `tests/reference/` are host-test fixtures
+and are not linked into the device or WASM builds. The adaptation does not
+include any Mutable Instruments module branding or claim hardware endorsement.

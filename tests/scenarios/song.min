@@ -1,3 +1,6 @@
+# Legacy MIN-1 scenario: select Morning from the Jazz Box default.
+turn PRESET 1
+wait 100
 # SONGS: REC records from the top, all that is done; REC again keeps it (and shows SONGS); PLAY plays it
 # back; SAVE keeps it in flash, past a reboot; SEL + PLAY: songs / live
 wait 500

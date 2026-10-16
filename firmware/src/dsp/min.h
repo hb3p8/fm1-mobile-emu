@@ -45,17 +45,22 @@
 enum { PT_UPPER, PT_LOWER, PT_BASS, PT_LEAD, PT_CHORDS };
 #define EN_CYC_MAX 8                   /* chords in a cycle, at most */
 #define EN_FIG_MAX 12                  /* a figure's steps, at most */
-#define EN_NCYCLES 18                  /* the library's cycles; then Mine (learned) and Rolled (an idea) */
+#define EN_NCYCLES 25                  /* the library's cycles; then Mine (learned) and Rolled (an idea) */
 #define EN_CYC_MINE EN_NCYCLES
 #define EN_CYC_ROLLED (EN_NCYCLES + 1)
+#define EN_CYC_ROMANCE (EN_NCYCLES + 2) /* score, appended so saved Mine/Rolled keep their IDs */
+#define EN_CYC_ROMANCE_FORMS (EN_NCYCLES + 3)
 #define EN_NFIG 8                      /* the library's figures; then Rolled */
 #define EN_FIG_ROLLED EN_NFIG
-#define EN_NPIECES 20
-enum { M_ARPEGGIO, M_PHASE, M_PATTERNS, M_BELLS, EN_NMODELS };
+#define EN_CYC_AFTER_FORMS (EN_NCYCLES + 4)
+#define EN_NPIECES 30
+#define EN_JAZZ_FIRST 20
+#define EN_JAZZ_CYCLE 18
+enum { M_ARPEGGIO, M_PHASE, M_PATTERNS, M_BELLS, M_JAZZ, EN_NMODELS };
 extern const char *const EN_MODEL_NAME[EN_NMODELS];
 
 /* the voices' instruments */
-enum { I_PIANO, I_ORGAN, I_FLUTE, I_STRINGS, I_MARIMBA, I_SAX, I_HORN, I_SYNBASS, EN_NINST };
+enum { I_PIANO, I_ORGAN, I_FLUTE, I_STRINGS, I_MARIMBA, I_SAX, I_HORN, I_SYNBASS, I_UPRIGHT, I_HYBRID_BASS, EN_NINST };
 extern const char *const EN_INST_NAME[EN_NINST];
 extern const char *const EN_NOTE_NAME[12];
 extern const char *const EN_PART_NAME[EN_NPART];
@@ -71,6 +76,7 @@ enum {
     P_TEMPO, P_ROOT, P_KEYS, P_HOLD,                      /* setup (Keys and Hold are the panel's) */
     P_MODEL, P_MIDI, P_CYCLE, P_UP_OCT,                   /* the model, MIDI out, the cycle (ALGORITHM), OCT */
     P_SEED_CYC, P_SEED_UP, P_SEED_LO, P_SEED_LD,          /* the ideas: a rolled cycle, figures, the line */
+    P_BS_PLUCK, P_BS_WOOD, P_BS_DECAY, P_BS_DAMP, P_BS_REVERB,
     P_NPARAMS
 };
 #define EN_SEED_MAX 32767
@@ -117,7 +123,7 @@ void en_midi_out(uint32_t st, uint32_t d1, uint32_t d2);
 /* SONGS: a take, from the top: its start (every parameter, Mine, the dice) and each command with its
  * tick. The app keeps the takes in flash; the render records into and plays from this one */
 #define EN_SONG_MAX 1880                       /* commands in a take */
-#define EN_SONG_MAGIC 0x31474E53u              /* "SNG1" */
+#define EN_SONG_MAGIC 0x32474E53u              /* "SNG2": 41 parameters; SNG1 migrated by the app */
 typedef struct {
     uint32_t magic, n, seed, end;              /* the commands, the dice at the start, the length (ticks) */
     int16_t par[P_NPARAMS];                    /* every value as the take began */
@@ -187,3 +193,16 @@ void en_voice_lead(const int *from, const int *pcs, int ntones, int *to, int lo,
 /* the pieces: recipes for every parameter (Keys, Hold and MIDI out are the player's) */
 const char *en_piece_name(int i);
 void en_piece(int i, int16_t *par);
+
+/* Jazz Box: manual notes never replace the ensemble harmony. */
+void en_note(int note, int velocity);
+extern volatile uint16_t en_jazz_scale, en_jazz_anchor;
+extern volatile uint8_t en_jazz_solo_note, en_jazz_bass_note;
+extern volatile uint8_t en_jazz_bar, en_jazz_chorus, en_jazz_walking;
+int en_jazz_score_active(void);
+int en_jazz_forms_active(void);
+extern volatile uint16_t en_jazz_form_bass, en_jazz_form_piano;
+const char *en_jazz_form_name(int part);
+int en_jazz_form_count(void);
+const char *en_jazz_scale_name(void);
+uint16_t en_jazz_scale_for(uint16_t mask, int bass, int key, uint16_t *anchors);

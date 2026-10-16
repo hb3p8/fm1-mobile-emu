@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MIN-1 in the browser</title>
-<meta name="description" content="MIN-1, a minimalist ensemble firmware for the M-VAVE FM-1, in your browser: the same code the FM-1 runs.">
+<title>Jazz Box — FM-1</title>
+<meta name="description" content="Jazz Box: jazz harmony, walking bass, X0X drums, a soloist and your live keyboard.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Semi+Condensed:wght@600;700&display=swap" media="print" onload="this.media='all'">
@@ -91,25 +91,32 @@ a { color: var(--ink); text-decoration-color: var(--accent); text-decoration-thi
 .knobs dd { margin: 0 0 .45rem; }
 kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 0 .3em; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .btnface, .keyface { transition: none; } }
+
+:root,:root[data-theme="dark"],:root:not([data-theme="light"]){--paper:#171b16;--panel:#232a20;--line:#3b4832;--muted:#a5b295;--ink:#ebeedc;--accent:#d4ed83;--on-accent:#1a2413;--upper:#bddb85;--lower:#e9a8d3;--bass:#91baa0;--lead:#d8e891;--chords:#a5c971;--lit:#53643b;--lit-ink:#ecf2dd;--lit-key:#718a50;--lit-play:#d4ed83;--learn:#e9a8d3;--held:#e9a8d3;--latch:#d4ed83;color-scheme:dark}
+header{margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:20px}h1{letter-spacing:.02em}header p{font-size:13px}.jazz-intro{display:flex;justify-content:space-between;gap:24px;align-items:end;margin:28px 0 24px}.jazz-intro h2{font:600 clamp(27px,4vw,43px)/1.15 var(--display);margin:0}.jazz-intro em{font:italic 1.05em Georgia,serif;color:var(--accent)}.jazz-intro p{font-size:12px;color:var(--muted);max-width:310px;margin:0}.jazz-controls{display:flex;gap:18px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--line);padding:15px 18px;border-radius:8px}.jazz-controls label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}select,button{font:inherit}select{background:#303b27;border:1px solid #52663c;border-radius:4px;color:var(--ink);padding:8px;font-size:12px}input[type=range]{accent-color:var(--accent);height:4px;width:95px}.transport-jazz{background:var(--accent);border:0;color:#1a2413;border-radius:4px;padding:10px 18px;font-weight:600;cursor:pointer}.transport-jazz:disabled{opacity:.5}.jazz-changes{display:flex;gap:8px;margin:15px 0}.jazz-changes span{flex:1;padding:12px;background:#222a1e;border:1px solid var(--line);border-radius:5px;font:600 21px var(--display);text-align:center}.jazz-changes .current{border-color:var(--accent);color:var(--accent);background:#303d24}.jazz-scale{padding:2px 0 14px;font-size:12px;color:var(--muted)}.jazz-scale strong{color:var(--accent);font-weight:600}.tracks{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:18px 0 22px}.track{padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;min-width:0}.track label{display:flex;gap:7px;align-items:center;font-size:12px;color:var(--ink)}.track small{color:var(--muted);font-size:10px}.track input[type=range]{width:100%;margin-top:14px}.track input[type=checkbox]{accent-color:var(--accent)}.track output{float:right;font-size:10px;color:var(--muted)}.jazz-help{border-top:1px solid var(--line);padding-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px}.jazz-help h2{font-size:17px;margin:0 0 10px}.jazz-help p{font-size:12px;color:var(--muted);line-height:1.9}.anchor .keyface{fill:#d4ed83}.held .keyface{fill:#e9a8d3!important}.held .key-label{fill:#302132!important}.key-label{pointer-events:none;font:12px monospace;fill:#20291a}.jazz-footer{font-size:11px;color:var(--muted);border-top:1px solid var(--line);padding-top:20px;margin-top:24px}.bar{font-size:12px}.bar button{font-size:11px}.bar #status{max-width:400px}@media(max-width:650px){.jazz-intro{display:block}.jazz-intro p{margin-top:15px}.tracks{grid-template-columns:repeat(3,1fr)}.jazz-controls{gap:12px;padding:12px}.jazz-help{grid-template-columns:1fr}.jazz-changes span{font-size:17px;padding:10px 4px}header nav{display:none}}
+.score-info{margin-top:16px;padding:12px 16px;border-left:2px solid var(--accent);background:var(--panel);font-size:12px;color:var(--muted);line-height:1.8}.score-info strong{color:var(--accent)}.jazz-changes.score{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.jazz-options{display:flex;flex-wrap:wrap;gap:12px;border:1px solid var(--line);border-radius:5px;margin:0;padding:8px 10px}.bass-tone{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border:1px solid var(--line);border-radius:5px;margin:12px 0;padding:12px 16px}.bass-tone legend{font-size:12px;color:var(--muted);padding:0 6px}.bass-tone label{font-size:12px;color:var(--muted)}.bass-tone output{float:right;color:var(--accent)}.bass-tone input{display:block;width:100%;margin-top:15px}.bass-tone:disabled{opacity:.4}.bass-tone.bass-fx{grid-template-columns:minmax(200px,360px);margin-top:0}.bass-fx small{display:block;margin-top:8px;font-size:10px;line-height:1.5}@media(max-width:520px){.bass-tone{grid-template-columns:repeat(2,1fr)}}.jazz-options legend{font-size:12px;color:var(--muted);padding:0 5px}.jazz-options input{accent-color:var(--accent);margin:0}.jazz-options label{cursor:pointer}
 </style>
 </head>
 <body>
 <main>
 <header>
-  <h1><a href="../" style="color:inherit;text-decoration:none" title="MIN-1 home">MIN-1</a></h1>
-  <p>a minimalist ensemble for the FM-1, in the browser: the same code the FM-1 runs</p>
-  <nav><a href="../emu/" aria-current="page">Emulator</a><a href="../install/">Install</a><a href="../manual/">Manual</a><a href="https://github.com/Reytian/fm1-min1">Source</a></nav>
+  <h1><a href="../" style="color:inherit;text-decoration:none" title="Jazz Box">JAZZ BOX</a></h1>
+  <p>Джазовый ансамбль для FM-1 · общий C-движок устройства и веб-эмулятора</p>
+  <nav><a href="https://github.com/Reytian/fm1-min1">Основа: MIN-1 ↗</a></nav>
 </header>
 
-<p class="turn">Turn your phone sideways for bigger controls.</p>
+<div class="jazz-intro"><h2>Ансамбль играет.<br><em>Мелодия — ваша.</em></h2><p>Семь джазовых циклов, Fine Romance Trio, Romance Forms и After You’ve Gone Forms. Гармония и формы сопровождения из ваших MIDI. Играйте на подсвеченных клавишах — ансамбль продолжит за вами.</p></div>
+<div class="jazz-controls"><button class="transport-jazz" id="jazzPlay" disabled>▶ Играть</button><label>Пресет <select id="jazzCycle"><option value="0">01 · ii–V–I, трезвучия</option><option value="1">02 · ii7–V7–Imaj7</option><option value="2">03 · Плавные голоса</option><option value="3">04 · Побочная доминанта</option><option value="4">05 · Тритоновая замена</option><option value="5">06 · Оба приёма</option><option value="6">07 · Хроматический спуск</option><option value="7">08 · Fine Romance Trio</option><option value="8">09 · Romance Forms</option><option value="9" selected>10 · After You’ve Gone Forms</option></select></label><label>Центр <select id="jazzRoot"></select></label><fieldset class="jazz-options"><legend>Пианино</legend><label><input type="radio" name="pianoRhythm" value="4" checked>Фразы</label><label><input type="radio" name="pianoRhythm" value="2">Арпеджио · 1/16</label><label><input type="radio" name="pianoRhythm" value="3">Синкопы</label><label><input type="radio" name="pianoRhythm" value="0">Длинные</label></fieldset><fieldset class="jazz-options"><legend>Тембр баса</legend><label><input type="radio" name="bassSound" value="2" checked>Rings</label><label><input type="radio" name="bassSound" value="0">Upright</label><label><input type="radio" name="bassSound" value="1">Piano</label></fieldset><label>Регистр баса <select id="bassOctave"><option value="-1">−12</option><option value="0" selected>Исходный · низкий</option><option value="1">+12</option></select></label><label>Темп <input id="jazzTempo" type="range" min="40" max="200" value="140" aria-label="Темп"><output id="jazzBpm">140</output></label></div><fieldset class="bass-tone" id="bassTone"><legend>Характер контрабаса · Rings</legend><label>Щипок <output data-bass-level="36">62</output><input type="range" min="0" max="100" value="62" data-bass="36" aria-label="Щипок контрабаса"></label><label>Корпус <output data-bass-level="37">70</output><input type="range" min="0" max="100" value="70" data-bass="37" aria-label="Корпус контрабаса"></label><label>Затухание <output data-bass-level="38">48</output><input type="range" min="0" max="100" value="48" data-bass="38" aria-label="Затухание контрабаса"></label><label>Глушение <output data-bass-level="39">58</output><input type="range" min="0" max="100" value="58" data-bass="39" aria-label="Глушение контрабаса"></label></fieldset><fieldset class="bass-tone bass-fx"><legend>Обработка баса · все тембры</legend><label>Реверберация баса <output data-bass-level="40">7</output><input type="range" min="0" max="100" value="7" data-bass="40" aria-label="Реверберация баса"><small>0 — сухой · 100 — максимум посыла</small></label></fieldset><button class="transport-jazz" id="newForms" hidden>Новый вариант фраз</button><div class="score-info" id="scoreInfo" hidden></div><div class="jazz-changes" id="jazzChanges"><span>E♭7</span><span>Dm7</span><span>D♭7</span><span>Cmaj7</span></div><div class="jazz-scale" id="jazzScale">Включите Jazz Box. Зелёные — гамма, яркие — опорные ноты, розовые — ваша партия.</div>
+
+<p class="turn">Поверните телефон горизонтально, чтобы увеличить панель.</p>
 <div class="device" id="device">
   <svg id="panel" viewBox="0 0 1000 640" role="application" aria-label="The FM-1: knobs, buttons, screen and keys"></svg>
   <canvas id="screen" width="240" height="240" aria-label="The FM-1 screen"></canvas>
-  <div class="start" id="start"><button id="go" type="button">Switch on</button></div>
+  <div class="start" id="start"><button id="go" type="button">Включить Jazz Box</button></div>
 </div>
 
 <div class="bar">
-  <span id="status">Off. It starts playing when you switch it on.</span>
+  <span id="status">Включите звук — ансамбль начнёт играть.</span>
   <span class="out">Output <span class="meter" role="meter" aria-label="Output level" aria-valuemin="-60" aria-valuemax="0" aria-valuenow="-60"><span id="meter"></span></span></span>
   <span class="cpu" id="cpu"></span>
   <span class="take">
@@ -120,131 +127,8 @@ kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--panel); 
   <button id="reset" type="button" title="Forget your changes, ideas, cycles and songs, and start again from the pieces' recipes">Factory reset</button>
 </div>
 
-<section class="help">
-  <div>
-    <h2>Playing</h2>
-    <ul>
-      <li><b>Keys</b> play the chord. In EASY keys, the default, each white key is a chord of the key, the tonic leftmost; a black key is the chord of the white key on its left with a seventh; several keys make a richer chord. The keys light where the cycle is, so you can play along.</li>
-      <li>Let go and the cycle comes back at its next chord. With <b>Hold</b> on (Setup) a chord stays until you play the same keys again. In NOTES keys (Setup) the notes you hold are the chord.</li>
-      <li><b>PLAY</b> plays and stops. <b>EDIT</b> rolls an idea for the page you are on: a new cycle, figure, line, bass or rhythm. SEL + EDIT goes back; ideas are kept with the piece.</li>
-      <li><b>ALGORITHM</b> the chord cycle (eighteen, then Mine and Rolled). <b>PRESETS</b> the piece; in SONGS, the song.</li>
-      <li><b>OCT−</b> / <b>OCT+</b> move the upper part an octave. <b>SAVE</b> saves; hold it to put the piece back to its recipe.</li>
-      <li>Hold a button for a second and a card says what it does.</li>
-    </ul>
-  </div>
-  <div>
-    <h2>By hand: SEL held</h2>
-    <p>Hold SEL (<kbd>Tab</kbd>, or Shift-click it) and the screen shows its map.</p>
-    <ul>
-      <li><b>ENV ARP LFO SEQ FX</b> bring their part in or out at the next chord; the arrangement is then yours (Build goes to 0).</li>
-      <li><b>White keys 1–8</b>: grow, shrink, shift, flip, still, slower, faster, a new section. On the Upper or Lower page they work on that part, elsewhere on both.</li>
-      <li><b>REC</b> learns a cycle: play two to eight chords one at a time, then REC; they become the cycle Mine. <b>EDIT</b> goes back to the idea before. <b>PLAY</b> switches between SONGS and LIVE.</li>
-    </ul>
-  </div>
-  <div>
-    <h2>Songs</h2>
-    <ul>
-      <li><b>REC</b> records a song from the top, everything you do, until REC again; then it is kept and MIN-1 switches to SONGS.</li>
-      <li>In SONGS, <b>PLAY</b> plays the song back exactly, <b>PRESETS</b> picks one of eight, and holding <b>SAVE</b> deletes it. SEL + PLAY goes back to LIVE.</li>
-      <li><b>Record audio</b>, under the FM-1, keeps what you hear: start it, play the song, stop it, and save a 16-bit stereo WAV to share.</li>
-    </ul>
-  </div>
-  <div>
-    <h2>The screen</h2>
-    <ul>
-      <li>At the top: the piece (in SONGS, the song), the key and the cycle, the tempo and the beat; a coral dot and the time while a song records.</li>
-      <li>The cycle's chords, the one playing filled. ROUND 2 OF 4 is the time round in this section; YOURS, in coral, when the keys have the chord.</li>
-      <li>A lane a part, in its colour, lit while it plays: the figures as dots (+ or − while the additive process grows or shrinks one), in Patterns each player's pattern, in Phase how far ahead the lower is.</li>
-      <li>At the bottom: the page's four knobs.</li>
-    </ul>
-  </div>
-  <div>
-    <h2>Mouse and touch</h2>
-    <ul>
-      <li>Drag a knob up or down, or use the scroll wheel over it.</li>
-      <li>Click or touch buttons and keys. On a touch screen several fingers work at once, so you can play chords and hold SEL.</li>
-      <li>With a mouse, <kbd>Shift</kbd>-click (or right-click) keys to hold a chord; click one of them to let it go. <kbd>Shift</kbd>-click a button to hold it down (SEL for its map, HOME for the tempo); click it again to let go.</li>
-    </ul>
-  </div>
-  <div>
-    <h2>Keyboard</h2>
-    <ul>
-      <li>White keys 1–8: <kbd>Q</kbd>–<kbd>I</kbd>, 9–16: <kbd>A</kbd>–<kbd>K</kbd>. Black keys 1–11: <kbd>1</kbd>–<kbd>0</kbd>, <kbd>-</kbd>. Hold several at once for a chord.</li>
-      <li><kbd>Tab</kbd> SEL, held: with <kbd>Q</kbd>–<kbd>I</kbd> the processes, with <kbd>Enter</kbd> learn a cycle. <kbd>Shift</kbd>+<kbd>Tab</kbd> still moves the focus.</li>
-      <li><kbd>Space</kbd> PLAY, <kbd>Enter</kbd> REC, <kbd>N</kbd> EDIT, <kbd>Esc</kbd> HOME, <kbd>Z</kbd> / <kbd>X</kbd> OCT− / OCT+.</li>
-      <li><kbd>↑</kbd> <kbd>↓</kbd> turn SELECT (with <kbd>Esc</kbd> held, the tempo). <kbd>←</kbd> <kbd>→</kbd> turn PRESETS.</li>
-    </ul>
-  </div>
-  <div class="wide">
-    <h2>The pieces</h2>
-    <p>Twenty, on PRESETS, in four models. Each remembers how you left it, and the model is a knob too (System), so any piece can be played another way.</p>
-    <div class="models">
-      <div><h3>Arpeggio</h3><p>Figures of the chord's tones, two against three; the additive process grows and shrinks them a note at a time.</p><p class="names">Morning · Glacier · Lagoon · Machine · Skyline · Evening · Counting · Prism</p></div>
-      <div><h3>Phase</h3><p>Two parts play one figure; the lower slowly drifts ahead, locks in a step ahead, drifts on, and comes round to unison.</p><p class="names">Drift · Breath · Weave · Tilt</p></div>
-      <div><h3>Patterns</h3><p>A chain of short patterns, each a little changed from the last; three players move along it at their own pace over a high pulse.</p><p class="names">Bazaar · Field · Gears · Murmur</p></div>
-      <div><h3>Bells</h3><p>A melody walks the scale by step in phrases that grow from one note; a bell answers each note with the chord's nearest tone.</p><p class="names">Vigil · Snowfall · Lantern · Chapel</p></div>
-    </div>
-  </div>
-  <div class="wide knobs">
-    <h2>Pages and knobs</h2>
-    <p>One page a part, each on its own button: KNOB 1 is the part's level, KNOB 2 its sound. <b>SELECT</b> steps through the pages; GLO pressed again opens System. Some knobs take another name in some models (in brackets).</p>
-    <div class="pages">
-      <div class="form">
-        <h3>Form <span>HOME</span></h3>
-        <dl>
-          <div><dt>Evolve (Patterns: Move on)</dt><dd>How restless it is: short sections, figures and chords that change. In Phase, how soon the parts unlock and drift on; in Patterns, how soon each player moves on.</dd></div>
-          <div><dt>Build</dt><dd>The slow arc between sparse and full: at each new section a part comes in or leaves. At 0 every part plays, or the ones you bring in by hand.</dd></div>
-          <div><dt>Process (Phase: Drift, Patterns: Spread, Bells: Phrases)</dt><dd>How often a figure takes up the additive process. In Phase, how fast the lower drifts; in Patterns, how far apart the players may get; in Bells, how long the phrases grow.</dd></div>
-          <div><dt>Chord</dt><dd>How long each chord of the cycle lasts: 2 beats, 1 bar, 2 bars or 4 bars. Tempo is HOME + SELECT, from any page.</dd></div>
-        </dl>
-      </div>
-      <div class="p-upper">
-        <h3>Upper <span>ENV</span></h3>
-        <dl>
-          <dt>Level, Sound</dt><dd>How loud; piano, organ, flute, strings or marimba.</dd><dt>Pulse, Figure (Patterns: Start, Bells: Bells)</dt><dd>2, 3, 4 or 6 notes a beat; the figure the chord is played in. In Patterns, the pattern it starts from; in Bells, where the bells answer: Above, Below, Both or Above 2. OCT− and OCT+ move it an octave.</dd>
-        </dl>
-      </div>
-      <div class="p-lower">
-        <h3>Lower <span>ARP</span></h3>
-        <dl>
-          <dt>Level, Sound</dt><dd>How loud; piano, organ, strings or marimba.</dd><dt>Pulse, Figure (Patterns: Start)</dt><dd>As the upper's. Against the upper's pulse they make the cross-rhythms: 3 against 2, 4 against 3. In Phase this is the part that drifts.</dd>
-        </dl>
-      </div>
-      <div class="p-bass">
-        <h3>Bass <span>LFO</span></h3>
-        <dl>
-          <dt>Level, Sound</dt><dd>How loud; synth bass, organ, strings or piano.</dd><dt>Style, Octave</dt><dd>Long notes, a pulse, octaves, or root and fifth; an octave down or up.</dd>
-        </dl>
-      </div>
-      <div class="p-lead">
-        <h3>Lead <span>SEQ</span></h3>
-        <dl>
-          <dt>Level, Sound</dt><dd>How loud; soprano sax, flute, horn, strings or piano.</dd><dt>Activity (Patterns, Bells: Pace), Harmony</dt><dd>How busy the line is (in Patterns and Bells, how quick its notes are); alone, a pair (a second voice below it) or in octaves.</dd>
-        </dl>
-      </div>
-      <div class="p-chords">
-        <h3>Chords <span>FX</span></h3>
-        <dl>
-          <dt>Level, Sound</dt><dd>How loud; strings, organ or horn.</dd><dt>Rhythm, Room</dt><dd>Held, a swell on each chord, 8ths, beats, a breath, or a single high pulse; the plate reverb, how much and how long.</dd>
-        </dl>
-      </div>
-      <div>
-        <h3>Setup and System <span>GLO, GLO again</span></h3>
-        <dl>
-          <dt>Tempo, Root, Keys, Hold</dt><dd>40 to 200 beats a minute; the key's root, which moves everything; EASY or NOTES keys; Hold on or off.</dd><dt>Model, MIDI out, Lights, CPU</dt><dd>The model the piece plays in; on the FM-1, a channel a part and the clock over USB; the key lights (Off, On, or Keys: without the buttons' glow); how hard the processor works.</dd>
-        </dl>
-      </div>
-    </div>
-  </div>
-  <div class="wide">
-    <h2>Saving</h2>
-    <p>SAVE keeps the pieces and the songs in this browser, as the FM-1 keeps them in its memory; MIN-1 also saves by itself a few seconds after a change while it is stopped. Factory reset forgets them.
-      It is the firmware, not a recording: what you hear is MIN-1 running at the FM-1's 44.1 kHz.
-      The emulator comes from Charles Vestal's AMB-1, and the idea of running FM-1 firmware in the browser from <a href="https://www.groove-os.com/">Groove OS</a>.</p>
-  </div>
-</section>
+<section class="tracks" id="jazzTracks" aria-label="Микшер инструментов"></section><section class="jazz-help"><div><h2>Подыгрывайте на клавиатуре</h2><p><kbd>A S D F G H J K</kbd> — белые клавиши C4–C5; <kbd>W E T Y U</kbd> — чёрные. <kbd>Z / X</kbd> — октава. <kbd>Пробел</kbd> — играть / стоп. Можно зажимать несколько нот; работает и русская раскладка.</p><p>Все клавиши FM-1 играют отдельные ноты, сохраняя аккорды ансамбля. Когда вы играете, автосолист уступает место и возвращается через такт после последней ноты.</p></div><div><h2>Как устроен ансамбль</h2><p><b>After You’ve Gone Forms</b>: 40 тактов гармонии, ми-бемоль мажор, 140 BPM. Мелодия и гармонизация правой руки отделены до разбора аккомпанемента. Бас и пианино выбирают из 256 форм, сохраняя динамику и ритмические жесты исходника. Кнопка «Новый вариант фраз» меняет выбор. Автосоло выключено — играйте свою мелодию.</p><p><b>Romance Forms</b>: та же гармония, но бас и пианино выбирают новые формы на каждом аккорде из <span id="formsCount">164</span> вариантов, разобранных по исходному MIDI. Ступени подстраиваются под качество аккорда и его гамму, басовые подходы — под следующий корень. Сохраняются длина фразы и two-feel / walking; соседние повторы исключены. На панели показаны текущие формы. «Новый вариант фраз» меняет выбор со следующего аккорда; на FM-1 — HOME → EDIT.</p><p><b>Fine Romance Trio</b>: 128 тактов из вашего MIDI, гармония с циклом 32 такта. Пианино сохраняет аккорды, короткие ответы и паузы; бас и ударные вместе переключаются между two-feel / хай-хэтом и walking / райдом. Автосоло изначально выключено. Темп, тональность и регистр баса можно менять. Для партии сопровождения сохранён свинг MIDI; HOME → KNOB3 меняет свинг автосоло.</p><p>В остальных пресетах пианино по умолчанию играет арпеджио шестнадцатыми, с динамикой и реверберацией оригинального Morning. Переключатель «Пианино» позволяет сравнить его с синкопированными аккордами. Бас идёт четвертями с хроматическими подводками; можно выбрать Rings, прежний Upright или Piano. В Rings запись щипка возбуждает модель струны; восемь атак чередуются в четырёх регистрах. Щипок и синтетическая струна больше не звучат двумя отдельными слоями. Ударные — 909 из X0X: райд, хэт на 2 и 4, тихая бочка и малый. Соло строит свинговые фразы по гамме текущего аккорда.</p><p>Яркие зелёные клавиши — терции и септимы, мягкие — остальные ноты гаммы. Тональность задаёт центр притяжения; хроматические аккорды могут содержать ноты вне основной гаммы.</p></div><div><h2>Управление на FM-1</h2><p><b>ENV</b> — ударные · <b>ARP</b> — ваша клавиатура · <b>LFO</b> — бас · <b>SEQ</b> — соло · <b>FX</b> — пианино. KNOB1 меняет громкость выбранной партии. HOME → KNOB3 — свинг. Нажмите LFO повторно: щипок, корпус, затухание и глушение контрабаса. Ещё раз LFO → Bass FX: KNOB1 — реверберация баса (0–100), для всех его тембров. ALGORITHM — последовательность; PRESETS — рецепт ансамбля.</p></div><div><h2>Запись и сохранение</h2><p>Record audio сохраняет весь звук в WAV. SAVE на устройстве сохраняет настройки; REC записывает исполнение. Настройки веб-версии остаются в этом браузере.</p></div></section><footer class="jazz-footer">Jazz Box · адаптация MIN-1 (Reytian), платформа Felucca / AMB-1, ударные X0X / 9W9 / ER-99 · GPL-3.0-only. Веб-эмулятор, без установки на устройство.</footer>
 </main>
-
 <script>
 "use strict";
 const NS = "http://www.w3.org/2000/svg";
@@ -255,8 +139,8 @@ const BLACK_K = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
 const BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14];
 const KEY0 = 53;                                          // key 0 is F3 (MIDI 53)
 const NOTE = ["C", "C♯", "D", "E♭", "E", "F", "F♯", "G", "A♭", "A", "B♭", "B"];
-const BODY = "#3a3d42", TRAY = "#26282c", KEY_W = "#d9dadc", KEY_B = "#c9cacd", KNOB = "#1f2124", BTNC = "#2e3135", LABEL = "#e8e8ea";
-const STORE_KEY = "min-emu-store";
+const BODY = "#20281c", TRAY = "#141b11", KEY_W = "#d6dcc8", KEY_B = "#849176", KNOB = "#11180e", BTNC = "#303c26", LABEL = "#e3eccf";
+const STORE_KEY = "jazz-box-emu-v1";
 
 const svg = document.getElementById("panel");
 function el(tag, attrs, parent = svg) {
@@ -305,8 +189,8 @@ el("rect", { x: 300, y: 44, width: 236, height: 236, rx: 26, fill: "#111214" });
 el("rect", { x: 568, y: 160, width: 400, height: 140, rx: 18, fill: TRAY });
 const ROW1 = ["FX", "SEL", "ENV", "LFO", "EDIT", "GLO"], ROW2 = ["HOME", "SAVE", "ARP", "SEQ", "PLAY", "REC"];
 for (let i = 0; i < 6; i++) {
-  button(582 + i * 63, 174, 54, 48, ROW1[i]);
-  if (ROW2[i] === "PLAY") button(582 + i * 63, 236, 54, 48, "PLAY", "STOP"); else button(582 + i * 63, 236, 54, 48, ROW2[i]);
+  button(582 + i * 63, 174, 54, 48, ROW1[i],{FX:"PIANO",ENV:"DRUMS",LFO:"BASS",GLO:"SETUP"}[ROW1[i]]);
+  if (ROW2[i] === "PLAY") button(582 + i * 63, 236, 54, 48, "PLAY", "STOP"); else button(582 + i * 63, 236, 54, 48, ROW2[i],{ARP:"KEYS",SEQ:"SOLO",HOME:"FORM"}[ROW2[i]]);
 }
 
 const keys = [];
@@ -317,6 +201,7 @@ const keys = [];
   for (let i = 0; i < 16; i++) {
     const g = el("g", { class: "ctl", role: "button", "aria-label": `key ${name(WHITE_K[i])}` });
     el("rect", { x: x0 + 12 + i * pitch + (pitch - kw) / 2, y: y0 + h * 0.43, width: kw, height: h * 0.52, rx: kw / 2, fill: KEY_W, class: "keyface white" }, g);
+    text(g,x0+12+(i+.5)*pitch,y0+h*.88,name(WHITE_K[i]),11,"#283420").setAttribute("class","key-label");
     keys[WHITE_K[i]] = { g };
   }
   BLACK_AFTER.forEach((a, k) => {
@@ -472,15 +357,20 @@ for (const k of Object.values(knobs)) {
 }
 
 const KEYMAP = {};
-"qwertyui".split("").forEach((c, i) => KEYMAP["Key" + c.toUpperCase()] = { key: WHITE_K[i] });
-"asdfghjk".split("").forEach((c, i) => KEYMAP["Key" + c.toUpperCase()] = { key: WHITE_K[8 + i] });
-"1234567890".split("").forEach((c, i) => KEYMAP["Digit" + c] = { key: BLACK_K[i] });
-KEYMAP.Minus = { key: BLACK_K[10] };
+const pianoCodes={KeyA:0,KeyW:1,KeyS:2,KeyE:3,KeyD:4,KeyF:5,KeyT:6,KeyG:7,KeyY:8,KeyH:9,KeyU:10,KeyJ:11,KeyK:12,KeyO:13,KeyL:14,KeyP:15,Semicolon:16,Quote:17};
+for(const [code,offset] of Object.entries(pianoCodes)) {
+  const k=7+offset; KEYMAP[code]={key:k};
+  const face=keys[k].g.querySelector('rect');
+  const x=+face.getAttribute('x'),y=+face.getAttribute('y'),w=+face.getAttribute('width'),h=+face.getAttribute('height');
+  const label=code==='Semicolon'?';':code==='Quote'?"'":code.slice(3);
+  text(keys[k].g,x+w/2,y+h*.48,label,13,'#24331b').setAttribute('class','key-shortcut');
+}
 Object.assign(KEYMAP, { Space: { btn: BTN.PLAY }, Enter: { btn: BTN.REC }, KeyN: { btn: BTN.EDIT }, Tab: { btn: BTN.SEL },
                         Escape: { btn: BTN.HOME }, KeyZ: { btn: BTN["OCT-"] }, KeyX: { btn: BTN["OCT+"] } });
 const ARROWS = { ArrowUp: ["SELECT", 1], ArrowDown: ["SELECT", -1], ArrowRight: ["PRESETS", 1], ArrowLeft: ["PRESETS", -1] };
 addEventListener("keydown", (e) => {
-  if (!node || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (!node || e.metaKey || e.ctrlKey || e.altKey || (["SELECT","TEXTAREA"].includes(e.target.tagName) || (e.target.tagName==="INPUT" && !["range","checkbox"].includes(e.target.type)))) return;
+  if (ARROWS[e.code] && e.target.tagName==="INPUT" && e.target.type==="range") return;
   if (ARROWS[e.code]) { turn(knobs[ARROWS[e.code][0]], ARROWS[e.code][1]); e.preventDefault(); return; }
   const m = KEYMAP[e.code];
   if (!m || (e.code === "Tab" && e.shiftKey)) return;    // Shift+Tab still moves the focus
@@ -579,7 +469,7 @@ function onRec(m) {
   recChunks.push(m.pcm);
   recFrames += m.pcm.length / 2;
   if (m.end) {
-    take = { chunks: recChunks, frames: recFrames, name: `MIN-1 ${m.title || ""}`.trim() };
+    take = { chunks: recChunks, frames: recFrames, name: `Jazz Box ${m.title || ""}`.trim() };
     recChunks = [];
     recBtn.disabled = false;
   } else if (recording && recFrames >= REC_MAX) {
@@ -649,7 +539,7 @@ const status = document.getElementById("status"), cpu = document.getElementById(
 async function switchOn() {
   const go = document.getElementById("go");
   go.disabled = true;
-  go.textContent = "Starting...";
+  go.textContent = "Запускаю ансамбль...";
   try {
     const ac = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
     const [wasm] = await Promise.all([fetch("min.wasm").then((r) => { if (!r.ok) throw new Error(`min.wasm: ${r.status}`); return r.arrayBuffer(); }),
@@ -663,10 +553,11 @@ async function switchOn() {
         else if (m.type === "rec") onRec(m);
         else if (m.type === "frame") {
           if (m.fb) drawScreen(m.fb);
+          if (m.jazz) drawJazz(m.jazz);
           drawLights(m.buttons, m.keys, m.song === 1);
           drawLevel(m.peak);
           window.minLast = m;
-          if (m.load !== undefined) cpu.textContent = `MIN-1 uses ${m.load}% of this computer's time`;
+          if (m.load !== undefined) cpu.textContent = `Jazz Box · ${m.load}% audio CPU`;
           if (m.store) saveStore(m.store);
         }
       };
@@ -675,14 +566,15 @@ async function switchOn() {
     await ready;
     await ac.resume();
     document.getElementById("start").hidden = true;
-    const on = ac.sampleRate === 44100 ? "On." : `On (the browser runs audio at ${ac.sampleRate} Hz).`;
+    const on = ac.sampleRate === 44100 ? "Звук включён." : `On (the browser runs audio at ${ac.sampleRate} Hz).`;
     status.textContent = on;
     ac.onstatechange = () => { status.textContent = ac.state === "running" ? on : "Paused by the browser: click the FM-1 or press a key to carry on."; };
     recBtn.disabled = false;
+    document.getElementById("jazzPlay").disabled=false;
     syncButtons(); syncKeys();
   } catch (err) {
     go.disabled = false;
-    go.textContent = "Switch on";
+    go.textContent = "Включить Jazz Box";
     status.textContent = "Could not start: " + (err && err.message || err) + ". Chrome, Edge, Firefox and Safari should all work.";
   }
 }
@@ -699,6 +591,45 @@ document.getElementById("reset").addEventListener("click", () => {
     document.getElementById("reset").textContent = "Click again to forget everything";
   }
 });
+const jazzRoot=document.getElementById('jazzRoot');
+NOTE.forEach((n,i)=>{const o=document.createElement('option');o.value=i;o.textContent=n+' major';jazzRoot.append(o)});jazzRoot.value='3';
+const trackInfo=[['Аккорды','Piano',20,65],['Бас','Walking',12,74],['Ударные','X0X 909',4,45],['Соло','Sax',16,50],['Ваши клавиши','Piano',8,85]];
+document.getElementById('bassOctave').addEventListener('change',e=>{send({type:'param',param:15,value:+e.target.value});e.target.blur()});
+const remembered={};
+for(const [name,sound,param,level] of trackInfo){remembered[param]=level;const card=document.createElement('div');card.className='track';card.innerHTML=`<label><input type="checkbox" data-track="${param}" checked>${name}</label><small>${sound}</small><output data-level="${param}">${level}</output><input aria-label="Громкость: ${name}" type="range" min="0" max="100" value="${level}" data-volume="${param}">`;document.getElementById('jazzTracks').append(card)}
+for(const slider of document.querySelectorAll('[data-volume]'))slider.addEventListener('input',()=>{remembered[slider.dataset.volume]=+slider.value;send({type:'param',param:+slider.dataset.volume,value:+slider.value})});
+for(const toggle of document.querySelectorAll('[data-track]'))toggle.addEventListener('change',()=>send({type:'param',param:+toggle.dataset.track,value:toggle.checked?(remembered[toggle.dataset.track]||60):0}));
+document.getElementById('jazzPlay').addEventListener('click',()=>send({type:'transport'}));
+document.getElementById('newForms').addEventListener('click',e=>{send({type:'param',param:32,value:Math.floor(Math.random()*32768)});e.target.blur()});
+document.getElementById('jazzCycle').addEventListener('change',e=>{send({type:'preset',value:20+(+e.target.value)});e.target.blur()});
+jazzRoot.addEventListener('change',e=>{send({type:'param',param:25,value:+e.target.value});e.target.blur()});
+for(const radio of document.querySelectorAll('[name=pianoRhythm]'))radio.addEventListener('change',()=>{if(radio.checked){send({type:'param',param:22,value:+radio.value});send({type:'param',param:23,value:50});radio.blur()}});
+for(const slider of document.querySelectorAll('[data-bass]'))slider.addEventListener('input',()=>{document.querySelector(`[data-bass-level="${slider.dataset.bass}"]`).textContent=slider.value;send({type:'param',param:+slider.dataset.bass,value:+slider.value})});
+for(const radio of document.querySelectorAll('[name=bassSound]'))radio.addEventListener('change',()=>{if(radio.checked){send({type:'param',param:13,value:+radio.value});radio.blur()}});
+document.getElementById('jazzTempo').addEventListener('input',e=>{document.getElementById('jazzBpm').textContent=e.target.value;send({type:'param',param:24,value:+e.target.value})});
+let changeSignature='';
+function drawJazz(j){
+ const p=j.params,score=!!j.score?.active,forms=!!j.forms?.active;
+ document.getElementById('newForms').hidden=!forms;
+ document.getElementById('jazzPlay').textContent=j.playing?'■ Стоп':'▶ Играть';
+ for(const [id,value] of [['jazzTempo',p[24]],['jazzRoot',p[25]],['jazzCycle',p[30]>=27?p[30]-20:Math.min(6,Math.max(0,p[30]-18))],['bassOctave',p[15]]]){const el=document.getElementById(id);if(document.activeElement!==el)el.value=value}
+ for(const radio of document.querySelectorAll('[name=pianoRhythm]')){radio.checked=+radio.value===(score&&p[22]===4?4:p[22]===0?0:p[22]===2?2:3);if(+radio.value===4)radio.disabled=!score}
+ for(const radio of document.querySelectorAll('[name=bassSound]'))radio.checked=+radio.value===p[13];
+ document.querySelector('[data-track="12"]').closest('.track').querySelector('small').textContent=p[13]===2?'Rings + sample':p[13]===1?'Piano walking':'Upright walking';
+ document.getElementById('bassTone').disabled=p[13]!==2;
+ for(const slider of document.querySelectorAll('[data-bass]')){const value=p[+slider.dataset.bass];if(document.activeElement!==slider)slider.value=value;document.querySelector(`[data-bass-level="${slider.dataset.bass}"]`).textContent=value}
+ document.getElementById('jazzBpm').textContent=p[24];
+ for(const [,sound,param] of trackInfo){const slider=document.querySelector(`[data-volume="${param}"]`),toggle=document.querySelector(`[data-track="${param}"]`);if(document.activeElement!==slider)slider.value=p[param];toggle.checked=p[param]>0;document.querySelector(`[data-level="${param}"]`).textContent=p[param]}
+ const info=document.getElementById('scoreInfo');info.hidden=!score;if(score){info.replaceChildren();const strong=document.createElement('strong');strong.textContent=`${p[30]===29?'After You’ve Gone Forms':forms?'Romance Forms':'Fine Romance Trio'} · оборот ${j.score.chorus}/${p[30]===29?3:4} · такт ${j.score.bar}/${p[30]===29?40:32}`;info.append(strong,document.createTextNode(j.score.walking?' — walking bass + райд':' — two-feel + хай-хэт'));if(forms){const labels={'Root + fifth':'тоника–квинта','Approach next':'подход к следующему','Ascending line':'восходящая линия','Descending line':'нисходящая линия','Turn / arch':'разворот','Rest':'пауза','Chord punctuation':'аккордовые удары','Two-note reply':'двухголосный ответ','Single-note reply':'одноголосный ответ','Chord + fill':'аккорд + заполнение','Chromatic turn':'хроматический оборот'};info.append(document.createElement('br'),document.createTextNode(`Бас #${j.forms.bass+1}: ${labels[j.forms.bassName]||j.forms.bassName} · Пианино #${j.forms.piano+1}: ${labels[j.forms.pianoName]||j.forms.pianoName}`));}}document.getElementById('jazzChanges').classList.toggle('score',score);
+ const sig=j.chords.join('|');if(sig!==changeSignature){document.getElementById('jazzChanges').replaceChildren(...j.chords.map(n=>{const span=document.createElement('span');span.textContent=n.replace(/b/g,'♭').replace(/M([79])/g,'maj$1');return span}));changeSignature=sig}
+ Array.from(document.getElementById('jazzChanges').children).forEach((el,i)=>el.classList.toggle('current',i===j.position));
+ const spelled=[2,4,6,7,9,11].includes(p[25])?['C','C♯','D','D♯','E','F','F♯','G','G♯','A','A♯','B']:NOTE;
+ const names=spelled.filter((_,pc)=>j.scale>>pc&1),anchors=spelled.filter((_,pc)=>j.anchors>>pc&1);
+ document.getElementById('jazzScale').replaceChildren();
+ const title=document.createElement('strong');title.textContent=(j.chords[j.position]||'')+' · '+j.scaleName+'  ';document.getElementById('jazzScale').append(title,document.createTextNode(names.join(' · ')+'  / опорные: '+anchors.join(', ')));
+ keys.forEach((k,i)=>{k.g.classList.toggle('anchor',!!(j.anchors>>((KEY0+i)%12)&1));const note=KEY0+i+12*p[31];k.hit.setAttribute('aria-label','key '+spelled[note%12]+(Math.floor(note/12)-1));const lab=k.g.querySelector('.key-label');if(lab)lab.textContent=spelled[note%12]+(Math.floor(note/12)-1);k.hit.setAttribute('aria-description',(j.anchors>>(note%12)&1)?'Опорная нота':(j.scale>>(note%12)&1)?'Нота подходящей гаммы':'Вне предложенной гаммы')});
+}
+
 </script>
 </body>
 </html>
