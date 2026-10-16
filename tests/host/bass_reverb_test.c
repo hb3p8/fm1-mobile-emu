@@ -11,13 +11,13 @@ int main(void)
     int sound,wet,p,i,j;int16_t params[P_NPARAMS];
     for(sound=0;sound<3;sound++)for(wet=0;wet<2;wet++) {
         voice_t *bass,*piano;
-        en_init();en_piece(28,params);
+        en_init();en_piece(8,params);
         for(p=0;p<P_NPARAMS;p++)apply(p,params[p]);
         apply(P_BS_SOUND,sound);apply(P_BS_REVERB,wet?100:0);
         bass=note_on(PT_BASS,40,.8f,4410,0);
         OK(fm_fabsf(bass->send-(wet?.5f:0))<.00001f);
         /* An already ringing bass follows the control, while piano stays put. */
-        piano=note_on(PT_LOWER,60,.8f,4410,0);
+        piano=note_on(PT_KEYS,60,.8f,4410,0);
         apply(P_BS_REVERB,31);OK(fm_fabsf(bass->send-.155f)<.00001f);OK(piano->send==PIANO_SEND);
         apply(P_BS_REVERB,wet?100:0);piano->on=0;
         /* Leave playback stopped: just this one bass note and its effect tail. */

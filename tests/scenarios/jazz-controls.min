@@ -1,0 +1,21 @@
+wait 200
+expect piece 9
+expect playing 1
+expect par24 140
+expect par28 0
+tap SEQ
+expect view 0
+tap GLO
+expect view 5
+spin K3 10
+spin K4 10
+expect par26 0
+expect par27 0
+tap LFO
+tap LFO
+spin K1 5
+expect par36 67
+tap LFO
+spin K1 10
+expect par40 17
+shot controls.png

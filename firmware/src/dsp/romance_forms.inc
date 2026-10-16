@@ -13,14 +13,7 @@ volatile uint16_t en_jazz_form_bass,en_jazz_form_piano;
 int en_jazz_form_count(void) { return jazz_after()?AFTER_FORM_COUNT:ROMANCE_FORM_COUNT; }
 static const romance_form_t *form_bank(void) {return jazz_after()?AFTER_FORMS:ROMANCE_FORMS;}
 static const romance_form_note_t *form_notes(void) {return jazz_after()?AFTER_FORM_NOTES:ROMANCE_FORM_NOTES;}
-static const char *const FORM_BASS_NAMES[5]={"Root + fifth","Approach next","Ascending line","Descending line","Turn / arch"};
-static const char *const FORM_PIANO_NAMES[6]={"Rest","Chord punctuation","Two-note reply","Single-note reply","Chord + fill","Chromatic turn"};
-const char *en_jazz_form_name(int part)
-{
-    unsigned id=part==PT_BASS?en_jazz_form_bass:en_jazz_form_piano;
-    if(!en_jazz_forms_active() || id>=(unsigned)en_jazz_form_count()) return "";
-    return part==PT_BASS?FORM_BASS_NAMES[form_bank()[id].kind]:FORM_PIANO_NAMES[form_bank()[id].kind];
-}
+const char *en_jazz_form_name(int part){unsigned id=part==PT_BASS?en_jazz_form_bass:en_jazz_form_piano;return en_jazz_forms_active() && id<(unsigned)en_jazz_form_count()?form_bank()[id].name:"";}
 static void jazz_forms_seed(int seed)
 {
     form_rng=lr_seed((uint32_t)seed);
@@ -28,7 +21,7 @@ static void jazz_forms_seed(int seed)
 static void jazz_forms_reset(void)
 {
     int p,k;
-    jazz_forms_seed(par[P_SEED_CYC]);
+    jazz_forms_seed(par[P_SEED]);
     if(en_jazz_forms_active()) form_rng^=rnd();
     if(!form_rng) form_rng=1;
     for(p=0;p<2;p++) {
@@ -61,7 +54,7 @@ static unsigned form_weight(unsigned id,int p,unsigned chord)
     if(f->part!=(p?PT_CHORDS:PT_BASS) || f->len!=h->beats*24) return 0;
     if(p && f->family!=form_family(h->mask)) return 0;
     if(f->feel!=en_jazz_walking || id==form_previous[p]) return 0;
-    return id==form_place[p][chord]?(unsigned)((100-par[P_EVOLVE])/20+1):6u;
+    return id==form_place[p][chord]?(unsigned)((100-par[P_VARIATION])/20+1):6u;
 }
 static unsigned form_pick(int p,unsigned chord)
 {

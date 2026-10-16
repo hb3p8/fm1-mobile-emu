@@ -105,7 +105,7 @@ __attribute__((used, visibility("default"))) const char *web_scale_name(void) { 
 __attribute__((used, visibility("default"))) const int16_t *web_params(void) { return en_params(); }
 __attribute__((used, visibility("default"))) uint32_t web_params_count(void) { return P_NPARAMS; }
 __attribute__((used, visibility("default"))) uint32_t web_part_notes(int p) { return p>=0 && p<EN_NPART ? en_notes[p] : 0; }
-__attribute__((used, visibility("default"))) uint32_t web_yours(void) { return en_yours; }
+__attribute__((used, visibility("default"))) uint32_t web_yours(void) { return 0; }
 __attribute__((used, visibility("default"))) uint32_t web_score_active(void) { return (uint32_t)en_jazz_score_active(); }
 __attribute__((used, visibility("default"))) uint32_t web_score_bar(void) { return en_jazz_bar; }
 __attribute__((used, visibility("default"))) uint32_t web_score_chorus(void) { return en_jazz_chorus; }

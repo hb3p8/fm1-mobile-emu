@@ -27,7 +27,7 @@ void en_midi_out(uint32_t status,uint32_t note,uint32_t vel)
 static void start(int piece,int seed)
 {
     int16_t p[P_NPARAMS];int k;
-    en_init();en_piece(piece,p);p[P_SEED_CYC]=(int16_t)seed;
+    en_init();en_piece(piece,p);p[P_SEED]=(int16_t)seed;
     for(k=0;k<P_NPARAMS;k++)en_set(k,p[k]);
     en_play(1);en_render(audio,1,2048);
 }
@@ -55,7 +55,7 @@ int main(void)
 {
     static result_t fixed,a,b,repeat;
     unsigned id,walking=65535,approach=65535,k,changed_bass=0,changed_piano=0;
-    start(28,42);
+    start(8,42);
     for(id=0;id<ROMANCE_FORM_COUNT;id++) {
         const romance_form_t *f=&ROMANCE_FORMS[id];
         if(f->part==PT_BASS && f->source_bar==33 && f->n==4)walking=id;
@@ -81,7 +81,7 @@ int main(void)
             for(unsigned n=0;n<form_n[p];n++) {OK(form_play[p][n].note>=21);OK(form_play[p][n].note<=(p?108:55));}
         }
     }
-    take(27,42,&fixed);take(28,42,&a);take(28,43,&b);take(28,42,&repeat);
+    take(7,42,&fixed);take(8,42,&a);take(8,43,&b);take(8,42,&repeat);
     OK(!fixed.bad && !a.bad && !b.bad && !repeat.bad);
     OK(a.harmony==fixed.harmony && b.harmony==fixed.harmony);
     OK(a.drums==fixed.drums && b.drums==fixed.drums);

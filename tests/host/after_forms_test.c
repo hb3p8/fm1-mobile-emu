@@ -20,7 +20,7 @@ void en_midi_out(uint32_t status,uint32_t note,uint32_t vel)
 static void start(int seed)
 {
     int16_t p[P_NPARAMS];
-    en_init();en_piece(29,p);p[P_SEED_CYC]=(int16_t)seed;
+    en_init();en_piece(9,p);p[P_SEED]=(int16_t)seed;
     for(int k=0;k<P_NPARAMS;k++)en_set(k,p[k]);
     en_play(1);en_render(audio,1,2048);
     notes_hash=drum_hash=2166136261u;memset(note_count,0,sizeof note_count);
@@ -44,8 +44,8 @@ static int take(int seed,uint32_t *nh,uint32_t *dh)
         }
         harmony=(harmony^en_chord_mask^en_chord_bass)*16777619u;
     }
-    OK(changes==126);OK(note_count[PT_BASS]>400);OK(note_count[PT_CHORDS]>500);OK(note_count[PT_UPPER]>1100);
-    OK(note_count[PT_LEAD]==0 && note_count[PT_LOWER]==0);
+    OK(changes==126);OK(note_count[PT_BASS]>400);OK(note_count[PT_CHORDS]>500);OK(note_count[PT_DRUMS]>1100);
+    OK(note_count[PT_KEYS]==0);
     *nh=notes_hash;*dh=drum_hash;
     return (int)harmony;
 }

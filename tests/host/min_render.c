@@ -82,7 +82,7 @@ typedef struct {
 /* piece i from the top, its levels changed by solo (-1: as the recipe), for secs; pcm may be 0 */
 static void play(int piece, int solo, int secs, int16_t *pcm, stats_t *st)
 {
-    static const uint8_t LEVEL[EN_NPART] = {P_UP_LEVEL, P_LO_LEVEL, P_BS_LEVEL, P_LD_LEVEL, P_CH_LEVEL};
+    static const uint8_t LEVEL[EN_NPART] = {P_DR_LEVEL, P_KEYS_LEVEL, P_BS_LEVEL, P_CH_LEVEL};
     int16_t par[P_NPARAMS];
     int32_t blk[512];
     uint32_t n = (uint32_t)secs * 44100u / 256u, b, k, notes0[EN_NPART], sec0;
@@ -95,7 +95,6 @@ static void play(int piece, int solo, int secs, int16_t *pcm, stats_t *st)
         for (p = 0; p < EN_NPART; p++)
             if (p != solo)
                 par[LEVEL[p]] = 0;
-        par[P_BUILD] = 0;
     }
     for (p = 0; p < P_NPARAMS; p++)
         en_set(p, par[p]);
@@ -156,8 +155,8 @@ int main(int argc, char **argv)
     dir = argc > 2 ? argv[2] : "build/render";
     only = argc > 3 ? atoi(argv[3]) : -1;
     pcm = malloc((size_t)secs * 44100u * 4u + 4096u);
-    printf("%-10s %6s %6s %5s  %5s %5s %5s %5s %5s  %3s %3s  %6s %6s  %s\n", "piece", "peak", "rms", "corr", "upper", "lower",
-           "bass", "lead", "chord", "vox", "sec", "us avg", "us max", "FM-1 load (insn/frame): avg, worst block");
+    printf("%-10s %6s %6s %5s  %5s %5s %5s %5s  %3s %3s  %6s %6s  %s\n", "piece", "peak", "rms", "corr", "drums", "keys",
+           "bass", "piano", "vox", "sec", "us avg", "us max", "FM-1 load (insn/frame): avg, worst block");
     for (i = 0; i < EN_NPIECES; i++) {
         stats_t st;
         char path[512];
@@ -166,16 +165,16 @@ int main(int argc, char **argv)
             continue;
         play(i, -1, secs, pcm, &st);
         rms = sqrt((st.ss_l + st.ss_r) / (2.0 * st.frames));
-        printf("%-10s %6.1f %6.1f %5.2f  %5u %5u %5u %5u %5u  %3u %3u  %6.1f %6.1f  %3.0f%%, %3.0f%% (%.0f, %.0f)\n",
+        printf("%-10s %6.1f %6.1f %5.2f  %5u %5u %5u %5u  %3u %3u  %6.1f %6.1f  %3.0f%%, %3.0f%% (%.0f, %.0f)\n",
                en_piece_name(i), db(st.peak), db(rms), st.ss_lr / sqrt(st.ss_l * st.ss_r + 1e-30), st.notes[0], st.notes[1],
-               st.notes[2], st.notes[3], st.notes[4], st.voices_max, st.sections, st.us_sum / (st.frames / 256), st.us_max,
+               st.notes[2], st.notes[3], st.voices_max, st.sections, st.us_sum / (st.frames / 256), st.us_max,
                (double)st.ins_sum / st.frames * DEV_PCT_PER_INSN, (double)st.ins_max / 256.0 * DEV_PCT_PER_INSN,
                (double)st.ins_sum / st.frames, (double)st.ins_max / 256.0);
         snprintf(path, sizeof path, "%s/%d-%s.wav", dir, i + 1, en_piece_name(i));
         wav_write(path, pcm, st.frames);
         if (parts) {
             int16_t par[P_NPARAMS];
-            static const uint8_t LEVEL[EN_NPART] = {P_UP_LEVEL, P_LO_LEVEL, P_BS_LEVEL, P_LD_LEVEL, P_CH_LEVEL};
+            static const uint8_t LEVEL[EN_NPART] = {P_DR_LEVEL, P_KEYS_LEVEL, P_BS_LEVEL, P_CH_LEVEL};
             en_piece(i, par);
             printf("    alone:");
             for (p = 0; p < EN_NPART; p++) {

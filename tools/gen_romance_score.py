@@ -92,7 +92,7 @@ def main():
     def quant(t):
         return (t * 24 + ppqn // 2) // ppqn
     events, counts = [], []
-    for track, part in ((6,2),(7,4),(11,0)):
+    for track, part in ((6,2),(7,3),(11,0)):
         count = 0
         for start, end, note, velocity in tracks[track]:
             if 8 * ppqn <= start < 520 * ppqn:
@@ -125,8 +125,6 @@ def main():
     target = pathlib.Path(sys.argv[1])
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text('\n'.join(text))
-    from gen_romance_forms import write_forms
-    write_forms(events,CHART,target.with_name('romance_forms.h'))
     print('%s: %d notes (bass %d, piano %d, drums %d), %d chords, 128 bars' % (target,len(events),*counts,len(CHART)))
 
 

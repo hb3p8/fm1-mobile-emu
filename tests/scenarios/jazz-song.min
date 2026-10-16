@@ -1,0 +1,20 @@
+wait 200
+tap REC
+wait 200
+tapkey w4
+wait 500
+tap REC
+wait 200
+expect song_used 1
+expect song_state 0
+tap SAVE
+wait 100
+reboot
+wait 200
+press SEL
+tap PLAY
+release SEL
+tap PLAY
+wait 300
+expect song_state 2
+shot song.png

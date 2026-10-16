@@ -10,15 +10,10 @@
 #define EN_VERSION "DEV"
 #endif
 #define PROJ_MAGIC 0x315A5A4Au           /* "JZZ1" */
-#define PROJ_FORMAT 8u                  /* 8: After Gone Forms; versions 3 through 7 migrated on load */
+#define PROJ_FORMAT 9u                  /* Jazz-only ten-slot project */
 #define NPIECES EN_NPIECES
 
-typedef struct {
-    int16_t par[P_NPARAMS];
-    uint8_t mine_n, rsv;                 /* "Mine", the learned cycle: its chords, relative to the root */
-    uint16_t mine_mask[EN_CYC_MAX];      /* (bit 0 = the root's class) */
-    uint8_t mine_bass[EN_CYC_MAX];
-} slot_t;
+typedef struct {int16_t par[P_NPARAMS];} slot_t;
 
 typedef struct {                         /* a song slot, as the list shows it (the take is in its own objects) */
     uint8_t used, piece;
@@ -33,7 +28,7 @@ typedef struct {
     uint8_t piece;                       /* which piece */
     uint8_t song;                        /* which song slot */
     uint8_t rsv0;
-    slot_t slot[NPIECES];                /* every piece as it was left, with its Mine (Keys, Hold, MIDI out global) */
+    slot_t slot[NPIECES];                /* each Jazz recipe as it was left; MIDI output is global */
     song_info_t songs[NSONGS];
     uint8_t rsv[16];                     /* room to grow */
 } project_t;
@@ -46,8 +41,7 @@ int project_save(void);                  /* 0 = saved and verified */
 void project_apply(void);                /* every value to the engine (boot, load) */
 const char *piece_name(int i);
 void project_piece(int i);               /* the playing piece kept, piece i taken up as it was left */
-void project_piece_reset(void);          /* the playing piece back to its recipe (its Mine kept) */
-void project_mine(int n, const uint16_t *mask, const uint8_t *bass);   /* the playing piece's Mine */
+void project_piece_reset(void);          /* the playing piece back to its recipe (other recipes kept) */
 int song_save(int k);                    /* the take in memory into slot k (0 = saved) */
 int song_load(int k);                    /* slot k's take into memory, while none records or plays (0 = loaded) */
 

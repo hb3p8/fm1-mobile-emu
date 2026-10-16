@@ -14,7 +14,7 @@ mkdir -p "$OUT" build/scenarios build/gen
 python3 tools/gen_drum_samples.py build/gen/x0x_drum_samples.h >/dev/null
 python3 tools/gen_upright_samples.py build/gen/upright_attacks.h >/dev/null
 python3 tools/gen_romance_score.py build/gen/romance_score.h >/dev/null
-python3 tools/gen_after_forms.py build/gen/after_forms.h >/dev/null
+python3 tools/form_library.py --output build/gen >/dev/null
 run() {
     name="$1"; shift
     if "$@" > "$OUT/$name.log" 2>&1; then
@@ -31,7 +31,6 @@ run uac sh -c "$CC -O2 -w -Ifirmware/src -Ifirmware/hal -o $OUT/uac_test tests/h
 run trs sh -c "$CC -O2 -w -Ifirmware/src -Ifirmware/hal -o $OUT/trs_test tests/host/trs_test.c && $OUT/trs_test"
 run min sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wdouble-promotion -Werror -DEN_HOST -Ibuild/gen -Ifirmware/src/dsp \
     -o $OUT/min_test tests/host/min_test.c firmware/src/dsp/min.c firmware/src/dsp/drum909.c firmware/src/dsp/upright.c firmware/src/dsp/rings_string.c && $OUT/min_test"
-run jazz sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror -DEN_HOST -Ibuild/gen -Ifirmware/src/dsp -o $OUT/jazz_test tests/host/jazz_test.c firmware/src/dsp/min.c firmware/src/dsp/drum909.c firmware/src/dsp/upright.c firmware/src/dsp/rings_string.c && $OUT/jazz_test"
 run romance sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror -DEN_HOST -Ibuild/gen -Ifirmware/src/dsp -o $OUT/romance_test tests/host/romance_test.c firmware/src/dsp/min.c firmware/src/dsp/drum909.c firmware/src/dsp/upright.c firmware/src/dsp/rings_string.c && $OUT/romance_test"
 run bass-reverb sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror -DEN_HOST -Ibuild/gen -Ifirmware/src/dsp -o $OUT/bass_reverb_test tests/host/bass_reverb_test.c firmware/src/dsp/drum909.c firmware/src/dsp/upright.c firmware/src/dsp/rings_string.c && $OUT/bass_reverb_test"
 run romance-forms sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror -DEN_HOST -Ibuild/gen -Ifirmware/src/dsp -o $OUT/romance_forms_test tests/host/romance_forms_test.c firmware/src/dsp/drum909.c firmware/src/dsp/upright.c firmware/src/dsp/rings_string.c && $OUT/romance_forms_test"
@@ -56,7 +55,7 @@ else
 fi
 run host-build sh host/build_host.sh
 if command -v emcc >/dev/null 2>&1; then
-    run emu sh -c "sh web/emu/build.sh >/dev/null && node tests/host/emu_test.mjs build/emu/min.wasm < /dev/null && node tests/host/jazz_emu_test.mjs build/emu/min.wasm"
+    run emu sh -c "sh web/emu/build.sh >/dev/null && node tests/host/jazz_emu_test.mjs build/emu/min.wasm"
 fi
 for s in tests/scenarios/*.min; do
     n=$(basename "$s" .min)

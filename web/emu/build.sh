@@ -9,7 +9,7 @@ mkdir -p build/gen build/emu
 python3 tools/gen_drum_samples.py build/gen/x0x_drum_samples.h >/dev/null
 python3 tools/gen_upright_samples.py build/gen/upright_attacks.h >/dev/null
 python3 tools/gen_romance_score.py build/gen/romance_score.h >/dev/null
-python3 tools/gen_after_forms.py build/gen/after_forms.h >/dev/null
+python3 tools/form_library.py --output build/gen >/dev/null
 [ -f build/gen/felucca_font.h ] || python3 tools/gen_font.py build/gen/felucca_font.h >/dev/null
 emcc -O2 -ffp-contract=off -std=gnu99 -Wall -Wno-unused-function -Wno-unused-parameter -Wno-unused-variable \
     -DEN_HOST -DEN_WEB "-DEN_VERSION=\"$(printf %s "${EN_VERSION:-DEV}" | tr a-z A-Z)\"" -Ifirmware/src -Ibuild/gen -Ifirmware/src/dsp -Ibuild/gen \

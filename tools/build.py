@@ -130,7 +130,7 @@ def generate():
     subprocess.run([sys.executable, str(SRC / "tools/gen_drum_samples.py"), str(GEN / "x0x_drum_samples.h")], check=True)
     subprocess.run([sys.executable, str(SRC / "tools/gen_upright_samples.py"), str(GEN / "upright_attacks.h")], check=True)
     subprocess.run([sys.executable, str(SRC / "tools/gen_romance_score.py"), str(GEN / "romance_score.h")], check=True)
-    subprocess.run([sys.executable, str(SRC / "tools/gen_after_forms.py"), str(GEN / "after_forms.h")], check=True)
+    subprocess.run([sys.executable, str(SRC / "tools/form_library.py"), "--output", str(GEN)], check=True)
     r = subprocess.run([sys.executable, str(SRC / "tools" / "gen_font.py"), str(GEN / "felucca_font.h")],
                        capture_output=True, text=True)
     sys.stdout.write(r.stdout)

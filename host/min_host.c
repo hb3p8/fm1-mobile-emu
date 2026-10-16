@@ -374,14 +374,10 @@ static int expect(const char *what, const char *val)
         got = en_cyc_pos;
     else if (!strcmp(what, "cycn"))
         got = en_cyc_n;
-    else if (!strcmp(what, "yours"))
-        got = en_yours;
     else if (!strcmp(what, "chordmask"))          /* the chord sounding, its classes (hex ok) */
         got = en_chord_mask;
     else if (!strcmp(what, "chordbass"))
         got = en_chord_bass;
-    else if (!strcmp(what, "learning"))
-        got = ui.learning;
     else if (!strcmp(what, "mode"))               /* 0 live, 1 songs */
         got = ui.mode;
     else if (!strcmp(what, "song_state"))         /* 0 idle, 1 recording, 2 playing */
@@ -394,18 +390,6 @@ static int expect(const char *what, const char *val)
         got = (int)en_song()->n;
     else if (!strcmp(what, "undo"))
         got = ui.undo_n;
-    else if (!strcmp(what, "latched"))
-        got = ui.latched;
-    else if (!strncmp(what, "figuser", 7))       /* figuserN: arpeggio N held by hand */
-        got = en_fig_user[atoi(what + 7) & 1];
-    else if (!strncmp(what, "figlen", 6))
-        got = en_fig_len[atoi(what + 6) & 1];
-    else if (!strcmp(what, "phase10"))            /* PHASE: the lower's lead, in tenths of a step */
-        got = (int)(en_phase * 10.0f);
-    else if (!strcmp(what, "learnn"))
-        got = ui.learn_n;
-    else if (!strcmp(what, "mine"))               /* the playing piece's Mine: its chords */
-        got = proj.slot[proj.piece].mine_n;
     else if (!strcmp(what, "voices"))
         got = en_voices;
     else if (!strcmp(what, "guard"))
@@ -525,9 +509,7 @@ int main(int argc, char **argv)
                 return 2;
             }
             enc_acc[e] += atoi(b);
-            accel_off = 1;
             run_ms(1);
-            accel_off = 0;
         } else if (!strcmp(cmd, "master"))
             master = (uint32_t)atoi(a);
         else if (!strcmp(cmd, "midi")) {

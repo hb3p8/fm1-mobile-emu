@@ -6,9 +6,9 @@ static drum909_t jazz_kit;
 static float jd_l[BLK], jd_r[BLK], jd_rev[BLK], jd_dly[BLK];
 static int16_t jazz_manual_voice[128];
 static uint8_t jazz_held_note[128];
-static int jazz_live, jazz_last=69, jazz_dir=1, jazz_bass[4], jazz_cooldown;
+static int jazz_bass[4];
 volatile uint16_t en_jazz_scale, en_jazz_anchor;
-volatile uint8_t en_jazz_solo_note, en_jazz_bass_note;
+volatile uint8_t en_jazz_bass_note;
 volatile uint8_t en_jazz_bar, en_jazz_chorus, en_jazz_walking;
 static uint32_t romance_origin, romance_last=0xffffffffu;
 static unsigned romance_i, romance_at;
@@ -37,8 +37,8 @@ uint16_t en_jazz_scale_for(uint16_t mask,int bass,int key,uint16_t *anchors)
     return rot12(J_SCALE[kind],bass);
 }
 const char *en_jazz_scale_name(void) { return J_SCALE_NAMES[jazz_scale_kind]; }
-int en_jazz_forms_active(void) { return model()==M_JAZZ && (par[P_CYCLE]==EN_CYC_ROMANCE_FORMS || par[P_CYCLE]==EN_CYC_AFTER_FORMS); }
-int en_jazz_score_active(void) { return model()==M_JAZZ && (par[P_CYCLE]==EN_CYC_ROMANCE || par[P_CYCLE]==EN_CYC_ROMANCE_FORMS || par[P_CYCLE]==EN_CYC_AFTER_FORMS); }
+int en_jazz_forms_active(void) { return (par[P_CYCLE]==EN_CYC_ROMANCE_FORMS || par[P_CYCLE]==EN_CYC_AFTER_FORMS); }
+int en_jazz_score_active(void) { return (par[P_CYCLE]==EN_CYC_ROMANCE || par[P_CYCLE]==EN_CYC_ROMANCE_FORMS || par[P_CYCLE]==EN_CYC_AFTER_FORMS); }
 static int jazz_after(void) {return par[P_CYCLE]==EN_CYC_AFTER_FORMS;}
 static const romance_chord_t *jazz_chart(void) {return jazz_after()?AFTER_HARMONY:ROMANCE_HARMONY;}
 static unsigned jazz_chart_count(void) {return jazz_after()?AFTER_CHORDS:ROMANCE_CHORDS;}
@@ -60,26 +60,13 @@ static void jazz_init(void)
         if(p->name[0]=='D' && p->name[1]=='e') drum909_set(&jazz_kit,DR_RD,i,40);
     }
     for(i=0;i<128;i++) { jazz_manual_voice[i]=-1; jazz_held_note[i]=0; }
-    jazz_live=0; jazz_last=69; jazz_cooldown=0;
-    en_jazz_scale=en_jazz_anchor=0; en_jazz_solo_note=en_jazz_bass_note=0;
+    en_jazz_scale=en_jazz_anchor=0; en_jazz_bass_note=0;
     jazz_score_reset();
 }
-static void jazz_manual(int note,int velocity)
-{
-    int idx; voice_t *v;
-    if(note<21 || note>108) return;
-    idx=jazz_manual_voice[note];
-    if(!velocity) {
-        if(jazz_held_note[note]) { jazz_held_note[note]=0; if(jazz_live>0) jazz_live--; }
-        if(idx>=0 && vc[idx].on && vc[idx].part==PT_LOWER && vc[idx].note==note) voice_release(&vc[idx]);
-        jazz_manual_voice[note]=-1; jazz_cooldown=96;
-    } else if(model()==M_JAZZ && !jazz_held_note[note]) {
-        jazz_held_note[note]=1; jazz_live++;
-        v=note_on(PT_LOWER,note,(float)velocity/127.0f,-1,0.0f);
-        jazz_manual_voice[note]=(int16_t)(v?v-vc:-1);
-        /* Give the player space as soon as they take over the melody. */
-        for(idx=VB[PT_LEAD];idx<VB[PT_LEAD+1];idx++) if(vc[idx].on) voice_release(&vc[idx]);
-    }
+static void jazz_manual(int note,int velocity){
+ int idx;if(note<21 || note>108)return;idx=jazz_manual_voice[note];
+ if(!velocity){jazz_held_note[note]=0;if(idx>=0 && vc[idx].on && vc[idx].part==PT_KEYS && vc[idx].note==note)voice_release(&vc[idx]);jazz_manual_voice[note]=-1;}
+ else if(!jazz_held_note[note]){jazz_held_note[note]=1;voice_t *v=note_on(PT_KEYS,note,(float)velocity/127,-1,0);jazz_manual_voice[note]=(int16_t)(v?v-vc:-1);}
 }
 static int jabs(int x) { return x<0?-x:x; }
 static int jmove(int a,int b) { int d=jabs(a-b); return d+(d>5?(d-5)*2:0)+(a==b?9:0); }
@@ -106,8 +93,8 @@ static void jazz_chord(void)
 }
 static void jazz_hit(int voice,int gm,float vel)
 {
-    if(!en_part_on[PT_UPPER]) return;
-    drum909_trigger(&jazz_kit,voice,vel); en_part_glow[PT_UPPER]=1.0f; en_notes[PT_UPPER]++;
+    if(!en_part_on[PT_DRUMS]) return;
+    drum909_trigger(&jazz_kit,voice,vel); en_part_glow[PT_DRUMS]=1.0f; en_notes[PT_DRUMS]++;
     midi(0x99u,(uint32_t)gm,(uint32_t)(vel*(en_jazz_score_active()?127.0f:100.0f)+(en_jazz_score_active()?.5f:0.0f)));
 }
 static void jazz_drum(int voice,float vel)
@@ -157,7 +144,7 @@ static void jazz_score_tick(void)
         const romance_note_t *e=&notes[romance_i++];
         int part=e->part,note=e->note;
         if(!en_part_on[part]) continue;
-        if(part==PT_UPPER) {
+        if(part==PT_DRUMS) {
             int voice;
             switch(note) {
             case 35: case 36: voice=DR_BD; break; case 37: voice=DR_RS; break;
@@ -183,12 +170,11 @@ static void jazz_score_tick(void)
 }
 static void jazz_tick(void)
 {
-    const int swing=12+(par[P_PROCESS]*6+50)/100;
+    const int swing=12+(par[P_SWING]*6+50)/100;
     const int score=en_jazz_score_active();
     int beat=(int)(ticks%96u),bar=(int)(ticks/96u),qbeat=(int)(ctick/24u)%4,off=(int)(ticks%24u),i;
     static const uint8_t comp[4][4]={{0,1,2,3},{1,2,3,255},{0,1,3,255},{0,1,2,3}};
     static const uint8_t late[4][4]={{0,1,1,1},{1,0,1,0},{0,1,0,0},{1,1,1,1}};
-    if(jazz_cooldown>0) jazz_cooldown--;
     if(score) jazz_score_tick();
     if(en_jazz_forms_active()) jazz_forms_tick();
     if(off==0) {
@@ -217,7 +203,7 @@ static void jazz_tick(void)
         if(par[P_CH_RHYTHM]==0) { if(ctick==0) chords_strike(.75f,(int32_t)(tick_len*(float)chord_ticks*.95f),0,0); }
         else if(par[P_CH_RHYTHM]==2) {
             /* One piano attack per sixteenth, rather than four at once.
-             * Morning's velocity curve and ringing modal piano are retained. */
+             * The modal piano's velocity curve and ringing decay are retained. */
             static const uint8_t figure[6]={0,1,2,3,2,1};
             if(ticks%6u==0u) {
                 int tones[4]; float vel=(off==0?.95f:.74f)+.06f*frand();
@@ -229,26 +215,10 @@ static void jazz_tick(void)
         else for(i=0;i<4;i++) if(comp[bar%4][i]!=255 && beat==comp[bar%4][i]*24+late[bar%4][i]*swing)
             chords_strike(i%2?.58f:.75f,(int32_t)(tick_len*(i==3?6.0f:14.0f)),0,0);
     }
-    /* Swing eighths, short motifs and breaths; anchor notes on strong beats.
-     * A human key press takes the lead for a bar without changing the harmony. */
-    if(en_part_on[PT_LEAD] && !jazz_live && !jazz_cooldown && (off==0 || off==swing)) {
-        int note,lo=62,hi=83,best=10000,candidate,strong=off==0 && ((ticks/24u)%2u==0);
-        uint16_t mask=strong?en_jazz_anchor:en_jazz_scale;
-        if((int)(rnd()%100u)>par[P_LD_ACT]+(strong?22:0) || (bar%4==3 && beat>48)) return;
-        if((ticks/12u)%7u==0u) jazz_dir=-jazz_dir;
-        note=jazz_last;
-        for(candidate=lo;candidate<=hi;candidate++) if(mask>>(candidate%12)&1u) {
-            int cost=jabs(candidate-(jazz_last+jazz_dir*2))*3+(candidate==jazz_last?5:0)+(int)(rnd()%5u);
-            if(cost<best) { best=cost; note=candidate; }
-        }
-        jazz_last=note; if(note>=81) jazz_dir=-1; if(note<=64) jazz_dir=1;
-        note_on(PT_LEAD,note,strong?.72f:.55f,(int32_t)(tick_len*(off==0?(float)swing*.8f:(float)(24-swing)*.8f)),0.0f);
-        en_jazz_solo_note=(uint8_t)note;
-    }
 }
 static void jazz_render(uint32_t n)
 {
-    uint32_t i; float g=pg[PT_UPPER]*0.25f;
+    uint32_t i; float g=pg[PT_DRUMS]*0.25f;
     if(!drum909_active(&jazz_kit)) return;
     for(i=0;i<n;i++) jd_l[i]=jd_r[i]=jd_rev[i]=jd_dly[i]=0;
     drum909_render_st(&jazz_kit,jd_l,jd_r,jd_rev,jd_dly,(int)n);

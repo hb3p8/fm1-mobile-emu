@@ -1,0 +1,17 @@
+wait 100
+tap LFO
+tap LFO
+tap LFO
+spin K1 14
+tap SAVE
+wait 100
+reboot
+wait 100
+expect piece 9
+expect par40 21
+spin PRESET 1
+expect piece 0
+spin PRESET -1
+expect piece 9
+expect par40 21
+shot restored.png
