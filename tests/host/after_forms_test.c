@@ -52,7 +52,7 @@ static int take(int seed,uint32_t *nh,uint32_t *dh)
 int main(int argc,char **argv)
 {
     uint32_t n[3],d[3];int h[3];start(42);
-    OK(en_params()[P_CYCLE]==EN_CYC_AFTER_FORMS && en_jazz_form_count()==256);
+    OK(en_params()[P_CYCLE]==EN_CYC_AFTER_FORMS && en_jazz_form_count()==AFTER_FORM_COUNT);
     OK(en_params()[P_TEMPO]==140 && en_params()[P_ROOT]==3);
     /* Verify every reusable form against every eligible chart chord in all keys. */
     for(int key=0;key<12;key++)for(unsigned c=0;c<AFTER_CHORDS;c++){
@@ -70,6 +70,6 @@ int main(int argc,char **argv)
     OK(h[0]!=1 && h[1]!=1 && h[2]!=1);
     OK(h[0]==h[1] && h[0]==h[2]);OK(d[0]==d[1] && d[0]==d[2]);
     OK(n[0]!=n[1] && n[0]==n[2]);
-    puts("PASS After Gone Forms: 256 forms, all keys, three full 120-bar takes, 126 selections, unchanged harmony/drums, seed repeatability, finite audio, no source melody.");
+    printf("PASS After Gone Forms: %u forms, all keys, three full 120-bar takes, 126 selections, unchanged harmony/drums, seed repeatability, finite audio, no source melody.\n",AFTER_FORM_COUNT);
     return 0;
 }

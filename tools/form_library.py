@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Canonical Jazz Box form library: validation and allocation-free C tables."""
 import json
+import hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 LIBRARY=ROOT/'assets/forms/library.json'
@@ -13,12 +14,14 @@ def integer(value,lo,hi,path):
     if type(value)!=int or not lo<=value<=hi:raise ValueError(f'{path}: expected integer {lo}…{hi}')
 
 def validate(lib):
-    if not isinstance(lib,dict) or lib.get('schema')!=1 or set(lib.get('banks',{}))!={'romance','after'}:raise ValueError('Expected schema 1 with romance and after banks')
+    if not isinstance(lib,dict) or lib.get('schema')!=1 or not isinstance(lib.get('banks'),dict) or set(lib['banks'])!={'romance','after'}:raise ValueError('Expected schema 1 with romance and after banks')
     for key,b in lib['banks'].items():
         if not isinstance(b,dict):raise ValueError(key+': expected bank')
         integer(b.get('bars'),1,120,key+'.bars');integer(b.get('choruses'),1,4,key+'.choruses');integer(b.get('key'),0,11,key+'.key')
+        if not isinstance(b.get('chart'),list):raise ValueError(key+': expected chart array')
         at=0
-        for i,c in enumerate(b.get('chart',[])):
+        for i,c in enumerate(b['chart']):
+            if not isinstance(c,dict):raise ValueError(key+': expected chord object')
             path=f'{key}.chart[{i}]'
             for name,lo,hi in [('at',0,65535),('mask',1,4095),('root',0,11),('beats',2,4),('scale',0,9)]:integer(c.get(name),lo,hi,path+'.'+name)
             if c['at']!=at or c['beats'] not in (2,4):raise ValueError(path+': non-contiguous harmony')
@@ -28,6 +31,7 @@ def validate(lib):
         ids=set()
         for i,f in enumerate(b['forms']):
             p=f'{key}.forms[{i}]'
+            if not isinstance(f,dict):raise ValueError(p+': expected form object')
             if not isinstance(f.get('id'),str) or not 1<=len(f['id'])<=64 or f['id'] in ids:raise ValueError(p+': missing/duplicate ID')
             ids.add(f['id'])
             name=f.get('name','')
@@ -39,6 +43,7 @@ def validate(lib):
             prev=-1
             for j,n in enumerate(f['notes']):
                 np=f'{p}.notes[{j}]'
+                if not isinstance(n,dict):raise ValueError(np+': expected note object')
                 for k,lo,hi in [('at',0,f['length']-1),('gate',1,255),('role',0,16),('oct',-4,5),('alter',-1,1),('velocity',1,127)]:integer(n.get(k),lo,hi,np+'.'+k)
                 if n['role'] not in (*range(8),16):raise ValueError(np+': role must be 0…7 or 16 (next root)')
                 if n['at']<prev:raise ValueError(np+': notes must be sorted by onset')
@@ -49,14 +54,18 @@ def validate(lib):
                     count=sum(f['part']==part and f['length']==c['beats']*24 and f['feel']==feel and (part=='bass' or f['family']==family(c['mask'])) for f in b['forms'])
                     if count<2:raise ValueError(f'{key}: need at least two {part} forms of {c["beats"]} beats, feel {feel}, family {family(c["mask"])}')
         if key=='after':
-            for i,n in enumerate(b.get('drums',[])):
+            if not isinstance(b.get('drums'),list):raise ValueError(key+': expected drums array')
+            for i,n in enumerate(b['drums']):
+                if not isinstance(n,dict):raise ValueError(key+': expected drum object')
                 for k,lo,hi in [('at',0,b['bars']*b['choruses']*96-1),('gate',1,65535),('note',0,127),('velocity',1,127)]:integer(n.get(k),lo,hi,f'{key}.drums[{i}].{k}')
     return lib
 
 def load(path=LIBRARY):return validate(json.loads(Path(path).read_text()))
 
-def emit(lib,dest):
+def emit(lib,dest,source_revision=None):
     validate(lib);dest=Path(dest);dest.mkdir(parents=True,exist_ok=True)
+    digest=source_revision or hashlib.sha256((json.dumps(lib,ensure_ascii=False,indent=2)+'\n').encode()).hexdigest()
+    (dest/'library-build.json').write_text(json.dumps({'revision':digest})+'\n')
     for key,b in lib['banks'].items():
         prefix='ROMANCE' if key=='romance' else 'AFTER'
         text=['/* Generated from assets/forms/library.json by tools/form_library.py. */','#pragma once']
@@ -78,4 +87,4 @@ def emit(lib,dest):
 
 if __name__=='__main__':
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('--output',default=str(ROOT/'build/gen'));a=p.parse_args();lib=load();emit(lib,a.output);print('Form library:',', '.join(f'{k}: {len(b["forms"])}' for k,b in lib['banks'].items()))
+    p=argparse.ArgumentParser();p.add_argument('--output',default=str(ROOT/'build/gen'));a=p.parse_args();raw=LIBRARY.read_bytes();lib=validate(json.loads(raw));emit(lib,a.output,hashlib.sha256(raw).hexdigest());print('Form library:',', '.join(f'{k}: {len(b["forms"])}' for k,b in lib['banks'].items()))

@@ -21,6 +21,7 @@ class Min extends AudioWorkletProcessor {
     this.peak = 0;
     this.rec = null;                                  // recording: the chunk being filled, interleaved
     this.recAt = 0;
+    this.previewEvents=[];this.previewFrame=0;
     this.port.onmessage = (e) => this.onMessage(e.data);
   }
 
@@ -50,9 +51,12 @@ class Min extends AudioWorkletProcessor {
       this.sentWrites = this.ex.web_store_writes();
       this.ex.web_master(m.master ?? 2800);
       this.ex.web_boot();
+      if(m.preview)this.ex.web_preview_mode();
       this.port.postMessage({ type: "ready" });
     } else if (!this.ex) {
       return;
+    } else if (m.type === "preview") {
+      this.ex.web_preview_mode();this.previewFrame=0;this.previewEvents=(m.events||[]).slice().sort((a,b)=>a.frame-b.frame||a.velocity-b.velocity);
     } else if (m.type === "param") {
       this.ex.web_param(m.param,m.value);
     } else if (m.type === "preset") {
@@ -129,6 +133,8 @@ class Min extends AudioWorkletProcessor {
     const out = outputs[0];
     const n = out[0].length;
     const t0 = clock();
+    while(this.previewEvents.length && this.previewEvents[0].frame<=this.previewFrame){const e=this.previewEvents.shift();this.ex.web_audition(e.part,e.note,e.velocity);}
+    this.previewFrame+=n;
     this.ex.web_render(n);
     this.busy += clock() - t0;
     this.frames += n;

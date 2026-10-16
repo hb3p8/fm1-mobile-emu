@@ -74,6 +74,11 @@ static int form_decode(const romance_form_note_t *e,int base,const int *roles,in
     int target=(e->role&16)?nearest(base,next_pc,base-6,base+6):base+roles[e->role&15];
     return target+12*e->oct+e->alter;
 }
+/* Shared by the editor regression test and the firmware planner. */
+int en_form_decode(int role,int octave,int alter,int base,uint16_t mask,uint16_t scale,int next_pc){
+ if(((role<0 || role>7) && role!=16) || octave< -4 || octave>5 || alter< -1 || alter>1 || base<0 || base>127 || next_pc<0 || next_pc>11)return -1;
+ int r[8];form_roles(mask,scale,r);romance_form_note_t e={0,1,(uint8_t)role,(int8_t)octave,(int8_t)alter,1};return form_decode(&e,base,r,next_pc);
+}
 static void form_materialise(int p,unsigned id,unsigned chord)
 {
     const romance_form_t *f=&form_bank()[id];

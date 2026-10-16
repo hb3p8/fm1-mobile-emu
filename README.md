@@ -34,7 +34,7 @@ Requires Emscripten, Python 3 and the existing font-generation dependencies.
 
 ```sh
 sh web/emu/build.sh
-python3 -m http.server 58049 --bind 127.0.0.1 --directory build/emu
+python3 tools/jazz_server.py --port 58049
 ```
 
 Open http://127.0.0.1:58049/. The WebAssembly runs the same C engine and FM-1
@@ -78,6 +78,25 @@ bounds and names and compiles the const C tables. A normal build never
 re-extracts or overwrites form edits from the source MIDI. MIDI analysis
 utilities remain in tools/ for deliberate analysis/import work.
 
+Open http://127.0.0.1:58049/forms.html for the separate editor. Filter either
+bank by part, chord family, phrase length or feel. Select a form to see its
+time/pitch roll and edit note onsets, gates, harmonic roles, octaves,
+chromatic offsets and MIDI velocity. Duplicate/add/delete forms, undo/redo,
+and JSON import/export are available. Form names use ASCII for the FM-1 font.
+
+Audition uses the actual Jazz Box WASM instruments, with a selectable chord,
+scale, next root and tempo; edits are audible before compiling. Preview
+register is chosen in isolation; the running ensemble also connects phrases
+to previous bass notes and piano voicings.
+
+**Save** writes `assets/forms/library.json` in this checkout. **Build web**
+validates and compiles the same library into the C engine, then reload the
+instrument tab to use it. Ordinary firmware builds use this same bank.
+The server binds only to loopback, rejects stale concurrent saves and leaves
+source harmony/drums read-only. A static HTTP server can play the instrument
+but cannot save or build from the editor. See assets/forms/README.md for the
+form format and role mapping.
+
 ## Persistence and checks
 
 Project format 9 stores only ten Jazz slots. Versions 3–8 import the Jazz
@@ -90,7 +109,8 @@ tests/run_tests.sh
 ```
 
 Checks cover the four-part engine, score loops, reusable forms in all keys,
-Rings reference, reverb routing, storage migration, WASM, native panel
+Rings reference, reverb routing, storage migration, library API, editor/C
+note-decoder parity, WASM, native panel
 scenarios and estimated render load. No physical device is implied by host
 or WASM checks. Hardware build/install tools and the Felucca platform remain;
 installable `.fwsc` packages require the AC79 SDK/toolchain.

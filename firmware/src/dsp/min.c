@@ -177,9 +177,6 @@ const char *en_chord_name(uint32_t mask, int bass, char *buf)
     return buf;
 }
 
-/* a ROLLED figure: 3 to 12 steps (the seed's last digit), one of four shapes: runs up, runs down, a
- * wave, a zigzag climbing; mostly by step, now and then a leap, over the chord's lowest seven tones */
-
 enum { C_SET=0,C_PLAY=1,C_NEXT=2,C_SEED=3,C_PANIC=4,C_CLOCK=5,C_REGROW=6,C_PART=11,C_SONG=13,C_NOTE=14 };
 #define QN 128u
 static uint32_t q[QN];static volatile uint32_t q_w,q_r;

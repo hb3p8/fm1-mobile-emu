@@ -6,7 +6,7 @@ async function boot(store={}){const {instance}=await WebAssembly.instantiate(was
 function run(ms){let peak=0;for(let n=0;n<ms*44.1;n+=128){ex.web_render(128);for(const p of[ex.web_out_l(),ex.web_out_r()])for(const x of new Float32Array(mem.buffer,p,128)){assert(Number.isFinite(x));peak=Math.max(peak,Math.abs(x))}}return peak}
 const params=()=>Array.from(new Int16Array(mem.buffer,ex.web_params(),ex.web_params_count()));
 const tap=(b)=>{ex.web_buttons(1<<b);run(80);ex.web_buttons(0);run(80)};
-await boot();assert.equal(params()[30],9);assert.equal(ex.web_form_count(),256);
+await boot();assert.equal(params()[30],9);assert.equal(ex.web_form_count(),JSON.parse(fs.readFileSync('assets/forms/library.json')).banks.after.forms.length);
 for(let i=0;i<10;i++){ex.web_preset(i);assert(run(1800)>.01);assert.equal(params()[30],i);assert.equal(params()[16],0);assert.equal(params()[28],0);}
 const chord=ex.web_position(),notes=ex.web_part_notes(1);ex.web_keys((1<<7)|(1<<11));run(100);assert.equal(ex.web_part_notes(1),notes+2);assert.equal(ex.web_position(),chord);ex.web_keys(0);
 const seed=params()[32];tap(6);tap(4);assert.notEqual(params()[32],seed);assert.equal(params()[30],9);

@@ -116,3 +116,9 @@ __attribute__((used, visibility("default"))) uint32_t web_form_bass(void) { retu
 __attribute__((used, visibility("default"))) uint32_t web_form_piano(void) { return en_jazz_form_piano; }
 __attribute__((used, visibility("default"))) const char *web_form_bass_name(void) { return en_jazz_form_name(PT_BASS); }
 __attribute__((used, visibility("default"))) const char *web_form_piano_name(void) { return en_jazz_form_name(PT_CHORDS); }
+
+/* Standalone form audition uses the instrument voices, with transport held. */
+__attribute__((used, visibility("default"))) void web_preview_mode(void) { en_play(0); en_panic(); }
+__attribute__((used, visibility("default"))) void web_audition(int part,int note,int velocity) { en_audition(part,note,velocity); }
+
+__attribute__((used, visibility("default"))) int web_form_decode(int role,int octave,int alter,int base,int mask,int scale,int next_pc) { return en_form_decode(role,octave,alter,base,(uint16_t)mask,(uint16_t)scale,next_pc); }

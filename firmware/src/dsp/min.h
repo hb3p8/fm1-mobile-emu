@@ -78,3 +78,5 @@ int en_jazz_form_count(void);
 const char *en_jazz_form_name(int part);
 const char *en_jazz_scale_name(void);
 uint16_t en_jazz_scale_for(uint16_t mask,int bass,int key,uint16_t *anchors);
+
+int en_form_decode(int role,int octave,int alter,int base,uint16_t mask,uint16_t scale,int next_pc);

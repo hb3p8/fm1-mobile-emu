@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-3.0-only
-# MIN-1 host tests: the maths, the platform pieces kept from Felucca / X0X / AMB-1, the instrument, and
-# the whole firmware app in the simulator (tests/scenarios/*.min: UI, chords, LEARN, persistence), with
+# Jazz Box host tests: maths, the Felucca / X0X / AMB-1 platform, the instrument, and
+# the whole firmware app in the simulator (UI, harmony and persistence), with
 # screenshots and audio in build/scenarios/; then each piece's estimated load on the FM-1.
 #   tests/run_tests.sh
 set -u
@@ -38,6 +38,7 @@ run after-forms sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror 
 run upright sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror -DEN_HOST -Ibuild/gen -Ifirmware/src/dsp -o $OUT/upright_test tests/host/upright_test.c firmware/src/dsp/upright.c firmware/src/dsp/rings_string.c -lm && $OUT/upright_test"
 run rings-reference sh -c "$CC -O2 -ffp-contract=off -std=c99 -Ifirmware/src/dsp -c firmware/src/dsp/rings_string.c -o $OUT/rings_reference.o && $CXX -O2 -ffp-contract=off -std=c++11 -DTEST -Itests/reference -Ifirmware/src/dsp tests/host/rings_reference_test.cpp $OUT/rings_reference.o -o $OUT/rings_reference_test && $OUT/rings_reference_test"
 run after-split python3 tests/host/after_split_test.py
+run form-library python3 tests/host/form_library_test.py
 run storage sh -c "$CC -O2 -o $OUT/storage_test tests/storage_test.c && $OUT/storage_test"
 # the update path, against the firmware package (Felucca's tests; needs ./build.sh)
 if [ -f build/min.fwsc ]; then
@@ -56,6 +57,7 @@ fi
 run host-build sh host/build_host.sh
 if command -v emcc >/dev/null 2>&1; then
     run emu sh -c "sh web/emu/build.sh >/dev/null && node tests/host/jazz_emu_test.mjs build/emu/min.wasm"
+    run forms-editor node tests/host/forms_editor_test.mjs
 fi
 for s in tests/scenarios/*.min; do
     n=$(basename "$s" .min)
