@@ -73,7 +73,8 @@ for name in ['index.html','style.css','app.js','manifest.webmanifest']+ICONS:
 FW_FILES = {'x0x': ['x0x.wasm', 'worklet.js'], 'felucca': ['felucca.wasm'], 'sloop': ['sloop.wasm'],
             'fimba': ['kalimba.wasm', 'worklet.js'], 'melodee': ['melodee.wasm'],
             'amb': ['amb.wasm', 'worklet.js'], 'maku': ['maku.wasm'], 'hyp1': ['hyp1.wasm', 'worklet.js'],
-            'ghoulbox': ['ghoulbox.wasm'], 'choralroot': ['choralroot.wasm']}
+            'ghoulbox': ['ghoulbox.wasm'], 'choralroot': ['choralroot.wasm'],
+            'jazzbox': ['jazzbox.wasm', 'worklet.js']}
 firmware_files = ['fw/flash-worklet.js']
 (dist/'fw').mkdir()
 shutil.copy2(HERE/'firmware/flash-worklet.js', dist/'fw/flash-worklet.js')

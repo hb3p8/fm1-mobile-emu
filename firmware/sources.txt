@@ -9,3 +9,4 @@ maku maku https://github.com/okumurari2/maku.git db910aabfc979f172db87817eb9b377
 hyp1 fm1-HYP1 https://github.com/RustyPawz/fm1-HYP1.git 88df8d57f53d13c358f410e00e12f164be41e4e5
 ghoulbox ghoulbox https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth.git eaf04bdc67baed36113cd1e71636e7e059299086
 choralroot ChoralRootFM1 https://github.com/Quixotic7/ChoralRootFM1.git 776c740b14f191dd4d991167f647557a6e55c3ab
+jazzbox fm1-jazzbox https://github.com/hb3p8/fm1-mobile-emu.git 20ca870db8af4e6f52fbf4f3efad1efda768614f

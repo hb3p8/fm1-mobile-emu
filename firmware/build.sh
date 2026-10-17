@@ -21,7 +21,7 @@ PY=${PYTHON:-$HERE/.venv/bin/python}
 PATH=$(dirname "$PY"):$PATH
 command -v emcc >/dev/null 2>&1 || { echo "firmware: no emcc (Emscripten)"; exit 1; }
 "$PY" -c 'import PIL, fontTools' || { echo "firmware: $PY needs Pillow and fontTools"; exit 1; }
-WANT=${*:-"x0x felucca sloop fimba melodee amb hyp1 ghoulbox choralroot maku"}
+WANT=${*:-"x0x felucca sloop fimba melodee amb hyp1 ghoulbox choralroot maku jazzbox"}
 EMCC_FLAGS="-O2 -ffp-contract=off -std=gnu99 -w --no-entry -sSTANDALONE_WASM -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=33554432 -sFILESYSTEM=0"
 
 gen() {   # generator script and output header, in the checkout, unless the header is there
@@ -76,6 +76,11 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
     hyp1)
         EN_VERSION="$VERSION" sh web/emu/build.sh >/dev/null
         cp build/emu/amb.wasm "$OUT/$id/hyp1.wasm"
+        cp build/emu/worklet.js "$OUT/$id/"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    jazzbox)
+        EN_VERSION="$VERSION" sh web/emu/build.sh >/dev/null
+        cp build/emu/min.wasm "$OUT/$id/jazzbox.wasm"
         cp build/emu/worklet.js "$OUT/$id/"
         echo "$VERSION" > "$OUT/$id/version" ;;
     ghoulbox)

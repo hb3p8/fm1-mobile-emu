@@ -128,5 +128,17 @@
     "assets": [
       "choralroot-0.22-beta1.fwsc"
     ]
+  },
+  "jazzbox": {
+    "id": "jazzbox",
+    "repo": "hb3p8/fm1-mobile-emu",
+    "tag": null,
+    "commit": "20ca870db8af4e6f52fbf4f3efad1efda768614f",
+    "published": null,
+    "prerelease": true,
+    "version": "experimental",
+    "release": "https://github.com/hb3p8/fm1-mobile-emu/tree/jazz-box-source",
+    "status": "experimental and work in progress",
+    "assets": []
   }
 }

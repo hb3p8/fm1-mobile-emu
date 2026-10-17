@@ -74,6 +74,13 @@ const FIRMWARES = {
     kind: "flash", wasm: "fw/maku/maku.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
     store: "maku", more: true, masterMax: 1023, masterDefault: 700,
   },
+  jazzbox: {
+    name: "Jazz Box", tag: "JAZZ BOX", by: "hb3p8, after Reytian's MIN-1", repo: "https://github.com/hb3p8/fm1-mobile-emu/tree/jazz-box-source",
+    about: "Experimental and work in progress. Jazz chord progressions, walking bass, drums and live piano keys.",
+    manual: "https://github.com/hb3p8/fm1-mobile-emu/blob/jazz-box-source/README.md",
+    kind: "store", wasm: "fw/jazzbox/jazzbox.wasm", worklet: "fw/jazzbox/worklet.js", processor: "min",
+    store: "jazzbox-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
+  },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit
 const FIRMWARE_KEY = "fm1-firmware";

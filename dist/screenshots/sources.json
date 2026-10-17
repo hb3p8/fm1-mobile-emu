@@ -58,5 +58,13 @@
     "url": "https://fm1.designburgapps.com/img/maku.png",
     "sha256": "3b6825eeac65afd83112dcf9e43219162c104f23dea4fa3f692ba8ac2b32c063",
     "bytes": 47393
+  },
+  {
+    "id": "jazzbox",
+    "url": "https://github.com/hb3p8/fm1-mobile-emu/tree/jazz-box-source",
+    "source": "Rendered from Jazz Box WebAssembly firmware; native 240x240 framebuffer, HOME page.",
+    "commit": "20ca870db8af4e6f52fbf4f3efad1efda768614f",
+    "sha256": "7f4051177bb4f0fa14013f171ae8f7ccf4afea4b78407d01266f8d73801b36cc",
+    "bytes": 11154
   }
 ]

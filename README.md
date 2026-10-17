@@ -1,6 +1,6 @@
 # FM-1 Mobile
 
-The M-VAVE FM-1 on your phone: real FM-1 firmwares, their own C code compiled to WebAssembly, behind a touch panel laid out like the instrument. Pick X0X, Felucca, SLOOP, FiMba-1, Melodee, AMB-1 or HYP-1 in the main menu; More contains GHOULBOX, ChoralRoot (Orchid-style) and MAKU, add the page to your home screen, and it works offline.
+The M-VAVE FM-1 on your phone: real FM-1 firmwares, their own C code compiled to WebAssembly, behind a touch panel laid out like the instrument. Pick X0X, Felucca, SLOOP, FiMba-1, Melodee, AMB-1 or HYP-1 in the main menu; More contains GHOULBOX, ChoralRoot (Orchid-style), MAKU and experimental Jazz Box, add the page to your home screen, and it works offline.
 
 **▶ Open it: <https://hb3p8.github.io/fm1-mobile-emu/>**
 
@@ -26,8 +26,9 @@ This is a fan project. It is not affiliated with M-VAVE or with the firmwares' a
 | [GHOULBOX](https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth) 2.1 | Dungeon synth with cathedral reverb and hurdy-gurdy | Jason Persinger |
 | [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) 0.22-beta1 (pre-release) | Orchid-style chord instrument: roots, chord shapes, bass and looper | Quixotic7 |
 | [MAKU](https://github.com/okumurari2/maku) 0.1 | An always-on ambience machine with random worlds and saved favourites | okumurari |
+| [Jazz Box](https://github.com/hb3p8/fm1-mobile-emu/tree/jazz-box-source) (experimental) | **Experimental and work in progress.** Jazz harmony, walking bass, drums and live piano keys | hb3p8, after Reytian’s MIN-1 |
 
-Each firmware's manual is linked from the menu. All ten have screenshot previews from [the FM-1 Firmware Hub](https://fm1.designburgapps.com/); the images are kept locally for offline use, with original URLs and checksums in `screenshots/sources.json`. Release tags, dates and pre-release status are recorded in `firmware/releases.json`. HYP-1 has no release tags: its current published build version and exact source commit are pinned there. Their saved work (patterns, projects, settings) stays in the browser, separately for each, and survives switching between them.
+Each firmware's manual is linked from the menu. The original ten have screenshot previews from [the FM-1 Firmware Hub](https://fm1.designburgapps.com/); the images are kept locally for offline use, with original URLs and checksums in `screenshots/sources.json`. Jazz Box’s preview is rendered from its pinned firmware source. Release tags, dates and pre-release status are recorded in `firmware/releases.json`. HYP-1 has no release tags: its current published build version and exact source commit are pinned there. Their saved work (patterns, projects, settings) stays in the browser, separately for each, and survives switching between them.
 
 ## Using it
 
@@ -55,7 +56,9 @@ Each firmware is built from its own source with its host simulator: the whole FM
 | Offline | `sw.js`: the service worker; `assemble.py` writes its file list and a version hash |
 | The site | `dist/`: what GitHub Pages serves, made by `assemble.py` and committed |
 
-Two kinds of firmware build exist. X0X, FiMba-1, AMB-1 and HYP-1 (the X0X line) keep numbered save objects, kept in localStorage, and come with their own worklet. Felucca, SLOOP, Melodee, GHOULBOX and MAKU (the Felucca line) write a simulated 1 MiB NOR flash; `firmware/flash-worklet.js` sends the page every changed 4 KiB sector, kept in IndexedDB. SLOOP has no browser build of its own: `firmware/sloop_web.c` is Felucca's (`web/emu/felucca_web.c`) fitted to SLOOP's sources, without changing any of them. Melodee similarly uses `firmware/melodee_web.c`: the real DSP, UI and NOR persistence, with its supported one-core audio path. It does not emulate the second hardware CPU, PLL clock switching or USB audio. MAKU uses its own browser build, with a fresh world seed each launch. ChoralRoot uses its own source simulator (`tools/emu/web/emu_web.c`), with its LEDs and staged flash adapted to the shared worklet and the same per-firmware sector storage. HYP-1 uses its own AMB-1-derived source build. The emulator cannot load FM-1 `.fwsc` update packages, which hold machine code for the instrument's processor.
+Two kinds of firmware build exist. X0X, FiMba-1, AMB-1, HYP-1 and Jazz Box (the X0X line) keep numbered save objects, kept in localStorage, and come with their own worklet. Felucca, SLOOP, Melodee, GHOULBOX and MAKU (the Felucca line) write a simulated 1 MiB NOR flash; `firmware/flash-worklet.js` sends the page every changed 4 KiB sector, kept in IndexedDB. SLOOP has no browser build of its own: `firmware/sloop_web.c` is Felucca's (`web/emu/felucca_web.c`) fitted to SLOOP's sources, without changing any of them. Melodee similarly uses `firmware/melodee_web.c`: the real DSP, UI and NOR persistence, with its supported one-core audio path. It does not emulate the second hardware CPU, PLL clock switching or USB audio. MAKU uses its own browser build, with a fresh world seed each launch. ChoralRoot uses its own source simulator (`tools/emu/web/emu_web.c`), with its LEDs and staged flash adapted to the shared worklet and the same per-firmware sector storage. HYP-1 uses its own AMB-1-derived source build. The emulator cannot load FM-1 `.fwsc` update packages, which hold machine code for the instrument's processor.
+
+Jazz Box uses its own MIN-1-derived C firmware and worklet, with a separate save store; no standalone Jazz Box web page or form editor is included in this collection. Its reproducible source snapshot is pinned on this repository’s `jazz-box-source` branch. The existing emulator panel, input, rendering and storage code is shared unchanged.
 
 ## Building
 
@@ -65,7 +68,7 @@ You need Git, [Emscripten](https://emscripten.org) (`emcc`), and Python 3 with P
 git clone git@github.com:hb3p8/fm1-mobile-emu.git && cd fm1-mobile-emu
 python3 -m venv firmware/.venv
 firmware/.venv/bin/pip install Pillow fonttools
-firmware/build.sh            # clones the ten firmwares into firmware/checkouts/ and builds them into firmware/out/
+firmware/build.sh            # clones the pinned firmwares into firmware/checkouts/ and builds them into firmware/out/
 python3 assemble.py          # writes dist/: the page, the firmwares, sw.js, the source archives
 python3 -m http.server 4180 --directory dist --bind 127.0.0.1
 ```
