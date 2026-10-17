@@ -59,6 +59,32 @@ editing, isolated audition, undo/redo and JSON import/export. The list can
 filter included/excluded forms and shows how many will be compiled. Existing
 libraries without `enabled` remain fully included.
 
+## Similarity groups in the editor
+
+The default **Similar-form groups** view clusters each bank by attack timing,
+chord-relative pitch shapes, voice motion and articulation. Bass and piano,
+two/four beats and two-feel/walking stay separate. NEXT-root gestures and
+opposing bass contours remain distinct. Piano qualities may share a group
+because the same abstract role pattern adapts to multiple chords.
+
+Attacks rolled across three MIDI ticks are treated as one chord. Uniform
+octave transposition, velocity, names and inclusion flags do not separate
+variants. Complete-link clustering requires every pair in a group to be
+close, avoiding a chain of progressively different phrases. This is a
+structural heuristic, not a claim that all members sound identical.
+
+Group headers fold/unfold, list the number of members and included forms,
+and identify bass/piano groups as B01/P01 etc. Filters show subsets of the
+same complete-bank groups. Search accepts group codes/titles as well as
+form names/IDs. **Ordinary list** restores the original view.
+Groups are computed for display and refresh after note edits. They never
+rewrite library order, IDs or notes, change build inclusion, merge/delete
+variants, or affect the firmware's random form selector.
+
+```sh
+node tests/host/form_groups_test.mjs
+```
+
 The validator checks bounds, stable IDs and source-chart continuity. Builds
 also require at least two **enabled** compatible forms for every required
 part/length/feel/family combination. Drafts may save fewer, so they remain

@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import{SCALES,SCALE_NAMES,NOTES,QUALITIES,family,materialize,noteName,roleName,validateForm}from'./forms-core.mjs';
+import{groupForms,groupingKey}from'./forms-groups.mjs';
 const $=id=>document.getElementById(id),clone=x=>structuredClone(x);
 const loadingControls=[...document.querySelectorAll('button,input,select')];loadingControls.forEach(e=>e.disabled=true);
 let library,savedJSON,revision,token,builtRevision,bankKey='romance',selectedId,selectedNote=-1,undoStack=[],redoStack=[],busy=false,audio,node,loadingAudio,startTime=0,playing=false,playDuration=0,raf=0;
 const bank=()=>library.banks[bankKey],form=()=>bank().forms.find(f=>f.id===selectedId),dirty=()=>JSON.stringify(library)!==savedJSON;
+const groupCache=new Map(),openGroups=new Set();
+function groups(){const key=groupingKey(bank().forms),cached=groupCache.get(bankKey);if(cached?.key===key)return cached.value;const value=groupForms(bank().forms);groupCache.set(bankKey,{key,value});return value}
 function option(value,label){const o=document.createElement('option');o.value=value;o.textContent=label;return o}
 for(const id of['root','nextRoot'])NOTES.forEach((n,i)=>$(id).append(option(i,n)));
 QUALITIES.forEach(([name,mask])=>$('quality').append(option(mask,name)));SCALE_NAMES.forEach((n,i)=>$('scale').append(option(i,n)));
@@ -16,15 +19,29 @@ function context(){return{root:+$('root').value,mask:+$('quality').value,scale:S
 function update(mutator,{full=true}={}){if(busy)return;checkpoint();try{mutator();const target=form().notes[selectedNote];form().notes.sort((a,b)=>a.at-b.at);selectedNote=form().notes.indexOf(target);validateForm(form());notice('');stopPreview();renderList();if(full)renderEditor();else{renderRoll();status()}}catch(e){library=JSON.parse(undoStack.pop());notice(e.message);renderEditor();status()}}
 function renderList(){
  if(!library)return;
+ const allGroups=groups(),groupSearch=new Map(allGroups.flatMap(g=>g.members.map(id=>[id,`${g.code} ${g.title}`])));
  const q=$('search').value.trim().toLowerCase(),part=$('partFilter').value,fam=$('familyFilter').value,len=$('lengthFilter').value,feel=$('feelFilter').value,enabled=$('enabledFilter').value;
- const filtered=bank().forms.filter(f=>(!q||(f.name+' '+f.id).toLowerCase().includes(q))&&(!part||f.part===part)&&(fam===''||f.family===+fam)&&(!len||f.length===+len)&&(feel===''||f.feel===+feel)&&(enabled===''||(f.enabled!==false)===(enabled==='1')));
- $('formList').replaceChildren();filtered.forEach(f=>{const i=bank().forms.indexOf(f),b=document.createElement('button');b.className='form-item'+(f.id===selectedId?' selected':'')+(f.enabled===false?' excluded':'');b.setAttribute('aria-label',`Форма ${i+1}: ${f.name}`);b.setAttribute('aria-pressed',String(f.id===selectedId));const title=document.createElement('strong'),num=document.createElement('span');num.className='number';num.textContent=String(i+1).padStart(3,'0');title.append(num,document.createTextNode(f.name));const small=document.createElement('small');small.textContent=`${f.part==='bass'?'Бас':'Пианино'} · ${f.length/24} доли · ${['maj','min','dom','dim'][f.family]} · ${f.feel?'walk':'2-feel'} · ${f.notes.length} нот${f.enabled===false?' · ВЫКЛ.':''}`;b.append(title,small);b.onclick=()=>select(f.id);$('formList').append(b)});
- if(!filtered.length){const p=document.createElement('p');p.className='muted';p.textContent='Нет форм с такими фильтрами.';$('formList').append(p)}$('shownCount').textContent=`Показано ${filtered.length} / ${bank().forms.length}`;status()
+ const filtered=bank().forms.filter(f=>(!q||(f.name+' '+f.id+' '+groupSearch.get(f.id)).toLowerCase().includes(q))&&(!part||f.part===part)&&(fam===''||f.family===+fam)&&(!len||f.length===+len)&&(feel===''||f.feel===+feel)&&(enabled===''||(f.enabled!==false)===(enabled==='1')));
+ const byId=new Map(bank().forms.map((f,i)=>[f.id,{f,i}])),visible=new Set(filtered.map(f=>f.id)),grouped=$('listView').value==='groups',scroll=$('formList').scrollTop;
+ const item=f=>{const i=byId.get(f.id).i,b=document.createElement('button');b.className='form-item'+(f.id===selectedId?' selected':'')+(f.enabled===false?' excluded':'');b.setAttribute('aria-label',`Форма ${i+1}: ${f.name}`);b.setAttribute('aria-pressed',String(f.id===selectedId));const title=document.createElement('strong'),num=document.createElement('span');num.className='number';num.textContent=String(i+1).padStart(3,'0');title.append(num,document.createTextNode(f.name));const small=document.createElement('small');small.textContent=`${f.part==='bass'?'Бас':'Пианино'} · ${f.length/24} доли · ${['maj','min','dom','dim'][f.family]} · ${f.feel?'walk':'2-feel'} · ${f.notes.length} нот${f.enabled===false?' · ВЫКЛ.':''}`;b.append(title,small);b.onclick=()=>select(f.id);return b};
+ $('formList').replaceChildren();$('formList').classList.toggle('grouped',grouped);let shownGroups=0;
+ if(grouped)for(const group of allGroups){
+  const members=group.members.filter(id=>visible.has(id));if(!members.length)continue;shownGroups++;
+  const details=document.createElement('details'),summary=document.createElement('summary'),title=document.createElement('strong'),meta=document.createElement('small'),body=document.createElement('div'),key=bankKey+':'+group.id;
+  details.className='form-group';details.dataset.group=group.id;details.classList.toggle('has-selection',group.members.includes(selectedId));details.open=openGroups.has(key)||group.members.includes(selectedId);summary.setAttribute('aria-label',`Группа ${group.code}: ${group.title}, форм ${members.length} из ${group.members.length}`);
+  title.textContent=`${group.part==='bass'?'Бас':'Пианино'} ${group.code} · ${group.title}`;
+  const enabled=group.members.filter(id=>byId.get(id).f.enabled!==false).length;
+  meta.textContent=`${group.length/24} доли · ${group.feel?'walking':'two-feel'} · форм: ${members.length===group.members.length?members.length:members.length+'/'+group.members.length} · ${enabled} вкл.`;
+  summary.append(title,meta);body.className='group-forms';members.forEach(id=>body.append(item(byId.get(id).f)));details.append(summary,body);details.addEventListener('toggle',()=>{if(details.open)openGroups.add(key);else openGroups.delete(key)});$('formList').append(details);
+ }else filtered.forEach(f=>$('formList').append(item(f)));
+ if(!filtered.length){const p=document.createElement('p');p.className='muted';p.textContent='Нет форм с такими фильтрами.';$('formList').append(p)}
+ $('shownCount').textContent=`Показано ${filtered.length} / ${bank().forms.length}${grouped?' · групп '+shownGroups:''}`;$('formList').scrollTop=scroll;
+ const selectedGroup=allGroups.find(g=>g.members.includes(selectedId));$('groupInfo').textContent=selectedGroup?`${selectedGroup.part==='bass'?'Бас':'Пианино'} ${selectedGroup.code} · ${selectedGroup.title} · форм в группе: ${selectedGroup.members.length}`:'';status()
 }
 function renderEditor(resetContext=false){
  const f=form();$('editor').hidden=!f;$('empty').hidden=!!f;if(!f)return;
  $('enabled').checked=f.enabled!==false;$('inclusionState').textContent=f.enabled===false?'Исключена из следующего билда; доступна для редактирования и прослушивания.':'Будет включена в следующий билд.';$('name').value=f.name;for(const k of['part','family','length','feel'])$(k).value=f[k];$('source').textContent=`${f.id} · ${bank().source} · ${f.source_bar?'такт '+f.source_bar:'своя форма'}`;
- if(resetContext){const c=bank().chart[0];$('root').value=(bank().key+c.root)%12;$('nextRoot').value=(bank().key+bank().chart[1].root)%12;const quality=QUALITIES.find(q=>family(q[1])===f.family);$('quality').value=quality[1];$('scale').value=quality[2];$('tempo').value=bankKey==='romance'?160:140}
+ if(resetContext){const c=bank().chart[0];$('root').value=(bank().key+c.root)%12;$('nextRoot').value=(bank().key+bank().chart[1].root)%12;const quality=QUALITIES.find(q=>family(q[1])===f.family);$('quality').value=quality[1];$('scale').value=quality[2];$('tempo').value=bankKey==='romance'?160:140;$('previewState').textContent='Звук — движок Jazz Box'}
  renderRoll();renderNotes();status()
 }
 function renderRoll(){
@@ -50,7 +67,7 @@ async function request(url,method='GET',body){const response=await fetch(url,{me
 async function save(){for(const b of Object.values(library.banks))for(const f of b.forms)validateForm(f);const data=await request('/api/library','PUT',library);revision=data.revision;savedJSON=JSON.stringify(library);notice('Изменения записаны в библиотеку проекта. Теперь можно собрать веб-билд.',false);status()}
 async function action(fn){if(busy)return;busy=true;const inputs=[...document.querySelectorAll('button,input,select')],states=inputs.map(e=>e.disabled);inputs.forEach(e=>e.disabled=true);status();try{await fn()}catch(e){notice(e.message)}finally{inputs.forEach((e,i)=>e.disabled=states[i]);busy=false;status()}}
 $('bank').onchange=()=>{if(!library)return;stopPreview();bankKey=$('bank').value;selectedId=bank().forms[0]?.id;renderList();renderEditor(true)};
-for(const id of['search','partFilter','familyFilter','lengthFilter','feelFilter','enabledFilter'])$(id).addEventListener(id==='search'?'input':'change',renderList);
+for(const id of['search','partFilter','familyFilter','lengthFilter','feelFilter','enabledFilter','listView'])$(id).addEventListener(id==='search'?'input':'change',renderList);
 $('enabled').onchange=()=>{const enabled=$('enabled').checked;update(()=>{if(enabled)delete form().enabled;else form().enabled=false})};
 const commitName=()=>{const value=$('name').value;if(value!==form().name)update(()=>{form().name=value})};$('name').addEventListener('change',commitName);$('name').addEventListener('blur',commitName);
 for(const k of['part','family','length','feel'])$(k).onchange=()=>{const value=k==='part'?$(k).value:+$(k).value;update(()=>{const f=form();f[k]=value;if(k==='part')f.kind=f.part==='bass'?4:4})};

@@ -15,6 +15,6 @@ emcc -O2 -ffp-contract=off -std=gnu99 -Wall -Wno-unused-function -Wno-unused-par
     -DEN_HOST -DEN_WEB "-DEN_VERSION=\"$(printf %s "${EN_VERSION:-DEV}" | tr a-z A-Z)\"" -Ifirmware/src -Ibuild/gen -Ifirmware/src/dsp -Ibuild/gen \
     --no-entry -sSTANDALONE_WASM -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=33554432 -sFILESYSTEM=0 \
     -o build/emu/min.wasm web/emu/min_web.c firmware/src/dsp/min.c firmware/src/dsp/drum909.c firmware/src/dsp/upright.c firmware/src/dsp/rings_string.c
-cp web/emu/index.html web/emu/worklet.js web/emu/forms.html web/emu/forms.js web/emu/forms-core.mjs web/emu/forms.css build/emu/
+cp web/emu/index.html web/emu/worklet.js web/emu/forms.html web/emu/forms.js web/emu/forms-core.mjs web/emu/forms-groups.mjs web/emu/forms.css build/emu/
 cp build/gen/library-build.json build/emu/
 echo "emu: build/emu ($(wc -c < build/emu/min.wasm) B wasm)"

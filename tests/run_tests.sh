@@ -39,6 +39,9 @@ run upright sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Werror -DEN
 run rings-reference sh -c "$CC -O2 -ffp-contract=off -std=c99 -Ifirmware/src/dsp -c firmware/src/dsp/rings_string.c -o $OUT/rings_reference.o && $CXX -O2 -ffp-contract=off -std=c++11 -DTEST -Itests/reference -Ifirmware/src/dsp tests/host/rings_reference_test.cpp $OUT/rings_reference.o -o $OUT/rings_reference_test && $OUT/rings_reference_test"
 run after-split python3 tests/host/after_split_test.py
 run form-library python3 tests/host/form_library_test.py
+if command -v node >/dev/null 2>&1; then
+    run form-groups node tests/host/form_groups_test.mjs
+fi
 run storage sh -c "$CC -O2 -o $OUT/storage_test tests/storage_test.c && $OUT/storage_test"
 # the update path, against the firmware package (Felucca's tests; needs ./build.sh)
 if [ -f build/min.fwsc ]; then

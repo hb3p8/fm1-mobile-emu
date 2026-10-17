@@ -90,6 +90,10 @@ Uncheck **Include in build** to keep a form in the library and exclude it
 from subsequent device/web builds. Inactive forms remain editable and
 auditionable. Save the flag, then build to apply it; the list can filter
 inactive forms. Build coverage counts only included forms.
+The default grouped view folds structurally similar phrases together by
+rhythm, roles and contour. Filters preserve group membership; the ordinary
+list remains available. Grouping changes only the editor view and leaves
+all variants, order, notes and build flags intact.
 
 Audition uses the actual Jazz Box WASM instruments, with a selectable chord,
 scale, next root and tempo; edits are audible before compiling. Preview
