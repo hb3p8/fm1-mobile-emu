@@ -24,6 +24,7 @@ export function noteName(n){return NOTES[(n%12+12)%12]+(Math.floor(n/12)-1)}
 export function roleName(n){return(n.role&16?'NEXT:1':ROLES[n.role&15])+(n.alter>0?'+1':n.alter<0?'−1':'')}
 export function validateForm(f){
  if(!f||typeof f!=='object'||typeof f.id!=='string'||f.id.length<1||f.id.length>64)throw Error('Форме нужен ID длиной 1–64 символа.');
+ if(f.enabled!==undefined&&typeof f.enabled!=='boolean')throw Error('Состояние формы должно быть true или false.');
  if(typeof f.name!=='string'||!f.name||f.name.length>32||/[^\x20-\x7e]/.test(f.name))throw Error('Название: 1–32 символа латиницей для экрана FM-1.');
  if(!['bass','piano'].includes(f.part)||![48,96].includes(f.length))throw Error('Проверьте партию и длину формы.');
  for(const[k,lo,hi]of[['family',0,3],['feel',0,1],['source_bar',0,255],['kind',0,f.part==='bass'?4:5]])if(!Number.isInteger(f[k])||f[k]<lo||f[k]>hi)throw Error(`Форма: ${k} должно быть ${lo}…${hi}.`);

@@ -83,6 +83,10 @@ bank by part, chord family, phrase length or feel. Select a form to see its
 time/pitch roll and edit note onsets, gates, harmonic roles, octaves,
 chromatic offsets and MIDI velocity. Duplicate/add/delete forms, undo/redo,
 and JSON import/export are available. Form names use ASCII for the FM-1 font.
+Uncheck **Include in build** to keep a form in the library and exclude it
+from subsequent device/web builds. Inactive forms remain editable and
+auditionable. Save the flag, then build to apply it; the list can filter
+inactive forms. Build coverage counts only included forms.
 
 Audition uses the actual Jazz Box WASM instruments, with a selectable chord,
 scale, next root and tempo; edits are audible before compiling. Preview

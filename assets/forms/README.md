@@ -16,6 +16,7 @@ is performed by the editor.
 | --- | --- |
 | id | Stable unique bank-local identifier, 1–64 characters |
 | name | Display name, 1–32 printable ASCII characters for the FM-1 font |
+| enabled | Optional boolean; omitted or `true` includes the form, `false` keeps it in JSON but omits its notes and row from both device and web builds |
 | part | `bass` or `piano` |
 | family | 0 major, 1 minor, 2 dominant, 3 diminished |
 | feel | 0 two-feel, 1 walking |
@@ -53,9 +54,16 @@ decoder is checked against the actual C implementation across all bank
 notes, keys and preview chord qualities. Sound comes from the same WASM
 piano and Rings bass as the instrument.
 
-The validator checks bounds, stable IDs, source-chart continuity and at least
-two compatible forms for every required part/length/feel/family combination.
-This prevents an edit from silently breaking the random selector. Harmony
+The editor's **Include in build** checkbox preserves inactive forms for
+editing, isolated audition, undo/redo and JSON import/export. The list can
+filter included/excluded forms and shows how many will be compiled. Existing
+libraries without `enabled` remain fully included.
+
+The validator checks bounds, stable IDs and source-chart continuity. Builds
+also require at least two **enabled** compatible forms for every required
+part/length/feel/family combination. Drafts may save fewer, so they remain
+editable after a restart, but cannot build until coverage is restored.
+The compiler never modifies the source JSON. Harmony
 and source drum tracks cannot be replaced through form import.
 
 ```sh

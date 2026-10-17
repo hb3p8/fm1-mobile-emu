@@ -13,7 +13,7 @@ def family(mask):
 def integer(value,lo,hi,path):
     if type(value)!=int or not lo<=value<=hi:raise ValueError(f'{path}: expected integer {lo}…{hi}')
 
-def validate(lib):
+def validate(lib,*,coverage=True):
     if not isinstance(lib,dict) or lib.get('schema')!=1 or not isinstance(lib.get('banks'),dict) or set(lib['banks'])!={'romance','after'}:raise ValueError('Expected schema 1 with romance and after banks')
     for key,b in lib['banks'].items():
         if not isinstance(b,dict):raise ValueError(key+': expected bank')
@@ -32,6 +32,7 @@ def validate(lib):
         for i,f in enumerate(b['forms']):
             p=f'{key}.forms[{i}]'
             if not isinstance(f,dict):raise ValueError(p+': expected form object')
+            if 'enabled' in f and type(f['enabled'])!=bool:raise ValueError(p+': enabled must be true or false')
             if not isinstance(f.get('id'),str) or not 1<=len(f['id'])<=64 or f['id'] in ids:raise ValueError(p+': missing/duplicate ID')
             ids.add(f['id'])
             name=f.get('name','')
@@ -48,11 +49,11 @@ def validate(lib):
                 if n['role'] not in (*range(8),16):raise ValueError(np+': role must be 0…7 or 16 (next root)')
                 if n['at']<prev:raise ValueError(np+': notes must be sorted by onset')
                 prev=n['at']
-        for c in b['chart']:
+        for c in b['chart'] if coverage else ():
             for part in ('bass','piano'):
                 for feel in ((0,1) if key=='romance' else (1,)):
-                    count=sum(f['part']==part and f['length']==c['beats']*24 and f['feel']==feel and (part=='bass' or f['family']==family(c['mask'])) for f in b['forms'])
-                    if count<2:raise ValueError(f'{key}: need at least two {part} forms of {c["beats"]} beats, feel {feel}, family {family(c["mask"])}')
+                    count=sum(f.get('enabled',True) and f['part']==part and f['length']==c['beats']*24 and f['feel']==feel and (part=='bass' or f['family']==family(c['mask'])) for f in b['forms'])
+                    if count<2:raise ValueError(f'{b.get("title",key)}: для сборки нужно минимум 2 включённые формы ({part}, {c["beats"]} доли, {"walking" if feel else "two-feel"}, семейство {family(c["mask"])}); осталось {count}. Включите подходящие формы.')
         if key=='after':
             if not isinstance(b.get('drums'),list):raise ValueError(key+': expected drums array')
             for i,n in enumerate(b['drums']):
@@ -60,7 +61,7 @@ def validate(lib):
                 for k,lo,hi in [('at',0,b['bars']*b['choruses']*96-1),('gate',1,65535),('note',0,127),('velocity',1,127)]:integer(n.get(k),lo,hi,f'{key}.drums[{i}].{k}')
     return lib
 
-def load(path=LIBRARY):return validate(json.loads(Path(path).read_text()))
+def load(path=LIBRARY,*,coverage=True):return validate(json.loads(Path(path).read_text()),coverage=coverage)
 
 def emit(lib,dest,source_revision=None):
     validate(lib);dest=Path(dest);dest.mkdir(parents=True,exist_ok=True)
@@ -77,6 +78,7 @@ def emit(lib,dest,source_revision=None):
             text += ['    {%d,%d,%d,%d,0},'%(n['at'],n['gate'],n['note'],n['velocity']) for n in b['drums']]+['};']
         flat=[];rows=[]
         for f in b['forms']:
+            if not f.get('enabled',True):continue
             notes=f['notes'];first=notes[0]['oct'] if notes else 0
             rows.append((len(flat),len(notes),f['length'],2 if f['part']=='bass' else 3,f['family'],f['feel'],f['kind'],first,0,f['source_bar'],json.dumps(f['name'])))
             flat.extend(notes)

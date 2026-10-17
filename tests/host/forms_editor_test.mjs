@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 import fs from'node:fs';import assert from'node:assert/strict';import{SCALES,QUALITIES,decode,materialize,validateForm}from'../../web/emu/forms-core.mjs';
 const lib=JSON.parse(fs.readFileSync('assets/forms/library.json'));let mem;
+const sample=structuredClone(lib.banks.romance.forms[0]);
+for(const enabled of[undefined,true,false])validateForm({...sample,enabled});
+for(const enabled of[0,1,'false',null])assert.throws(()=>validateForm({...sample,enabled}),/Состояние формы/);
 const wasi=new Proxy({clock_time_get:(_,p,o)=>{new DataView(mem.buffer).setBigUint64(o,0n,true);return 0;}},{get:(t,k)=>t[k]||(()=>0)});
 const{instance}=await WebAssembly.instantiate(fs.readFileSync('build/emu/min.wasm'),{wasi_snapshot_preview1:wasi,env:new Proxy({},{get:()=>()=>0})});const e=instance.exports;mem=e.memory;if(e._initialize)e._initialize();e.web_boot();e.web_preview_mode();
 let comparisons=0;

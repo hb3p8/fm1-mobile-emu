@@ -48,7 +48,7 @@ def make_handler(library=LIBRARY,web_root=ROOT/'build/emu',project_root=ROOT):
         def do_PUT(self):
             if urlsplit(self.path).path!='/api/library':return self.reply(404,{'error':'Unknown endpoint'})
             try:
-                data=self.payload();validate(data)
+                data=self.payload();validate(data,coverage=False)
                 with lock:
                     previous=library.read_bytes()
                     if self.headers.get('If-Match')!=revision(previous):return self.reply(409,{'error':'Library changed in another window. Export your draft before reloading.'})
@@ -69,6 +69,7 @@ def make_handler(library=LIBRARY,web_root=ROOT/'build/emu',project_root=ROOT):
                 self.payload()
                 with lock:
                     if self.headers.get('If-Match')!=revision(library.read_bytes()):return self.reply(409,{'error':'Save the current library before building'})
+                    load(library)
                     env=os.environ.copy()
                     if 'EMSDK_PYTHON' not in env and Path('/opt/homebrew/bin/python3').exists():env['EMSDK_PYTHON']='/opt/homebrew/bin/python3'
                     proc=subprocess.run(['sh','web/emu/build.sh'],cwd=project_root,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=180)
@@ -85,5 +86,5 @@ def make_handler(library=LIBRARY,web_root=ROOT/'build/emu',project_root=ROOT):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--port',type=int,default=58049);p.add_argument('--web-root',type=Path,default=ROOT/'build/emu');a=p.parse_args()
-    load();server=http.server.ThreadingHTTPServer(('127.0.0.1',a.port),make_handler(web_root=a.web_root.resolve()))
+    load(coverage=False);server=http.server.ThreadingHTTPServer(('127.0.0.1',a.port),make_handler(web_root=a.web_root.resolve()))
     print(f'Jazz Box: http://127.0.0.1:{a.port}/\nForms: http://127.0.0.1:{a.port}/forms.html',flush=True);server.serve_forever()
