@@ -133,10 +133,10 @@
     "id": "jazzbox",
     "repo": "hb3p8/fm1-mobile-emu",
     "tag": null,
-    "commit": "20ca870db8af4e6f52fbf4f3efad1efda768614f",
+    "commit": "e422f4f91bc62e59d84c804f670a9ade0a4b9233",
     "published": null,
     "prerelease": true,
-    "version": "experimental",
+    "version": "experimental-2",
     "release": "https://github.com/hb3p8/fm1-mobile-emu/tree/jazz-box-source",
     "status": "experimental and work in progress",
     "assets": []
