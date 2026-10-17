@@ -12,6 +12,9 @@ assert.equal(groupForms([base,variant]).length,1);
 assert.equal(formDistance(base,{...base,notes:base.notes.map(n=>({...n,velocity:127}))}),0);
 assert.equal(groupingKey([base]),groupingKey([{...base,name:'Renamed',enabled:false,notes:base.notes.map(n=>({...n,velocity:1}))}]));
 for(const change of[{part:'piano'},{length:48},{feel:0}])assert.equal(formDistance(base,{...base,...change}),Infinity);
+const short={...base,length:48,notes:[note(0,0),note(24,2)]};
+assert.equal(formDistance(short,{...short,feel:0}),0,'two-beat forms share a group across source feels');
+assert.equal(groupForms([short,{...short,id:'short-variant',feel:0}]).length,1);
 const descending={...base,id:'down',notes:[note(0,2),note(24,1),note(48,0)]};
 assert.equal(formDistance(base,descending),Infinity);
 assert.equal(groupForms([base,descending]).length,2);
@@ -36,7 +39,7 @@ for(const [key,bank]of Object.entries(lib.banks)){
  assert.deepEqual(groups,groupForms([...bank.forms].reverse()),'grouping must be independent of library order');
  for(const group of groups){
   assert(group.members.includes(group.representative));
-  for(const id of group.members){const f=byId.get(id);assert.equal(f.part,group.part);assert.equal(f.length,group.length);assert.equal(f.feel,group.feel)}
+  for(const id of group.members){const f=byId.get(id);assert.equal(f.part,group.part);assert.equal(f.length,group.length);assert.equal(f.length===48?-1:f.feel,group.feel)}
   for(let i=0;i<group.members.length;i++)for(let j=0;j<i;j++){assert(formDistance(byId.get(group.members[i]),byId.get(group.members[j]))<=GROUP_DISTANCE+1e-12);pairs++}
  }
  assert(groups.some(g=>g.members.length>1),key+' should contain actual clusters');

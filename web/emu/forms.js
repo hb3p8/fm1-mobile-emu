@@ -21,7 +21,7 @@ function renderList(){
  if(!library)return;
  const allGroups=groups(),groupSearch=new Map(allGroups.flatMap(g=>g.members.map(id=>[id,`${g.code} ${g.title}`])));
  const q=$('search').value.trim().toLowerCase(),part=$('partFilter').value,fam=$('familyFilter').value,len=$('lengthFilter').value,feel=$('feelFilter').value,enabled=$('enabledFilter').value;
- const filtered=bank().forms.filter(f=>(!q||(f.name+' '+f.id+' '+groupSearch.get(f.id)).toLowerCase().includes(q))&&(!part||f.part===part)&&(fam===''||f.family===+fam)&&(!len||f.length===+len)&&(feel===''||f.feel===+feel)&&(enabled===''||(f.enabled!==false)===(enabled==='1')));
+ const filtered=bank().forms.filter(f=>(!q||(f.name+' '+f.id+' '+groupSearch.get(f.id)).toLowerCase().includes(q))&&(!part||f.part===part)&&(fam===''||f.family===+fam)&&(!len||f.length===+len)&&(feel===''||f.length===48||f.feel===+feel)&&(enabled===''||(f.enabled!==false)===(enabled==='1')));
  const byId=new Map(bank().forms.map((f,i)=>[f.id,{f,i}])),visible=new Set(filtered.map(f=>f.id)),grouped=$('listView').value==='groups',scroll=$('formList').scrollTop;
  const item=f=>{const i=byId.get(f.id).i,b=document.createElement('button');b.className='form-item'+(f.id===selectedId?' selected':'')+(f.enabled===false?' excluded':'');b.setAttribute('aria-label',`Форма ${i+1}: ${f.name}`);b.setAttribute('aria-pressed',String(f.id===selectedId));const title=document.createElement('strong'),num=document.createElement('span');num.className='number';num.textContent=String(i+1).padStart(3,'0');title.append(num,document.createTextNode(f.name));const small=document.createElement('small');small.textContent=`${f.part==='bass'?'Бас':'Пианино'} · ${f.length/24} доли · ${['maj','min','dom','dim'][f.family]} · ${f.feel?'walk':'2-feel'} · ${f.notes.length} нот${f.enabled===false?' · ВЫКЛ.':''}`;b.append(title,small);b.onclick=()=>select(f.id);return b};
  $('formList').replaceChildren();$('formList').classList.toggle('grouped',grouped);let shownGroups=0;
@@ -31,7 +31,7 @@ function renderList(){
   details.className='form-group';details.dataset.group=group.id;details.classList.toggle('has-selection',group.members.includes(selectedId));details.open=openGroups.has(key)||group.members.includes(selectedId);summary.setAttribute('aria-label',`Группа ${group.code}: ${group.title}, форм ${members.length} из ${group.members.length}`);
   title.textContent=`${group.part==='bass'?'Бас':'Пианино'} ${group.code} · ${group.title}`;
   const enabled=group.members.filter(id=>byId.get(id).f.enabled!==false).length;
-  meta.textContent=`${group.length/24} доли · ${group.feel?'walking':'two-feel'} · форм: ${members.length===group.members.length?members.length:members.length+'/'+group.members.length} · ${enabled} вкл.`;
+  meta.textContent=`${group.length/24} доли · ${group.length===48?'two-feel + walking':group.feel?'walking':'two-feel'} · форм: ${members.length===group.members.length?members.length:members.length+'/'+group.members.length} · ${enabled} вкл.`;
   summary.append(title,meta);body.className='group-forms';members.forEach(id=>body.append(item(byId.get(id).f)));details.append(summary,body);details.addEventListener('toggle',()=>{if(details.open)openGroups.add(key);else openGroups.delete(key)});$('formList').append(details);
  }else filtered.forEach(f=>$('formList').append(item(f)));
  if(!filtered.length){const p=document.createElement('p');p.className='muted';p.textContent='Нет форм с такими фильтрами.';$('formList').append(p)}

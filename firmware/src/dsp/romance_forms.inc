@@ -53,7 +53,8 @@ static unsigned form_weight(unsigned id,int p,unsigned chord)
     const romance_chord_t *h=&jazz_chart()[chord];
     if(f->part!=(p?PT_CHORDS:PT_BASS) || f->len!=h->beats*24) return 0;
     if(p && f->family!=form_family(h->mask)) return 0;
-    if(f->feel!=en_jazz_walking || id==form_previous[p]) return 0;
+    /* Two-beat gestures share one pool, regardless of their source feel. */
+    if((f->len!=48 && f->feel!=en_jazz_walking) || id==form_previous[p]) return 0;
     return id==form_place[p][chord]?(unsigned)((100-par[P_VARIATION])/20+1):6u;
 }
 static unsigned form_pick(int p,unsigned chord)

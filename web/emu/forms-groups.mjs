@@ -26,7 +26,7 @@ export function phraseProfile(form){
   event.motion=previous===undefined?0:event.center-previous;
   previous=event.center;
  }
- return{part:form.part,length:form.length,feel:form.feel,events,
+ return{part:form.part,length:form.length,feel:form.length===48?-1:form.feel,events,
   next:notes.some(n=>n.role===16),chromatic:notes.some(n=>n.alter!==0),
   travel:events.length>1?events.at(-1).center-events[0].center:0};
 }

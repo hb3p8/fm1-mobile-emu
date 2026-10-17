@@ -12,6 +12,26 @@ from form_library import LIBRARY,load,validate,emit
 from jazz_server import make_handler
 from http.server import ThreadingHTTPServer
 lib=load();assert all(len(b['forms'])>=2 for b in lib['banks'].values())
+# Two-beat piano coverage pools both source feels, including a single
+# walking diminished variant paired with a two-feel variant.
+pooled=copy.deepcopy(lib)
+short=[f for f in pooled['banks']['romance']['forms'] if f['part']=='piano' and f['length']==48 and f['family']==3]
+for f in short:f['enabled']=False
+two=next(f for f in short if f['feel']==0);walk=next(f for f in short if f['feel']==1)
+two['enabled']=walk['enabled']=True
+validate(pooled)
+walk['feel']=0  # Both can also come from the same source feel.
+validate(pooled)
+walk['enabled']=False
+try:validate(pooled)
+except ValueError as e:assert '2 доли, two-feel + walking, семейство 3' in str(e)
+else:raise AssertionError('One short form cannot satisfy the no-repeat selector')
+four=copy.deepcopy(lib)
+for f in four['banks']['romance']['forms']:
+    if f['length']==96 and f['part']=='piano' and f['feel']==1:f['enabled']=False
+try:validate(four)
+except ValueError as e:assert '4 доли, walking' in str(e)
+else:raise AssertionError('Four-beat coverage must still respect feel')
 for mutate in [lambda x:x['banks']['romance']['forms'][0]['notes'][0].update(velocity=128),lambda x:x['banks']['romance']['forms'][0].update(notes=[None]),lambda x:x.update(banks=['romance','after']),lambda x:x['banks']['romance'].update(forms=[]),lambda x:x['banks']['romance']['forms'][0].update(enabled=0),lambda x:x['banks']['romance']['forms'][0].update(enabled='false')]:
     bad=copy.deepcopy(lib);mutate(bad)
     try:validate(bad)

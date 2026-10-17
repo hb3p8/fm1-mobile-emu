@@ -51,9 +51,10 @@ def validate(lib,*,coverage=True):
                 prev=n['at']
         for c in b['chart'] if coverage else ():
             for part in ('bass','piano'):
-                for feel in ((0,1) if key=='romance' else (1,)):
-                    count=sum(f.get('enabled',True) and f['part']==part and f['length']==c['beats']*24 and f['feel']==feel and (part=='bass' or f['family']==family(c['mask'])) for f in b['forms'])
-                    if count<2:raise ValueError(f'{b.get("title",key)}: для сборки нужно минимум 2 включённые формы ({part}, {c["beats"]} доли, {"walking" if feel else "two-feel"}, семейство {family(c["mask"])}); осталось {count}. Включите подходящие формы.')
+                for feel in ((None,) if c['beats']==2 else (0,1) if key=='romance' else (1,)):
+                    count=sum(f.get('enabled',True) and f['part']==part and f['length']==c['beats']*24 and (feel is None or f['feel']==feel) and (part=='bass' or f['family']==family(c['mask'])) for f in b['forms'])
+                    movement='two-feel + walking' if feel is None else 'walking' if feel else 'two-feel'
+                    if count<2:raise ValueError(f'{b.get("title",key)}: для сборки нужно минимум 2 включённые формы ({part}, {c["beats"]} доли, {movement}, семейство {family(c["mask"])}); осталось {count}. Включите подходящие формы.')
         if key=='after':
             if not isinstance(b.get('drums'),list):raise ValueError(key+': expected drums array')
             for i,n in enumerate(b['drums']):

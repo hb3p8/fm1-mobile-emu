@@ -45,7 +45,7 @@ static void take(int piece,int seed,result_t *r)
         if(en_jazz_forms_active() && en_jazz_form_bass!=last[0]) {
             if(en_jazz_form_piano==last[1])r->bad=1;
             last[0]=en_jazz_form_bass;last[1]=en_jazz_form_piano;r->changes++;
-            if(ROMANCE_FORMS[last[0]].feel!=en_jazz_walking || ROMANCE_FORMS[last[1]].feel!=en_jazz_walking)r->bad=1;
+            for(int p=0;p<2;p++)if(ROMANCE_FORMS[last[p]].len!=48 && ROMANCE_FORMS[last[p]].feel!=en_jazz_walking)r->bad=1;
             if(ROMANCE_FORMS[last[1]].family!=form_family(rot12(cur_mask,-cur_bass)))r->bad=1;
         }
     }
@@ -55,6 +55,31 @@ int main(void)
 {
     static result_t fixed,a,b,repeat;
     unsigned id,walking=65535,approach=65535,k,changed_bass=0,changed_piano=0;
+    /* Exact eligible pool for both banks, both movement settings and every
+     * chord: short forms ignore feel, long forms retain it, immediate
+     * repeats stay excluded. Exercise picks, not only weight predicates. */
+    for(int piece=8;piece<=9;piece++) {
+        start(piece,42);
+        for(unsigned chord=0;chord<jazz_chart_count();chord++)for(int feel=0;feel<2;feel++)for(int p=0;p<2;p++) {
+            if(piece==9 && !feel)continue;
+            en_jazz_walking=feel;form_previous[p]=65535;
+            unsigned count=0,seen=0;
+            for(id=0;id<(unsigned)en_jazz_form_count();id++) {
+                const romance_form_t *f=&form_bank()[id];
+                int eligible=f->part==(p?PT_CHORDS:PT_BASS) && f->len==jazz_chart()[chord].beats*24 &&
+                    (!p || f->family==form_family(jazz_chart()[chord].mask)) && (f->len==48 || f->feel==feel);
+                OK((form_weight(id,p,chord)>0)==eligible);count+=eligible;
+            }
+            OK(count>=2);
+            for(unsigned draw=0;draw<512;draw++) {
+                unsigned previous=form_previous[p],picked=form_pick(p,chord);
+                OK(form_weight(picked,p,chord)>0 && picked!=previous);
+                seen|=1u<<form_bank()[picked].feel;
+                form_previous[p]=(uint16_t)picked;
+            }
+            if(piece==8 && jazz_chart()[chord].beats==2)OK(seen==3);
+        }
+    }
     start(8,42);
     for(id=0;id<ROMANCE_FORM_COUNT;id++) {
         const romance_form_t *f=&ROMANCE_FORMS[id];

@@ -25,10 +25,11 @@ is performed by the editor.
 | kind | Original analysis category, retained as metadata |
 | notes | At most 48 notes, sorted by `at`; an empty form is a rest |
 
-The selector requires a matching part, length and feel. Piano additionally
+The selector requires a matching part and length. Two-beat forms share a
+pool across two-feel and walking; four-beat forms must match feel. Piano additionally
 matches chord family. Bass contours can cross families because their roles
 are remapped to the current chord. The Romance arrangement changes between
-two-feel and walking; After Gone currently selects walking forms.
+two-feel and walking for four-beat forms; After Gone uses walking there.
 
 ## Note fields
 
@@ -63,7 +64,8 @@ libraries without `enabled` remain fully included.
 
 The default **Similar-form groups** view clusters each bank by attack timing,
 chord-relative pitch shapes, voice motion and articulation. Bass and piano,
-two/four beats and two-feel/walking stay separate. NEXT-root gestures and
+two/four beats stay separate. Source two-feel/walking is ignored for two-beat
+groups and respected for four-beat groups. NEXT-root gestures and
 opposing bass contours remain distinct. Piano qualities may share a group
 because the same abstract role pattern adapts to multiple chords.
 
@@ -87,7 +89,8 @@ node tests/host/form_groups_test.mjs
 
 The validator checks bounds, stable IDs and source-chart continuity. Builds
 also require at least two **enabled** compatible forms for every required
-part/length/feel/family combination. Drafts may save fewer, so they remain
+part/length/family combination (also feel for four-beat forms). Drafts may
+save fewer, so they remain
 editable after a restart, but cannot build until coverage is restored.
 The compiler never modifies the source JSON. Harmony
 and source drum tracks cannot be replaced through form import.
