@@ -3,7 +3,7 @@ import{SCALES,SCALE_NAMES,NOTES,QUALITIES,family,materialize,noteName,roleName,v
 import{groupForms,groupingKey}from'./forms-groups.mjs';
 const $=id=>document.getElementById(id),clone=x=>structuredClone(x);
 const loadingControls=[...document.querySelectorAll('button,input,select')];loadingControls.forEach(e=>e.disabled=true);
-let library,savedJSON,revision,token,builtRevision,bankKey='romance',selectedId,selectedNote=-1,undoStack=[],redoStack=[],busy=false,audio,node,loadingAudio,startTime=0,playing=false,playDuration=0,raf=0;
+let library,savedJSON,revision,token,builtRevision,bankKey='romance',selectedId,selectedNote=-1,undoStack=[],redoStack=[],busy=false,audio,node,loadingAudio,startTime=0,playing=false,playDuration=0,raf=0,previewRequest=0;
 const bank=()=>library.banks[bankKey],form=()=>bank().forms.find(f=>f.id===selectedId),dirty=()=>JSON.stringify(library)!==savedJSON;
 const groupCache=new Map(),openGroups=new Set();
 function groups(){const key=groupingKey(bank().forms),cached=groupCache.get(bankKey);if(cached?.key===key)return cached.value;const value=groupForms(bank().forms);groupCache.set(bankKey,{key,value});return value}
@@ -13,7 +13,7 @@ QUALITIES.forEach(([name,mask])=>$('quality').append(option(mask,name)));SCALE_N
 function notice(text,error=true){$('notice').hidden=!text;$('notice').className=error?'':'success';$('notice').textContent=text}
 function status(){if(!library)return;$('saveState').textContent=busy?'Выполняется…':dirty()?'Есть несохранённые правки':builtRevision===revision?'Сохранено · в веб-билде':'Сохранено · требуется сборка';$('save').disabled=busy||!dirty();$('build').disabled=busy||dirty()||builtRevision===revision;$('undo').disabled=busy||!undoStack.length;$('redo').disabled=busy||!redoStack.length;$('revision').textContent='JSON '+revision.slice(0,10);const active=bank().forms.filter(f=>f.enabled!==false).length;$('bankStats').textContent=`${bank().forms.length} форм · ${active} в сборку · ${bank().forms.length-active} выключено`}
 function checkpoint(){undoStack.push(JSON.stringify(library));if(undoStack.length>60)undoStack.shift();redoStack=[]}
-function select(id){stopPreview();selectedId=id;selectedNote=-1;renderList();renderEditor(true)}
+function select(id){stopPreview();selectedId=id;selectedNote=-1;renderList();renderEditor(true);startPreview()}
 function ensureSelection(){if(!form())selectedId=bank().forms[0]?.id;selectedNote=-1}
 function context(){return{root:+$('root').value,mask:+$('quality').value,scale:SCALES[+$('scale').value],nextRoot:+$('nextRoot').value}}
 function update(mutator,{full=true}={}){if(busy)return;checkpoint();try{mutator();const target=form().notes[selectedNote];form().notes.sort((a,b)=>a.at-b.at);selectedNote=form().notes.indexOf(target);validateForm(form());notice('');stopPreview();renderList();if(full)renderEditor();else{renderRoll();status()}}catch(e){library=JSON.parse(undoStack.pop());notice(e.message);renderEditor();status()}}
@@ -86,14 +86,15 @@ async function ensureAudio(){
  if(loadingAudio)return loadingAudio;if(node){await audio.resume();return}
  loadingAudio=(async()=>{audio??=new AudioContext({sampleRate:44100});await audio.resume();await audio.audioWorklet.addModule('worklet.js?v='+Date.now());node=new AudioWorkletNode(audio,'min',{numberOfInputs:0,numberOfOutputs:1,outputChannelCount:[2]});node.connect(audio.destination);const bytes=await(await fetch('min.wasm',{cache:'no-store'})).arrayBuffer();await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Аудиодвижок не ответил.')),15000);node.port.onmessage=e=>{if(e.data.type==='ready'){clearTimeout(timer);resolve()}};node.port.postMessage({type:'load',wasm:bytes,preview:true,master:2048})});node.port.postMessage({type:'param',param:12,value:88});node.port.postMessage({type:'param',param:20,value:78});node.port.postMessage({type:'param',param:13,value:2})})();try{await loadingAudio}catch(e){if(node){node.disconnect();node=null}if(audio){await audio.close();audio=null}throw e}finally{loadingAudio=null}
 }
-function stopPreview(){if(node)node.port.postMessage({type:'preview',events:[]});playing=false;cancelAnimationFrame(raf);$('play').textContent='▶ Прослушать';const line=$('playhead');if(line)line.setAttribute('visibility','hidden')}
-$('play').onclick=async()=>{if(playing){stopPreview();return}try{
- $('play').disabled=true;$('previewState').textContent='Подключаю звук…';await ensureAudio();const f=form(),ctx=context(),bpm=+$('tempo').value;if(!Number.isFinite(bpm)||bpm<40||bpm>200)throw Error('Темп: 40–200 BPM.');const tick=60/bpm/24,events=[];
+function stopPreview(){previewRequest++;if(node)node.port.postMessage({type:'preview',events:[]});playing=false;cancelAnimationFrame(raf);$('play').disabled=false;$('play').textContent='▶ Прослушать';const line=$('playhead');if(line)line.setAttribute('visibility','hidden')}
+async function startPreview(){stopPreview();if(!form())return;const request=previewRequest;try{
+ $('play').disabled=true;$('previewState').textContent='Подключаю звук…';await ensureAudio();if(request!==previewRequest)return;const f=form(),ctx=context(),bpm=+$('tempo').value;if(!Number.isFinite(bpm)||bpm<40||bpm>200)throw Error('Темп: 40–200 BPM.');const tick=60/bpm/24,events=[];
  const add=(part,note,vel,at,gate)=>{events.push({frame:Math.round(at*tick*audio.sampleRate),part,note,velocity:vel},{frame:Math.round((at+gate)*tick*audio.sampleRate),part,note,velocity:0})};
  const played=new Set();materialize(f,ctx).forEach(n=>{const key=n.at+':'+n.pitch;if(played.has(key))return;played.add(key);add(f.part==='bass'?2:3,n.pitch,n.velocity,n.at,n.gate)});
  if($('withContext').checked){if(f.part==='bass'){const intervals=[];for(let i=0;i<12;i++)if(ctx.mask>>i&1)intervals.push(i);for(const i of intervals.slice(0,4))add(3,48+ctx.root+i,40,0,f.length-2)}else add(2,24+ctx.root,70,0,f.length-2)}
  startTime=audio.currentTime;playDuration=f.length*tick;playing=true;node.port.postMessage({type:'preview',events});$('play').textContent='■ Стоп';$('previewState').textContent=`${NOTES[ctx.root]}${QUALITIES.find(q=>q[1]===ctx.mask)[0]} · ${bpm} BPM · Jazz Box WASM`;
  const animate=()=>{if(!playing)return;const t=audio.currentTime-startTime;if(t>playDuration){playing=false;$('play').textContent='▶ Прослушать';$('playhead')?.setAttribute('visibility','hidden');return}const line=$('playhead');if(line){line.setAttribute('visibility','visible');const x=55+Math.min(1,t/playDuration)*828;line.setAttribute('x1',x);line.setAttribute('x2',x)}raf=requestAnimationFrame(animate)};raf=requestAnimationFrame(animate)
- }catch(e){notice(e.message)}finally{$('play').disabled=false}};
+ }catch(e){if(request===previewRequest)notice(e.message)}finally{if(request===previewRequest)$('play').disabled=false}}
+$('play').onclick=()=>{if(playing)stopPreview();else startPreview()};
 window.addEventListener('beforeunload',e=>{if(dirty()){e.preventDefault();e.returnValue=''}});
 try{const data=await request('/api/library');library=data.library;revision=data.revision;token=data.token;builtRevision=data.builtRevision;savedJSON=JSON.stringify(library);bankKey=$('bank').value;selectedId=bank().forms[0]?.id;loadingControls.forEach(e=>e.disabled=false);renderList();renderEditor(true)}catch(e){notice(e.message);$('saveState').textContent='Нет подключения к библиотеке';for(const b of document.querySelectorAll('button,input,select'))b.disabled=true}
