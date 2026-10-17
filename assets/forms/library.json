@@ -461,7 +461,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-005",
@@ -597,7 +598,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-007",
@@ -677,7 +679,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-009",
@@ -901,7 +904,8 @@
               "alter": 0,
               "velocity": 61
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-013",
@@ -1477,7 +1481,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-021",
@@ -1797,7 +1802,8 @@
               "alter": 0,
               "velocity": 44
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-027",
@@ -2041,7 +2047,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-032",
@@ -2729,7 +2736,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-042",
@@ -2881,7 +2889,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-044",
@@ -3101,7 +3110,8 @@
               "alter": 0,
               "velocity": 51
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-047",
@@ -3201,7 +3211,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-048",
@@ -3305,7 +3316,8 @@
               "alter": 0,
               "velocity": 63
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-050",
@@ -3785,7 +3797,8 @@
               "alter": 0,
               "velocity": 63
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-060",
@@ -3985,7 +3998,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-064",
@@ -4181,7 +4195,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-067",
@@ -4505,7 +4520,8 @@
               "alter": 0,
               "velocity": 61
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-070",
@@ -4965,7 +4981,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-077",
@@ -5265,7 +5282,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-084",
@@ -5781,7 +5799,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-093",
@@ -5861,7 +5880,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-095",
@@ -6129,7 +6149,8 @@
               "alter": 0,
               "velocity": 47
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-100",
@@ -6229,7 +6250,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-101",
@@ -6533,7 +6555,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-107",
@@ -6937,7 +6960,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-112",
@@ -6997,7 +7021,8 @@
               "alter": 0,
               "velocity": 63
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-113",
@@ -7033,7 +7058,8 @@
               "alter": 0,
               "velocity": 76
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-114",
@@ -7525,7 +7551,8 @@
               "alter": 0,
               "velocity": 44
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-123",
@@ -8273,7 +8300,8 @@
               "alter": 0,
               "velocity": 61
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-136",
@@ -8573,7 +8601,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-141",
@@ -9141,7 +9170,8 @@
               "alter": 0,
               "velocity": 55
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-151",
@@ -9569,7 +9599,8 @@
               "alter": 0,
               "velocity": 63
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-160",
@@ -9629,7 +9660,8 @@
               "alter": 0,
               "velocity": 63
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-161",
@@ -9665,7 +9697,8 @@
               "alter": 0,
               "velocity": 76
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "romance-162",
@@ -10926,7 +10959,8 @@
               "alter": 0,
               "velocity": 39
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-009",
@@ -12990,7 +13024,8 @@
               "alter": 0,
               "velocity": 64
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-041",
@@ -13957,7 +13992,8 @@
               "alter": 1,
               "velocity": 33
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-059",
@@ -14545,7 +14581,8 @@
               "alter": 1,
               "velocity": 50
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-068",
@@ -14625,7 +14662,8 @@
               "alter": 0,
               "velocity": 61
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-070",
@@ -14769,7 +14807,8 @@
               "alter": 0,
               "velocity": 51
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-072",
@@ -15201,7 +15240,8 @@
               "alter": 0,
               "velocity": 27
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-076",
@@ -17573,7 +17613,8 @@
               "alter": 0,
               "velocity": 57
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-113",
@@ -18125,7 +18166,8 @@
               "alter": 0,
               "velocity": 21
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-121",
@@ -18445,7 +18487,8 @@
               "alter": -1,
               "velocity": 67
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-125",
@@ -18941,7 +18984,8 @@
               "alter": -1,
               "velocity": 69
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-131",
@@ -19517,7 +19561,8 @@
               "alter": 0,
               "velocity": 54
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-141",
@@ -19717,7 +19762,8 @@
               "alter": 0,
               "velocity": 68
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-143",
@@ -20573,7 +20619,8 @@
               "alter": -1,
               "velocity": 31
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-155",
@@ -21325,7 +21372,8 @@
               "alter": 0,
               "velocity": 84
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-163",
@@ -23788,7 +23836,8 @@
               "alter": 1,
               "velocity": 50
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-197",
@@ -27428,7 +27477,8 @@
               "alter": 1,
               "velocity": 50
             }
-          ]
+          ],
+          "enabled": false
         },
         {
           "id": "after-255",
