@@ -1,5 +1,8 @@
 # Jazz Box for M-VAVE FM-1
 
+**Experimental and work in progress.** This firmware is under active development.
+The browser build is available in the FM-1 Mobile collection under **More**.
+
 A local jazz accompaniment instrument derived from Reytian's MIN-1, using
 its modal piano, Dattorro plate, platform and device/web build. Four parts:
 X0X 909 drums, live piano keys, walking bass, and accompanying piano.
