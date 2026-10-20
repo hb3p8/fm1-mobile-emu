@@ -102,6 +102,13 @@ const FIRMWARES = {
     kind: "store", wasm: "fw/dub/dub.wasm", worklet: "fw/dub/worklet.js", processor: "amb",
     store: "dub-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
   },
+  kawa: {
+    name: "KAWA", tag: "KAWA", by: "Omnipotard (Guizmoh)", repo: "https://github.com/Guizmoh/Kawa-Tracker-Fm1",
+    about: "A six-track chiptune and IDM tracker: chip waves, FM, breaks, song chains and 32 live effects.",
+    manual: "https://guizmoh.github.io/Kawa-Tracker-Fm1/manual/",
+    kind: "store", wasm: "fw/kawa/kawa.wasm", worklet: "fw/kawa/worklet.js", processor: "kawa",
+    store: "kawa-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
+  },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit
 const FIRMWARE_KEY = "fm1-firmware";

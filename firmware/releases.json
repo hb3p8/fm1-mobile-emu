@@ -203,5 +203,18 @@
     ],
     "version": "1.2.0",
     "release": "https://github.com/sbegueria/fm1-dub/releases/tag/v1.2.0"
+  },
+  "kawa": {
+    "id": "kawa",
+    "repo": "Guizmoh/Kawa-Tracker-Fm1",
+    "tag": null,
+    "commit": "047d21f6154ff6f86c7d3dc4b90f8d5e3320c300",
+    "published": "2026-10-20T04:46:11Z",
+    "prerelease": true,
+    "version": "0.5",
+    "release": "https://guizmoh.github.io/Kawa-Tracker-Fm1/",
+    "assets": [
+      "kawa-0.5.fwsc"
+    ]
   }
 }

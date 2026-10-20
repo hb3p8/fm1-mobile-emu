@@ -21,7 +21,7 @@ PY=${PYTHON:-$HERE/.venv/bin/python}
 PATH=$(dirname "$PY"):$PATH
 command -v emcc >/dev/null 2>&1 || { echo "firmware: no emcc (Emscripten)"; exit 1; }
 "$PY" -c 'import PIL, fontTools' || { echo "firmware: $PY needs Pillow and fontTools"; exit 1; }
-WANT=${*:-"x0x felucca sloop fimba melodee amb hyp1 ghoulbox choralroot maku jazzbox min1 tonitor dub"}
+WANT=${*:-"x0x felucca sloop fimba melodee amb hyp1 ghoulbox choralroot maku jazzbox min1 tonitor dub kawa"}
 EMCC_FLAGS="-O2 -ffp-contract=off -std=gnu99 -w --no-entry -sSTANDALONE_WASM -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=33554432 -sFILESYSTEM=0"
 
 gen() {   # generator script and output header, in the checkout, unless the header is there
@@ -94,6 +94,14 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
         gen gen_tables.py build/gen/tonitor_tables.h
         gen gen_font.py build/gen/tonitor_font.h
         emcc $EMCC_FLAGS -fno-builtin -I. -Ifirmware/src -Ibuild/gen -o "$OUT/$id/tonitor.wasm" "$HERE/tonitor_web.c"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    kawa)
+        cd source
+        emcc -O2 -ffp-contract=off -std=gnu99 -ffreestanding -fno-builtin \
+            -DKAWA_WASM "-DAPP_VER=\"$VERSION\"" -I. -Ifirmware/src -Ifirmware/gen \
+            --no-entry -sSTANDALONE_WASM -sINITIAL_MEMORY=4194304 -sSTACK_SIZE=262144 \
+            -Wl,--export-dynamic -o "$OUT/$id/kawa.wasm" "$HERE/kawa_web.c"
+        cp "$HERE/kawa-worklet.js" "$OUT/$id/worklet.js"
         echo "$VERSION" > "$OUT/$id/version" ;;
     jazzbox)
         EN_VERSION="$VERSION" sh web/emu/build.sh >/dev/null

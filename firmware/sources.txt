@@ -13,3 +13,4 @@ jazzbox fm1-jazzbox https://github.com/hb3p8/fm1-mobile-emu.git e422f4f91bc62e59
 min1 fm1-min1 https://github.com/Reytian/fm1-min1.git 8d6dd77d34cde4f980bd84e726d6a923f951a0dd
 tonitor tonitor https://github.com/nzimas/tonitor.git 964e3ec1e078191f3356bf5b0f7e764a357e9219
 dub fm1-dub https://github.com/sbegueria/fm1-dub.git ed490917895803fa160bd53b21ad848cd7bbe04a
+kawa Kawa-Tracker-Fm1 https://github.com/Guizmoh/Kawa-Tracker-Fm1.git 047d21f6154ff6f86c7d3dc4b90f8d5e3320c300

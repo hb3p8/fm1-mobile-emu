@@ -84,5 +84,11 @@
     "url": "https://thefirmwarehub.com/img/dub.png",
     "sha256": "bbf8fa3a1afcdcb47be307ef7e4bf97f32e44e5b769d7701815d8715c9e8320b",
     "bytes": 12164
+  },
+  {
+    "id": "kawa",
+    "url": "https://thefirmwarehub.com/img/kawa.png",
+    "sha256": "2cece740201074483e4efbe8241c637989d31758f86af8d9267c36e978d428ef",
+    "bytes": 196987
   }
 ]

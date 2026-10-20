@@ -46,6 +46,7 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
   render(1200);
   assert.ok(frame && new Set(frame).size>3,`${id}: blank firmware screen`);
   if(id==='tonitor')assert.ok(frame.includes(0xa0fe), 'tonitor: first track yellow lost its RGB565 byte order');
+  if(id==='kawa') {send({type:'keys',mask:1});render(80);send({type:'keys',mask:0});render(80);} // First key closes KAWA's boot page.
   send({type:'keys',mask:id==='choralroot' ? (1<<5)|(1<<9) : 1<<7});render(400);send({type:'keys',mask:0});render(300);
   tap(10);render(2000);tap(10);render(200); // X0X's white keys edit steps; PLAY makes them sound.
   assert.ok(peak>0.001 && peak<1.5,`${id}: audio peak ${peak}`);
@@ -59,11 +60,13 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
   }
   else if(id==='tonitor') {send({type:'buttons',mask:1<<7});render(1000);send({type:'buttons',mask:0});render(80);tap(7);}
   else if(id==='maku')tap(11); // MAKU REC likes its world and stores it.
+  else if(id==='kawa') {tap(7);tap(13);tap(13);tap(13);} // PROJECTS > SAVE > slot > name > write.
   else if(id==='melodee') {tap(7);tap(13);tap(13);tap(13);} // USER slot, Save here sheet, name, write.
   else if(id==='hyp1') {tap(5);tap(7);} // Global > SAVE stores the piece.
   else {tap(7);tap(13);tap(13);} // SAVE, confirm (preset slot / overwrite).
   render(1600);
   const after=writes();
+  if(id==='kawa')assert.ok(store[0]?.some(v=>v!==0), 'kawa: project slot was not saved');
   assert.ok(after>before,`${id}: SAVE did not reach storage`);
   // Re-open a firmware after the page's persisted writes: boot must still draw and render.
   const restoredReady = new Promise((res,rej)=> {resolveReady=res;rejectReady=rej;});
