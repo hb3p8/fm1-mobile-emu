@@ -12,6 +12,7 @@ const script = fs.readFileSync(path.join(app,'dist/app.js'),'utf8');
 vm.runInContext(script.slice(0,script.indexOf('const FIRMWARE_KEY'))+'\nglobalThis.catalog=FIRMWARES;', registry);
 
 for (const [id, fw] of Object.entries(registry.catalog)) {
+  if(process.argv.length>2 && !process.argv.slice(2).includes(id))continue;
   assert.ok(fs.existsSync(path.join(app,'dist',fw.screenshot)),`${id}: missing screenshot`);
   const bytes = fs.readFileSync(path.join(app,'dist',fw.wasm));
   let Processor, resolveReady, rejectReady, frame, frames=0, sectors={}, store={};
@@ -44,6 +45,7 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
   function tap(bit){send({type:'buttons',mask:1<<bit});render(80);send({type:'buttons',mask:0});render(80);}
   render(1200);
   assert.ok(frame && new Set(frame).size>3,`${id}: blank firmware screen`);
+  if(id==='tonitor')assert.ok(frame.includes(0xa0fe), 'tonitor: first track yellow lost its RGB565 byte order');
   send({type:'keys',mask:id==='choralroot' ? (1<<5)|(1<<9) : 1<<7});render(400);send({type:'keys',mask:0});render(300);
   tap(10);render(2000);tap(10);render(200); // X0X's white keys edit steps; PLAY makes them sound.
   assert.ok(peak>0.001 && peak<1.5,`${id}: audio peak ${peak}`);
@@ -51,13 +53,18 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
   assert.ok(frames>1,`${id}: screen never updates`);
   const writes=()=>processor.ex.web_flash_writes_count?.() ?? processor.ex.web_flash_dirty?.() ?? processor.ex.web_store_writes();
   const before=writes();
-  if(id==='maku')tap(11); // MAKU REC likes its world and stores it.
+  if(id==='sloop') { // SAVE + white key 5 stores section A.
+    send({type:'buttons',mask:1<<7});render(80);send({type:'keys',mask:1<<7});render(80);
+    send({type:'keys',mask:0});render(80);send({type:'buttons',mask:0});render(80);
+  }
+  else if(id==='tonitor') {send({type:'buttons',mask:1<<7});render(1000);send({type:'buttons',mask:0});render(80);tap(7);}
+  else if(id==='maku')tap(11); // MAKU REC likes its world and stores it.
   else if(id==='melodee') {tap(7);tap(13);tap(13);tap(13);} // USER slot, Save here sheet, name, write.
   else if(id==='hyp1') {tap(5);tap(7);} // Global > SAVE stores the piece.
   else {tap(7);tap(13);tap(13);} // SAVE, confirm (preset slot / overwrite).
   render(1600);
   const after=writes();
-  if(['melodee','maku','hyp1','choralroot','ghoulbox'].includes(id))assert.ok(after>before,`${id}: SAVE did not reach storage`);
+  assert.ok(after>before,`${id}: SAVE did not reach storage`);
   // Re-open a firmware after the page's persisted writes: boot must still draw and render.
   const restoredReady = new Promise((res,rej)=> {resolveReady=res;rejectReady=rej;});
   const restored=new Processor();
@@ -70,6 +77,13 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
     for(const [offset,bytes] of Object.entries(sectors)) {
       const expected=bytes ? new Uint8Array(bytes) : new Uint8Array(4096).fill(255);
       assert.deepEqual(nor.slice(+offset,+offset+4096),expected,`${id}: saved sector ${offset} was not restored`);
+    }
+  }
+  else {
+    for(const [object,bytes] of Object.entries(store)) {
+      assert.equal(restored.ex.web_store_len(+object), bytes.length, `${id}: saved object ${object} length was not restored`);
+      const actual = new Uint8Array(restored.ex.memory.buffer,restored.ex.web_store(+object),bytes.length);
+      assert.deepEqual(new Uint8Array(actual),new Uint8Array(bytes),`${id}: saved object ${object} was not restored`);
     }
   }
   console.log(`${id} ${fw.version}: boot, screen, note, encoder, restore OK; peak=${peak.toFixed(3)} writes=${after-before}`);

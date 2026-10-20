@@ -74,7 +74,8 @@ FW_FILES = {'x0x': ['x0x.wasm', 'worklet.js'], 'felucca': ['felucca.wasm'], 'slo
             'fimba': ['kalimba.wasm', 'worklet.js'], 'melodee': ['melodee.wasm'],
             'amb': ['amb.wasm', 'worklet.js'], 'maku': ['maku.wasm'], 'hyp1': ['hyp1.wasm', 'worklet.js'],
             'ghoulbox': ['ghoulbox.wasm'], 'choralroot': ['choralroot.wasm'],
-            'jazzbox': ['jazzbox.wasm', 'worklet.js']}
+            'jazzbox': ['jazzbox.wasm', 'worklet.js'], 'min1': ['min1.wasm', 'worklet.js'],
+            'tonitor': ['tonitor.wasm'], 'dub': ['dub.wasm', 'worklet.js']}
 firmware_files = ['fw/flash-worklet.js']
 (dist/'fw').mkdir()
 shutil.copy2(HERE/'firmware/flash-worklet.js', dist/'fw/flash-worklet.js')

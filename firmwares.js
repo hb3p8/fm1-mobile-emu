@@ -43,7 +43,7 @@ const FIRMWARES = {
     name: "AMB-1", tag: "AMB-1", by: "Charles Vestal", repo: "https://github.com/charlesvestal/fm1-amb",
     about: "Generative ambient: breathing voices, bells on unequal tape loops, a gliding bass.",
     manual: "https://charlesvestal.github.io/fm1-amb/manual/",
-    kind: "store", wasm: "fw/amb/amb.wasm", worklet: "fw/amb/worklet.js", processor: "amb",
+    kind: "store", wasm: "fw/amb/amb.wasm", worklet: "fw/amb/worklet.js", processor: "fm1",
     store: "amb-emu-store", masterMax: 4096, masterDefault: 2800,
   },
   hyp1: {
@@ -80,6 +80,27 @@ const FIRMWARES = {
     manual: "https://github.com/hb3p8/fm1-mobile-emu/blob/jazz-box-source/README.md",
     kind: "store", wasm: "fw/jazzbox/jazzbox.wasm", worklet: "fw/jazzbox/worklet.js", processor: "min",
     store: "jazzbox-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
+  },
+  min1: {
+    name: "MIN-1", tag: "MIN-1", by: "Reytian", repo: "https://github.com/Reytian/fm1-min1",
+    about: "A minimalist ensemble inspired by Philip Glass: four models, twenty pieces and live chords.",
+    manual: "https://github.com/Reytian/fm1-min1#readme",
+    kind: "store", wasm: "fw/min1/min1.wasm", worklet: "fw/min1/worklet.js", processor: "min",
+    store: "min1-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
+  },
+  tonitor: {
+    name: "Tonitor", tag: "TONITOR", by: "Nuno Zimas", repo: "https://github.com/nzimas/tonitor",
+    about: "Six tracks of electroacoustic textures: seven sound engines, free loopers, grains and reverb.",
+    manual: "https://nzimas.github.io/tonitor/manual.html",
+    kind: "flash", wasm: "fw/tonitor/tonitor.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "tonitor", more: true, masterMax: 1023, masterDefault: 700,
+  },
+  dub: {
+    name: "DUB-1", tag: "DUB-1", by: "sbegueria", repo: "https://github.com/sbegueria/fm1-dub",
+    about: "Generative dub techno: chord stabs, tape echo, FM pings, sub bass and drums.",
+    manual: "https://github.com/sbegueria/fm1-dub#readme",
+    kind: "store", wasm: "fw/dub/dub.wasm", worklet: "fw/dub/worklet.js", processor: "amb",
+    store: "dub-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
   },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit

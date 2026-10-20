@@ -1,61 +1,61 @@
 [
   {
     "id": "x0x",
-    "url": "https://fm1.designburgapps.com/img/x0x.png",
+    "url": "https://thefirmwarehub.com/img/x0x.png",
     "sha256": "20a9c76fcde4c10dd31d4ef54b0bf475a204d27dc08196381d3c1fa5922f5278",
     "bytes": 13672
   },
   {
     "id": "felucca",
-    "url": "https://fm1.designburgapps.com/img/felucca.png",
+    "url": "https://thefirmwarehub.com/img/felucca.png",
     "sha256": "04c26b6f508f78515bb5635b29266a47dfce57819ffc92c23cb02aa9d5ad7e5f",
     "bytes": 66648
   },
   {
     "id": "sloop",
-    "url": "https://fm1.designburgapps.com/img/sloop.png",
+    "url": "https://thefirmwarehub.com/img/sloop.png",
     "sha256": "06c1512a859df63c2cc5a65e5e2e2c84b8db0af0d66c58f3b686b2768039a847",
     "bytes": 4228
   },
   {
     "id": "fimba",
-    "url": "https://fm1.designburgapps.com/img/fimba.png",
+    "url": "https://thefirmwarehub.com/img/fimba.png",
     "sha256": "009469ecab8453994974305a6a33a8426d6b86683f3bcd210c65429a6a87d7ff",
     "bytes": 9982
   },
   {
     "id": "melodee",
-    "url": "https://fm1.designburgapps.com/img/melodee.png",
+    "url": "https://thefirmwarehub.com/img/melodee.png",
     "sha256": "dfff7f857d99302a69ed2fcb09c3735c2954861be25b2fcdb063d851c3bee9af",
     "bytes": 154410
   },
   {
     "id": "amb",
-    "url": "https://fm1.designburgapps.com/img/amb.png",
+    "url": "https://thefirmwarehub.com/img/amb.png",
     "sha256": "230a4c6a6bdb060c5eb448f93d16f0a8234aff1d0da1c345db41ee5e9069f732",
     "bytes": 9592
   },
   {
     "id": "hyp1",
-    "url": "https://fm1.designburgapps.com/img/hyp1.png",
-    "sha256": "0934bcae7adb2a40472f5f93deb06ce53b9205439d9c26251dfca9bdf16560f1",
-    "bytes": 9887
+    "url": "https://thefirmwarehub.com/img/hyp1.png",
+    "sha256": "426aedf4a434b6a22eb9a6a7fef80e443d28c46724dafc1e912140b94b2f1b38",
+    "bytes": 214143
   },
   {
     "id": "ghoulbox",
-    "url": "https://fm1.designburgapps.com/img/ghoulbox.png",
+    "url": "https://thefirmwarehub.com/img/ghoulbox.png",
     "sha256": "de7a6284069f81643a6c2909f7df58340b69abb5914bebe5dc14e691d9e1630a",
     "bytes": 65854
   },
   {
     "id": "choralroot",
-    "url": "https://fm1.designburgapps.com/img/choralroot.png",
+    "url": "https://thefirmwarehub.com/img/choralroot.png",
     "sha256": "f243c2d9c64b0fa1fb2debd76af81c80989e845e75f2f031db01c255d1d58761",
     "bytes": 22526
   },
   {
     "id": "maku",
-    "url": "https://fm1.designburgapps.com/img/maku.png",
+    "url": "https://thefirmwarehub.com/img/maku.png",
     "sha256": "3b6825eeac65afd83112dcf9e43219162c104f23dea4fa3f692ba8ac2b32c063",
     "bytes": 47393
   },
@@ -66,5 +66,23 @@
     "commit": "20ca870db8af4e6f52fbf4f3efad1efda768614f",
     "sha256": "7f4051177bb4f0fa14013f171ae8f7ccf4afea4b78407d01266f8d73801b36cc",
     "bytes": 11154
+  },
+  {
+    "id": "min1",
+    "url": "https://thefirmwarehub.com/img/min1.png",
+    "sha256": "7a14679d3b9b7b37dd21eb1283a85e079d6e9dff82ac682a664a27697509b381",
+    "bytes": 13015
+  },
+  {
+    "id": "tonitor",
+    "url": "https://thefirmwarehub.com/img/tonitor.png",
+    "sha256": "2bbe9b72ff0b3ab127462e87c0b34f075f277750b6889e676f2974259b925e3d",
+    "bytes": 26054
+  },
+  {
+    "id": "dub",
+    "url": "https://thefirmwarehub.com/img/dub.png",
+    "sha256": "bbf8fa3a1afcdcb47be307ef7e4bf97f32e44e5b769d7701815d8715c9e8320b",
+    "bytes": 12164
   }
 ]

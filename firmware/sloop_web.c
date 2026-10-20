@@ -159,44 +159,52 @@ static void irq_restore(uint32_t f) { (void)f; }
 static uint32_t fl_jedec_ram(void) { return 0x856014u; }             /* the FM-1's part (project.c) */
 static void fl_plain_window_init(void) {}
 #define FL_FAR(fn) (fn)
+#define ST_XIP_PTR(off) (nor + (off))
 #include "firmware/src/storage.c"
 #include "firmware/src/upreset.c"
 #include "firmware/src/project.c"
 #include "firmware/src/splash.c"
 
-/* ------------------------------------------------- main.c and its HAL --- */
-typedef struct { uint32_t magic, count, vec, pc, emu, dbg, rets; } fm1_crash_t;
-static struct { uint8_t p3_rst, wdt_con; uint32_t rst_src; } fm1_boot;
-uint32_t _data_start[1], _data_end[1], _data_load[1], _bss_start[1], _bss_end[1];
-uint32_t _pool_start[1], _pool_end[1], _rt_start[1], _rt_end[1], _rt_load[1];
-static uint32_t web_master_adc = 700;   /* MASTER, 0..1023 as the ADC reads it */
+/* The power-on defaults from SLOOP 2.7.1 main.c (Leo Kuroshita / isod89, GPL-3.0).
+ * Its host harness executes render jobs serially (CORES=1); no second CPU is emulated. */
+static uint32_t web_master_adc = 700;
 enum { FM1_ADC_BATT = 3, FM1_ADC_MASTER = 4 };
 static int32_t fm1_adc_read(uint32_t ch) { return ch == FM1_ADC_MASTER ? (int32_t)web_master_adc : 620; }
 static void fm1_adc_init(void) {}
-static void fm1_timer5_ack(void) {}
-static void fm1_timer5_start(void (*isr)(void), uint32_t prio) { (void)isr; (void)prio; }
-void isr_timer5(void) {}
-static void fm1_reboot(void) {}
-static void fm1_enter_uboot(void) {}
-static void fm1_guard_lock_top(void) {}
-static void fm1_irq_enable_all(void) {}
-static void fm1_irq_init(void) {}
-static void fm1_time_init(void) {}
-static void fm1_reset_reason(void) {}
-static void fm1_wdt_arm(uint32_t v) { (void)v; }
-static void fm1_mailbox_clear(void) {}
-static void fm1_guard_enable(uint32_t m) { (void)m; }
-enum { FM1_GUARD_STACK = 1, FM1_GUARD_WRITE = 2, FM1_GUARD_BUS = 4, FM1_GUARD_PC = 8 };
-/* main.c's calls into the USB driver (registers) and the boot guard: nothing here */
-#define usb_poll() ((void)0)
-#define usb_start() ((void)0)
-#define usb_retry(ms) ((void)(ms))
-#define usb_detach() ((void)0)
-#include "firmware/src/main.c"
-#undef usb_poll
-#undef usb_start
-#undef usb_retry
-#undef usb_detach
+/* power-on: three parts with their default sounds (TRK_DEF), the drum track, empty patterns */
+UI_SMALL static void felucca_init(void)
+{
+    uint32_t i;
+    for (i = 0; i < G_COUNT; i++)
+        song.g[i] = GP[i].def;
+    fm6_init();                               /* every part's FM6 patch: the init voice */
+    for (i = 0; i < NTRK; i++) {
+        track_t *t = &trk[i];
+        track_defaults(t);
+        if (i < NPART) {
+            set_engine_of(t, TRK_DEF[i][0]);
+            apply_preset_to(t, TRK_DEF[i][1]);   /* with its sends */
+            t->engine = t->eng_req;
+        }
+        track_defaults_steps(t);              /* the sequencers start empty */
+    }
+    TDRUM->p[P_E0] = DRUM_DEFAULT_KIT;        /* the 808 kit */
+    song.sel = 0;
+    song.master_q12 = 2048;
+    autosave_resume();                        /* the project as it was left (project.c) */
+    song.g[G_SYNC] = (int16_t)lights_sync;    /* a setting of the FM-1 (panel.c) */
+    song.g[G_MIDI] = (int16_t)lights_mout;
+    song.g[G_ROUTE] = (int16_t)lights_min;
+    song.g[G_CH1] = midi_set[0], song.g[G_CH2] = midi_set[1], song.g[G_CH3] = midi_set[2];   /* (2.6: GLO > MIDI, */
+    song.g[G_DRCH] = midi_set[3], song.g[G_CHOTH] = midi_set[4], song.g[G_BEND] = midi_set[5];
+    song.g[G_FXCH] = midi_set[6];
+    song.g[G_DRMAP] = midi_set[7];                   /* (2.7) GLO > MIDI 3: DR MAP */
+    song.g[G_CLKOUT] = midi_set[9];                  /* (2.7) GLO > MIDI 3: CLK OUT */
+    song.g[G_RMCH] = midi_set[8];                    /* (2.7) GLO > MIDI 3: REMOTE */                    /* (2.7) GLO > MIDI 3: FX CH */   /* settings of the FM-1) */
+    layers_init();                            /* the panel's layer buttons for the keys (ui_layers.c) */
+    go_home();
+    ui.force = 1;
+}
 
 /* --------------------------------------------------------- the device --- */
 static uint32_t web_booted, web_boot_ms, web_last_frame;
