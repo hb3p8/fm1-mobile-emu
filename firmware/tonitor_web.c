@@ -73,6 +73,7 @@ static void lcd_fill(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c)
 
 #include "dsp.h"
 #include "gfx.c"
+#include "logo.c"
 #include "fm.c"
 #include "anima.c"
 #include "cal.c"
@@ -80,7 +81,41 @@ static void lcd_fill(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c)
 #include "druid.c"
 #include "bayarea.c"
 #include "hive.c"
+#include "obrador.c"
 #include "reverb.c"
+/* CPU1's mailbox (src/audio_worker.h), as one core sees it: a job posted runs at the join -- the units of work are
+ * apart, so the sound is the same as with the two cores at once. host_cores 1: CPU1 off (the one-core path) */
+static int audio_worker_online;            /* (0: one core, as the host times it -- the sum of both; cores sets it) */
+static void (*host_job)(void *);
+static int host_jobs_n;
+static void *host_job_ctx;
+static int audio_worker_submit(void (*fn)(void *), void *ctx)
+{
+    if (!audio_worker_online)
+        return 0;
+    host_job = fn;
+    host_job_ctx = ctx;
+    return 1;
+}
+static int audio_worker_join(void)
+{
+    if (host_job) {
+        host_job(host_job_ctx);
+        host_jobs_n++;
+    }
+    host_job = 0;
+    return 1;
+}
+static void audio_worker_check(void) {}
+/* usb.c's side, as the tests see it: no host attached; what would be sent out kept, for the MIDI tests */
+static struct { uint8_t config, suspended; } usb;
+static uint32_t host_mout[256], host_mout_n;
+static void midi_out_event(uint32_t pkt)
+{
+    if (host_mout_n < 256u)
+        host_mout[host_mout_n] = pkt;
+    host_mout_n++;
+}
 #define MQ 64u
 static uint32_t midi_in_q[MQ];
 static volatile uint32_t mi_w, mi_r;
@@ -113,7 +148,9 @@ static int32_t fm1_enc_take(uint32_t e)
 static uint8_t host_led[64];
 static void fm1_led_key(uint32_t id, int on) { if (id < 64u) host_led[id] = (uint8_t)!!on; }
 #include "ui.c"
+#include "snaps.c"
 #include "sessions.c"
+#include "setup.c"
 #include "backup.c"
 
 /* the flash, emulated: NOR (erased to 0xFF, programming only clears bits); erases counted */
@@ -172,6 +209,8 @@ static void web_frame(void)
     uint32_t k10 = (uint32_t)(knob / 16);
     master_q12 = (int32_t)((k10 * k10) >> 8);
     ui_input();
+    setup_poll();
+    midi_poll();
     ui_leds();
     ui_draw();
     quiet = !ui.keys && !ui.save_down;
@@ -185,9 +224,12 @@ EXPORT void web_boot(void)
 {
     if (booted) return;
     ses_scan(1);
+    setup_load();
     layers_init();
     ui_init();
     sounds_init();
+    scale_draw();
+    lx_post();
     ui.force = 1;
     booted = 1;
     web_frame();

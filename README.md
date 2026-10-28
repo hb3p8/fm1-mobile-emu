@@ -1,6 +1,6 @@
 # FM-1 Mobile
 
-The M-VAVE FM-1 on your phone: real FM-1 firmwares, their own C code compiled to WebAssembly, behind a touch panel laid out like the instrument. Pick X0X, Felucca, SLOOP, FiMba-1, Melodee, AMB-1 or HYP-1 in the main menu; More contains GHOULBOX, ChoralRoot (Orchid-style), MAKU, experimental Jazz Box, MIN-1, Tonitor, DUB-1 and KAWA, add the page to your home screen, and it works offline.
+The M-VAVE FM-1 on your phone: real FM-1 firmwares, their own C code compiled to WebAssembly, behind a touch panel laid out like the instrument. Pick X0X, Felucca, SLOOP, FiMba-1, Melodee, AMB-1 or HYP-1 in the main menu; More contains GHOULBOX, ChoralRoot (Orchid-style), MAKU, experimental Jazz Box, MIN-1, Tonitor, DUB-1, KAWA, Caravel and FRASIL; add the page to your home screen, and it works offline.
 
 **▶ Open it: <https://hb3p8.github.io/fm1-mobile-emu/>**
 
@@ -16,22 +16,24 @@ This is a fan project. It is not affiliated with M-VAVE or with the firmwares' a
 | Firmware | What it is | By |
 | --- | --- | --- |
 | [X0X](https://github.com/charlesvestal/fm1-x0x) 1.1.0 | Drum machine and acid bass line: 909 and 808 drums, a 303, breaks (your own loops too) | Charles Vestal |
-| [Felucca](https://github.com/hugelton/Felucca) 1.6.1 | Multi-engine synthesizer: thirteen engines, four tracks, a 64-step sequencer | Leo Kuroshita, Hügelton Instruments |
-| [SLOOP](https://github.com/isod89/sloop-fm1) 2.7.1 | Live groovebox: three synths and a drum machine, song mode, physical models | isod89, after Felucca |
+| [Felucca](https://github.com/hugelton/Felucca) 1.7.0 | Multi-engine synthesizer: thirteen engines, four tracks, a 64-step sequencer | Leo Kuroshita, Hügelton Instruments |
+| [SLOOP](https://github.com/isod89/sloop-fm1) 2.8.3 | Live groovebox: three synths and a drum machine, song mode, physical models | isod89, after Felucca |
 | [FiMba-1](https://github.com/jadamsowers/fm1-fimba) 0.6.1 (pre-release) | A kalimba: modelled tines on a body, thumb-roll chords, mbira patterns | Adam Sowers |
-| [Melodee](https://github.com/keremimo/melodee) 1.4.5 | Multi-engine synthesizer: CZ-1, FM6, Prophet, microtonal scales and sequencing | keremimo |
+| [Melodee](https://github.com/keremimo/melodee) 1.5.1 | Multi-engine synthesizer: CZ-1, FM6, Prophet, microtonal scales and sequencing | keremimo |
 | [AMB-1](https://github.com/charlesvestal/fm1-amb) 1.3 | Generative ambient voices, bells on tape loops and a gliding bass | Charles Vestal |
-| [HYP-1](https://github.com/RustyPawz/fm1-HYP1) 1.5.44 | Hypnotic techno and acid with generative voices and sequenced drums | RedtailWorks |
+| [HYP-1](https://github.com/RustyPawz/fm1-HYP1) 1.5.54 | Hypnotic techno and acid with generative voices and sequenced drums | RedtailWorks |
 | **More** | | |
-| [GHOULBOX](https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth) 2.3.2 | Dungeon synth with cathedral reverb and hurdy-gurdy | Jason Persinger |
-| [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) 0.26.1 | Orchid-style chord instrument: roots, chord shapes, bass and looper | Quixotic7 |
+| [GHOULBOX](https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth) 2.4 | Dungeon synth with cathedral reverb and hurdy-gurdy | Jason Persinger |
+| [ChoralRoot](https://github.com/Quixotic7/ChoralRootFM1) 0.27 | Orchid-style chord instrument: roots, chord shapes, bass and looper | Quixotic7 |
 | [MAKU](https://github.com/okumurari2/maku) 1.0 | An always-on ambience machine with random worlds and saved favourites | okumurari |
 | [Jazz Box](https://github.com/hb3p8/fm1-mobile-emu/tree/jazz-box-source) (experimental) | **Experimental and work in progress.** Jazz harmony, walking bass, drums and live piano keys | hb3p8, after Reytian’s MIN-1 |
 | [MIN-1](https://github.com/Reytian/fm1-min1) 0.2.1 | A minimalist ensemble with live chords, four models and twenty pieces | Reytian |
-| [Tonitor](https://github.com/nzimas/tonitor) 0.49 | Electroacoustic textures: seven sound engines, six tracks and free loopers | Nuno Zimas |
-| [DUB-1](https://github.com/sbegueria/fm1-dub) 1.2.0 | Generative dub techno with tape echo, chord stabs and sub bass | sbegueria |
+| [Tonitor](https://github.com/nzimas/tonitor) 68 | Electroacoustic textures: eight sound engines, six tracks and free loopers | Nuno Zimas |
+| [DUB-1](https://github.com/sbegueria/fm1-dub) 1.3.0 | Generative dub techno with tape echo, chord stabs and sub bass | sbegueria |
 
-| [KAWA](https://github.com/Guizmoh/Kawa-Tracker-Fm1) 0.5 (beta) | Six-track chiptune and IDM tracker with song chains and 32 live effects | Omnipotard (Guizmoh) |
+| [KAWA](https://github.com/Guizmoh/Kawa-Tracker-Fm1) 0.6 (beta) | Six-track chiptune and IDM tracker with song chains and 32 live effects | Omnipotard (Guizmoh) |
+| [Caravel](https://github.com/bonszaimusic/caravel) 0.6.0 (beta) | Multi-engine synthesis, pair morphing, performance macros and ambient voices | BonszaiMusic, after Felucca |
+| [FRASIL](https://github.com/styvesgoupil/frasil) 2.0.1 | Layered drones, FM glints, bass sequencing, shimmer and freeze | Styves Goupil |
 
 Each firmware's manual is linked from the menu. All except Jazz Box have screenshot previews from [the FM-1 Firmware Hub](https://fm1.designburgapps.com/); the images are kept locally for offline use, with original URLs and checksums in `screenshots/sources.json`. Jazz Box’s preview is rendered from its pinned firmware source. Release tags, dates and pre-release status are recorded in `firmware/releases.json`. HYP-1, Tonitor and KAWA have no release tags: its current published build version and exact source commit are pinned there. Their saved work (patterns, projects, settings) stays in the browser, separately for each, and survives switching between them.
 
@@ -61,7 +63,7 @@ Each firmware is built from its own source with its host simulator: the whole FM
 | Offline | `sw.js`: the service worker; `assemble.py` writes its file list and a version hash |
 | The site | `dist/`: what GitHub Pages serves, made by `assemble.py` and committed |
 
-Two kinds of firmware build exist. X0X, FiMba-1, AMB-1, HYP-1, MIN-1, DUB-1, KAWA and Jazz Box keep numbered save objects, kept in localStorage, and come with their own worklet. Felucca, SLOOP, Melodee, GHOULBOX, MAKU and Tonitor write a simulated 1 MiB NOR flash; `firmware/flash-worklet.js` sends the page every changed 4 KiB sector, kept in IndexedDB. SLOOP has no browser build of its own: `firmware/sloop_web.c` is Felucca's (`web/emu/felucca_web.c`) fitted to SLOOP's sources, without changing any of them. Melodee similarly uses `firmware/melodee_web.c`: the real DSP, UI and NOR persistence, with its supported one-core audio path. It does not emulate the second hardware CPU, PLL clock switching or USB audio. MAKU uses its own browser build, with a fresh world seed each launch. ChoralRoot uses its own source simulator (`tools/emu/web/emu_web.c`), with its LEDs and staged flash adapted to the shared worklet and the same per-firmware sector storage. HYP-1 uses its own AMB-1-derived source build. AMB-1 1.3 uses its own fm1-base source simulator (including the pinned base and BSP submodules). Tonitor uses `firmware/tonitor_web.c`, adapted from its host harness: the original DSP, panel, graphics, sound generation and session storage, with audio-driven timing and simulated NOR flash. MIN-1 and DUB-1 use their upstream browser source builds and separate save stores. KAWA 0.5 beta uses its own browser simulator through `firmware/kawa_web.c` and `firmware/kawa-worklet.js`: the real tracker, project slots, autosave and settings, with control mapping and framebuffer conversion for the shared panel. As in the original, the first key closes its boot page. Its separate sample-import page is not included. The emulator cannot load FM-1 `.fwsc` update packages, which hold machine code for the instrument's processor.
+Two kinds of firmware build exist. X0X, FiMba-1, AMB-1, HYP-1, MIN-1, DUB-1, KAWA, FRASIL and Jazz Box keep numbered save objects, kept in localStorage, and come with their own worklet. Felucca, SLOOP, Melodee, GHOULBOX, MAKU, Tonitor and Caravel write a simulated 1 MiB NOR flash; `firmware/flash-worklet.js` sends the page every changed 4 KiB sector, kept in IndexedDB. SLOOP has no browser build of its own: `firmware/sloop_web.c` is Felucca's (`web/emu/felucca_web.c`) fitted to SLOOP's sources, without changing any of them. Melodee similarly uses `firmware/melodee_web.c`: the real DSP, UI and NOR persistence, with its supported one-core audio path. It does not emulate the second hardware CPU, PLL clock switching or USB audio. MAKU uses its own browser build, with a fresh world seed each launch. ChoralRoot uses its own source simulator (`tools/emu/web/emu_web.c`), with its LEDs and staged flash adapted to the shared worklet and the same per-firmware sector storage. HYP-1 uses its own AMB-1-derived source build. AMB-1 1.3 uses its own fm1-base source simulator (including the pinned base and BSP submodules). Tonitor uses `firmware/tonitor_web.c`, adapted from its host harness: the original DSP, panel, graphics, sound generation and session storage, with audio-driven timing and simulated NOR flash. MIN-1 and DUB-1 use their upstream browser source builds and separate save stores. KAWA 0.6 beta uses its own browser simulator through `firmware/kawa_web.c` and `firmware/kawa-worklet.js`: the real tracker, project slots, autosave and settings, with control mapping and framebuffer conversion for the shared panel. As in the original, the first key closes its boot page. Its separate sample-import page is not included. Caravel uses its upstream browser build with the single-core configuration; it has a separate save store from Felucca. FRASIL uses its upstream fm1-base browser simulator, including the pinned recursive dependencies, and saves its settings and scenes in a separate store. The emulator cannot load FM-1 `.fwsc` update packages, which hold machine code for the instrument's processor.
 
 Jazz Box uses its own MIN-1-derived C firmware and worklet, with a separate save store; no standalone Jazz Box web page or form editor is included in this collection. Its reproducible source snapshot is pinned on this repository’s `jazz-box-source` branch. The existing emulator panel, input, rendering and storage code is shared unchanged.
 
@@ -107,7 +109,7 @@ It needs a browser build of its own source: a host simulator compiled to a stand
 
 ## Licence and credits
 
-GPL-3.0-only (`LICENSE`) for this app. Each firmware retains its upstream licence and notices; AMB-1 1.3 and fm1-base are MPL-2.0, and the other included firmwares are GPL-3.0. All corresponding source and dependency notices are included in their archives. `dist/source.tar.gz` is this app's source; `dist/src/<firmware>.tar.gz` holds each firmware's source tree exactly as built, and both are linked from the menu.
+GPL-3.0-only (`LICENSE`) for this app. Each firmware retains its upstream licence and notices; AMB-1 1.3, FRASIL and fm1-base are MPL-2.0, and the other included firmwares are GPL-3.0. All corresponding source and dependency notices are included in their archives. `dist/source.tar.gz` is this app's source; `dist/src/<firmware>.tar.gz` holds each firmware's source tree exactly as built, and both are linked from the menu.
 
 - Firmwares: X0X by Charles Vestal, Felucca by Leo Kuroshita / Hügelton Instruments, SLOOP by isod89, FiMba-1 by Adam Sowers; see each source tree's `LICENSING.md` for the parts they build on.
 - The browser emulator design (the device clock driven by the audio worklet) is X0X's, after an idea by Groove OS; the Felucca-family worklet and `sloop_web.c` follow Felucca's browser build.

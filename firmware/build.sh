@@ -21,7 +21,7 @@ PY=${PYTHON:-$HERE/.venv/bin/python}
 PATH=$(dirname "$PY"):$PATH
 command -v emcc >/dev/null 2>&1 || { echo "firmware: no emcc (Emscripten)"; exit 1; }
 "$PY" -c 'import PIL, fontTools' || { echo "firmware: $PY needs Pillow and fontTools"; exit 1; }
-WANT=${*:-"x0x felucca sloop fimba melodee amb hyp1 ghoulbox choralroot maku jazzbox min1 tonitor dub kawa"}
+WANT=${*:-"x0x felucca sloop fimba melodee amb hyp1 ghoulbox choralroot maku jazzbox min1 tonitor dub kawa caravel frasil"}
 EMCC_FLAGS="-O2 -ffp-contract=off -std=gnu99 -w --no-entry -sSTANDALONE_WASM -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=33554432 -sFILESYSTEM=0"
 
 gen() {   # generator script and output header, in the checkout, unless the header is there
@@ -56,6 +56,16 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
         EMU_PREVIEW=0 sh web/emu/build.sh >/dev/null
         cp build/emu/felucca.wasm "$OUT/$id/"
         sed -n 's/^#define FELUCCA_VERSION "\([^"]*\)".*/\1/p' firmware/src/felucca.c | sed 's/^v//' > "$OUT/$id/version" ;;
+    caravel)
+        "$PY" -c 'import runpy; runpy.run_path("tools/build.py", run_name="build_tools")["generate"]()' >/dev/null
+        EMU_PREVIEW=0 sh web/emu/build.sh >/dev/null
+        cp build/emu/felucca.wasm "$OUT/$id/caravel.wasm"
+        echo "$VERSION" > "$OUT/$id/version" ;;
+    frasil)
+        PYTHON="$PY" sh build.sh --release "$VERSION" --web >/dev/null
+        cp app/build/emu/app.wasm "$OUT/$id/frasil.wasm"
+        cp app/build/emu/worklet.js "$OUT/$id/"
+        echo "$VERSION" > "$OUT/$id/version" ;;
     sloop)
         mkdir -p build/gen build/emu
         for g in font:felucca_font icons:felucca_icons tables:felucca_tables samples:felucca_samples \
@@ -93,7 +103,7 @@ grep -v '^#' "$HERE/sources.txt" | while read -r id dir repo commit; do
         mkdir -p build/gen
         gen gen_tables.py build/gen/tonitor_tables.h
         gen gen_font.py build/gen/tonitor_font.h
-        emcc $EMCC_FLAGS -fno-builtin -I. -Ifirmware/src -Ibuild/gen -o "$OUT/$id/tonitor.wasm" "$HERE/tonitor_web.c"
+        emcc $EMCC_FLAGS -fno-builtin "-DTONITOR_VERSION=\"$VERSION\"" -I. -Ifirmware/src -Ibuild/gen -o "$OUT/$id/tonitor.wasm" "$HERE/tonitor_web.c"
         echo "$VERSION" > "$OUT/$id/version" ;;
     kawa)
         cd source

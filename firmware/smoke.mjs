@@ -59,6 +59,11 @@ for (const [id, fw] of Object.entries(registry.catalog)) {
     send({type:'keys',mask:0});render(80);send({type:'buttons',mask:0});render(80);
   }
   else if(id==='tonitor') {send({type:'buttons',mask:1<<7});render(1000);send({type:'buttons',mask:0});render(80);tap(7);}
+  else if(id==='dub') {send({type:'buttons',mask:1<<5});render(1000);send({type:'buttons',mask:0});render(80);} // GLO held saves the piece.
+  else if(id==='frasil') { // SAVE + REC stores a scene; FX keeps the existing name.
+    send({type:'buttons',mask:1<<7});render(80);send({type:'buttons',mask:(1<<7)|(1<<11)});render(80);
+    send({type:'buttons',mask:1<<7});render(80);send({type:'buttons',mask:0});render(80);tap(0);
+  }
   else if(id==='maku')tap(11); // MAKU REC likes its world and stores it.
   else if(id==='kawa') {tap(7);tap(13);tap(13);tap(13);} // PROJECTS > SAVE > slot > name > write.
   else if(id==='melodee') {tap(7);tap(13);tap(13);tap(13);} // USER slot, Save here sheet, name, write.

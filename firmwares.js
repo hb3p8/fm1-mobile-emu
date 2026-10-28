@@ -90,7 +90,7 @@ const FIRMWARES = {
   },
   tonitor: {
     name: "Tonitor", tag: "TONITOR", by: "Nuno Zimas", repo: "https://github.com/nzimas/tonitor",
-    about: "Six tracks of electroacoustic textures: seven sound engines, free loopers, grains and reverb.",
+    about: "Six tracks of electroacoustic textures: eight sound engines, free loopers, grains and reverb.",
     manual: "https://nzimas.github.io/tonitor/manual.html",
     kind: "flash", wasm: "fw/tonitor/tonitor.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
     store: "tonitor", more: true, masterMax: 1023, masterDefault: 700,
@@ -108,6 +108,20 @@ const FIRMWARES = {
     manual: "https://guizmoh.github.io/Kawa-Tracker-Fm1/manual/",
     kind: "store", wasm: "fw/kawa/kawa.wasm", worklet: "fw/kawa/worklet.js", processor: "kawa",
     store: "kawa-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
+  },
+  caravel: {
+    name: "Caravel", tag: "CARAVEL", by: "BonszaiMusic, after Felucca", repo: "https://github.com/bonszaimusic/caravel",
+    about: "Multi-engine synthesis with SEM, HADES and DRONE voices, pair morphing and performance macros.",
+    manual: "https://github.com/bonszaimusic/caravel#readme",
+    kind: "flash", wasm: "fw/caravel/caravel.wasm", worklet: "fw/flash-worklet.js", processor: "flash-firmware",
+    store: "caravel", more: true, masterMax: 1023, masterDefault: 700,
+  },
+  frasil: {
+    name: "FRASIL", tag: "FRASIL", by: "Styves Goupil", repo: "https://github.com/styvesgoupil/frasil",
+    about: "Layered ambient drones, FM glints and a bass sequencer, with shimmer, freeze and scene morphing.",
+    manual: "https://frasilsynth.com/guide/",
+    kind: "store", wasm: "fw/frasil/frasil.wasm", worklet: "fw/frasil/worklet.js", processor: "fm1",
+    store: "frasil-emu-store", more: true, masterMax: 4096, masterDefault: 2800,
   },
 };
 for (const [id, build] of Object.entries(FIRMWARE_BUILDS)) Object.assign(FIRMWARES[id], build);   // version, commit

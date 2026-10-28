@@ -1,5 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
- * Melodee 1.4 in the browser, after the Felucca/SLOOP web adapter. The real
+ * Melodee integration: Copyright (C) 2026 Kerem Kilic (Ellic Studio).
+ * Portions Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments.
+ * Melodee 1.5 in the browser, after the Felucca/SLOOP web adapter. The real
  * DSP, sequencer, UI and persistence run with a simulated clock, LCD and NOR.
  * Uses Melodee's supported serial audio path (MELODEE_DUAL_CORE=0); USB,
  * hardware clock switching and the second hardware core are not emulated.
@@ -168,6 +170,9 @@ static int32_t web_knob = 512 * 16;
 static void melodee_init(void)
 {
     uint32_t i;
+    trk_voices_bind();
+    midi_insert_init();
+    punch_reset();
     chain_defaults(&chain_config);
     pattern_init();
     for (i = 0; i < G_COUNT; i++)
@@ -178,8 +183,8 @@ static void melodee_init(void)
     for (i = 0; i < NTRK; i++) {
         track_t *t = &trk[i];
         track_defaults(t);
-        set_engine_of(t, TRK_DEF[i][0]);
-        apply_preset_to(t, TRK_DEF[i][1]);    /* with its sends */
+        set_engine_of(t, trk_def_engine(i));
+        apply_preset_to(t, trk_def_preset(i));    /* with its sends */
         t->engine = t->eng_req;
         track_defaults_steps(t);              /* (a sound load never touches them) */
         pat_sig[i] = steps_sig(t);            /* (empty: not the user's) */
@@ -211,7 +216,9 @@ static void web_frame(void)
     if (b > 0) song.batt_raw = song.batt_raw ? song.batt_raw + (b - song.batt_raw) / 32 : b;
     web_knob += (a * 16 - web_knob) / 8;
     uint32_t k10 = (uint32_t)(web_knob / 16);
-    song.master_q12 = (k10 * k10) >> 8;
+    midi_master_physical((k10 * k10) >> 8);
+    wire_release();
+    pattern_poll();
     cz_service();
     fm6_service();
     melodee_dbg.ui_frames++;

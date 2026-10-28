@@ -6,40 +6,40 @@
     "commit": "27f6fac7e07ce97b5de158b45aec99f59a9e23fd",
     "published": "2026-10-15T16:33:19Z",
     "prerelease": false,
+    "version": "1.1.0",
+    "release": "https://github.com/charlesvestal/fm1-x0x/releases/tag/v1.1.0",
     "assets": [
       "x0x-1.1.0.fwsc"
-    ],
-    "version": "1.1.0",
-    "release": "https://github.com/charlesvestal/fm1-x0x/releases/tag/v1.1.0"
+    ]
   },
   "felucca": {
     "id": "felucca",
     "repo": "hugelton/Felucca",
-    "tag": "v1.6.1",
-    "commit": "a53ecf428c29c780108fd70a31b71a32a6b5c313",
-    "published": "2026-10-14T15:36:24Z",
+    "tag": "v1.7.0",
+    "commit": "d7b1b7c4099bba28854869ddb256b3d9f634cee8",
+    "published": "2026-10-28T01:05:54Z",
     "prerelease": false,
+    "version": "1.7.0",
+    "release": "https://github.com/hugelton/Felucca/releases/tag/v1.7.0",
     "assets": [
-      "felucca-1.6.1-app.bin",
-      "felucca-1.6.1-source.tar.gz",
-      "felucca-1.6.1.fwsc"
-    ],
-    "version": "1.6.1",
-    "release": "https://github.com/hugelton/Felucca/releases/tag/v1.6.1"
+      "felucca-1.7.0-app.bin",
+      "felucca-1.7.0-source.tar.gz",
+      "felucca-1.7.0.fwsc"
+    ]
   },
   "sloop": {
     "id": "sloop",
     "repo": "isod89/sloop-fm1",
-    "tag": "v2.7.1",
-    "commit": "4ec1ac829fd2bdf2c571ea215fb3d62477d01220",
-    "published": "2026-10-16T16:22:37Z",
+    "tag": "v2.8.3",
+    "commit": "5eb24c1dc18261a85c193e8b28318944690e58fd",
+    "published": "2026-10-27T21:11:49Z",
     "prerelease": false,
+    "version": "2.8.3",
+    "release": "https://github.com/isod89/sloop-fm1/releases/tag/v2.8.3",
     "assets": [
-      "sloop-2.7.1.fwsc",
-      "sloop-editor-2.7.1.html"
-    ],
-    "version": "2.7.1",
-    "release": "https://github.com/isod89/sloop-fm1/releases/tag/v2.7.1"
+      "sloop-2.8.3.fwsc",
+      "sloop-editor-2.8.3.html"
+    ]
   },
   "fimba": {
     "id": "fimba",
@@ -48,33 +48,33 @@
     "commit": "0485ed0d387ce78216428c7b19f97d77bbe10b4d",
     "published": "2026-10-13T03:08:33Z",
     "prerelease": true,
+    "version": "0.6.1",
+    "release": "https://github.com/jadamsowers/fm1-fimba/releases/tag/v0.6.1",
     "assets": [
       "fimba-0.6.1.fwsc",
       "FiMba-1.html"
-    ],
-    "version": "0.6.1",
-    "release": "https://github.com/jadamsowers/fm1-fimba/releases/tag/v0.6.1"
+    ]
   },
   "melodee": {
     "id": "melodee",
     "repo": "keremimo/melodee",
-    "tag": "v1.4.5",
-    "commit": "398ada1e09d864c12f3b778a43e45c7c2a8031b8",
-    "published": "2026-10-19T14:15:30Z",
+    "tag": "v1.5.1",
+    "commit": "6a608ba122ac42293908d394e26713e31ec52fb0",
+    "published": "2026-10-26T08:28:10Z",
     "prerelease": false,
+    "version": "1.5.1",
+    "release": "https://github.com/keremimo/melodee/releases/tag/v1.5.1",
     "assets": [
       "BUILD_INFO.json",
-      "fm1-recover-1.4.5-linux-x64.zip",
-      "fm1-recover-1.4.5-macos-arm64.zip",
-      "fm1-recover-1.4.5-macos-x64.zip",
-      "fm1-recover-1.4.5-windows-x64.zip",
-      "melodee-1.4.5-app.bin",
-      "melodee-1.4.5-licenses.zip",
-      "melodee-1.4.5.fwsc",
+      "fm1-recover-1.5.1-linux-x64.zip",
+      "fm1-recover-1.5.1-macos-arm64.zip",
+      "fm1-recover-1.5.1-macos-x64.zip",
+      "fm1-recover-1.5.1-windows-x64.zip",
+      "melodee-1.5.1-app.bin",
+      "melodee-1.5.1-licenses.zip",
+      "melodee-1.5.1.fwsc",
       "SHA256SUMS"
-    ],
-    "version": "1.4.5",
-    "release": "https://github.com/keremimo/melodee/releases/tag/v1.4.5"
+    ]
   },
   "amb": {
     "id": "amb",
@@ -83,11 +83,11 @@
     "commit": "188b0a42f20a547864e732ae5ea1339d0fbcf395",
     "published": "2026-10-17T12:31:42Z",
     "prerelease": false,
+    "version": "1.3",
+    "release": "https://github.com/charlesvestal/fm1-amb/releases/tag/v1.3",
     "assets": [
       "amb-1.3.fwsc"
-    ],
-    "version": "1.3",
-    "release": "https://github.com/charlesvestal/fm1-amb/releases/tag/v1.3"
+    ]
   },
   "maku": {
     "id": "maku",
@@ -96,6 +96,8 @@
     "commit": "5671198f1989cbd4a0e674b2059e7f8316faf37d",
     "published": "2026-10-16T06:04:51Z",
     "prerelease": false,
+    "version": "1.0",
+    "release": "https://github.com/okumurari2/maku/releases/tag/maku-v1.0",
     "assets": [
       "ATTRIBUTION.txt",
       "LICENSE",
@@ -103,57 +105,55 @@
       "maku-1.0-app.bin",
       "maku-1.0.fwsc",
       "SHA256SUMS"
-    ],
-    "version": "1.0",
-    "release": "https://github.com/okumurari2/maku/releases/tag/maku-v1.0"
+    ]
   },
   "hyp1": {
     "id": "hyp1",
     "repo": "RustyPawz/fm1-HYP1",
     "tag": null,
-    "commit": "5bb69102bcd5a1bbf0b4c10682b495f030ca96eb",
-    "published": "2026-10-19T00:35:09Z",
+    "commit": "57c456db61826331d356458c9c1a136517da7cbf",
+    "published": "2026-10-22T22:43:45Z",
     "prerelease": false,
-    "version": "1.5.44",
+    "version": "1.5.54",
     "release": "https://rustypawz.github.io/fm1-HYP1/",
     "assets": [
-      "hyp1-1.5.44.fwsc"
+      "hyp1-1.5.54.fwsc"
     ]
   },
   "ghoulbox": {
     "id": "ghoulbox",
     "repo": "jasonpersinger/ghoulbox-fm1-dungeon-synth",
-    "tag": "ghoulbox-v2.3.2",
-    "commit": "71ac3f87e0a33b08831f11a89fbd6012de8024ce",
-    "published": "2026-10-17T16:02:23Z",
+    "tag": "ghoulbox-v2.4",
+    "commit": "9f2b9a22e456d7fe9552b40f7a1d0c13200913bb",
+    "published": "2026-10-24T11:29:25Z",
     "prerelease": false,
+    "version": "2.4",
+    "release": "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth/releases/tag/ghoulbox-v2.4",
     "assets": [
-      "ghoulbox-2.3.2.fwsc",
-      "GHOULBOX-User-Guide-2.3-print.pdf",
-      "GHOULBOX-User-Guide-2.3.pdf"
-    ],
-    "version": "2.3.2",
-    "release": "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth/releases/tag/ghoulbox-v2.3.2"
+      "ghoulbox-2.4.fwsc",
+      "GHOULBOX-User-Guide-2.4-print.pdf",
+      "GHOULBOX-User-Guide-2.4.pdf"
+    ]
   },
   "choralroot": {
     "id": "choralroot",
     "repo": "Quixotic7/ChoralRootFM1",
-    "tag": "v0.26.1",
-    "commit": "7d97982a7db3dad2da456a3e4d4478548b6571d9",
-    "published": "2026-10-20T07:12:52Z",
+    "tag": "v0.27",
+    "commit": "070bd306ed63c7d08f09bb6ea937262b52b1a6c0",
+    "published": "2026-10-26T04:45:54Z",
     "prerelease": false,
+    "version": "0.27",
+    "release": "https://github.com/Quixotic7/ChoralRootFM1/releases/tag/v0.27",
     "assets": [
-      "choralroot-0.26.1-1core-app.bin",
-      "choralroot-0.26.1-1core.fwsc",
-      "choralroot-0.26.1-app.bin",
-      "choralroot-0.26.1.fwsc",
+      "choralroot-0.27-1core-app.bin",
+      "choralroot-0.27-1core.fwsc",
+      "choralroot-0.27-app.bin",
+      "choralroot-0.27.fwsc",
       "LICENSE",
       "LICENSES.zip",
       "LICENSING.md",
       "SHA256SUMS"
-    ],
-    "version": "0.26.1",
-    "release": "https://github.com/Quixotic7/ChoralRootFM1/releases/tag/v0.26.1"
+    ]
   },
   "jazzbox": {
     "id": "jazzbox",
@@ -174,11 +174,11 @@
     "commit": "8d6dd77d34cde4f980bd84e726d6a923f951a0dd",
     "published": "2026-10-16T03:14:29Z",
     "prerelease": false,
+    "version": "0.2.1",
+    "release": "https://github.com/Reytian/fm1-min1/releases/tag/v0.2.1",
     "assets": [
       "min-0.2.1.fwsc"
-    ],
-    "version": "0.2.1",
-    "release": "https://github.com/Reytian/fm1-min1/releases/tag/v0.2.1"
+    ]
   },
   "tonitor": {
     "id": "tonitor",
@@ -187,34 +187,78 @@
     "prerelease": false,
     "release": "https://nzimas.github.io/tonitor/",
     "assets": [],
-    "commit": "964e3ec1e078191f3356bf5b0f7e764a357e9219",
-    "version": "0.49",
-    "published": "2026-10-19T15:11:49+03:00"
+    "commit": "0dccfcaed372368dd1519db22f4f4c5a109132d0",
+    "version": "68",
+    "published": "2026-10-27T13:26:53+02:00"
   },
   "dub": {
     "id": "dub",
     "repo": "sbegueria/fm1-dub",
-    "tag": "v1.2.0",
-    "commit": "ed490917895803fa160bd53b21ad848cd7bbe04a",
-    "published": "2026-10-19T16:14:45Z",
+    "tag": "v1.3.0",
+    "commit": "e6fe7b8f8f3114019bb36b5b536ad458eacd2c2d",
+    "published": "2026-10-23T14:03:37Z",
     "prerelease": false,
+    "version": "1.3.0",
+    "release": "https://github.com/sbegueria/fm1-dub/releases/tag/v1.3.0",
     "assets": [
-      "dub-1.2.0.fwsc"
-    ],
-    "version": "1.2.0",
-    "release": "https://github.com/sbegueria/fm1-dub/releases/tag/v1.2.0"
+      "dub-1.3.0.fwsc"
+    ]
   },
   "kawa": {
     "id": "kawa",
     "repo": "Guizmoh/Kawa-Tracker-Fm1",
     "tag": null,
-    "commit": "047d21f6154ff6f86c7d3dc4b90f8d5e3320c300",
-    "published": "2026-10-20T04:46:11Z",
+    "commit": "e00406e1f5b19f5f7e8147a976f0f2f58bd37cbc",
+    "published": "2026-10-28T13:37:57Z",
     "prerelease": true,
-    "version": "0.5",
+    "version": "0.6",
     "release": "https://guizmoh.github.io/Kawa-Tracker-Fm1/",
     "assets": [
       "kawa-0.5.fwsc"
+    ]
+  },
+  "caravel": {
+    "id": "caravel",
+    "repo": "bonszaimusic/caravel",
+    "tag": "v0.6.0",
+    "commit": "b50bad57dcf32862f36661a5fc2996e13392b93e",
+    "published": "2026-10-27T15:35:58Z",
+    "prerelease": true,
+    "version": "0.6.0",
+    "release": "https://github.com/bonszaimusic/caravel/releases/tag/v0.6.0",
+    "assets": [
+      "Apache-2.0-msfa.txt",
+      "Apache-2.0.txt",
+      "ATTRIBUTION.txt",
+      "caravel-0.6.0-app.bin",
+      "caravel-0.6.0-loader.bin",
+      "caravel-0.6.0-source.tar.gz",
+      "caravel-0.6.0.fwsc",
+      "CREDITS.md",
+      "LICENSE",
+      "LICENSING.md",
+      "MIT-DaisySP.txt",
+      "MIT-Felucca-Engines.txt",
+      "MIT-Fukiai.txt",
+      "MIT-Rings.txt",
+      "NOTICE",
+      "OFL-DotGothic16.txt",
+      "OFL-InterTight.txt",
+      "release-build.json",
+      "SHA256SUMS"
+    ]
+  },
+  "frasil": {
+    "id": "frasil",
+    "repo": "styvesgoupil/frasil",
+    "tag": "v2.0.1",
+    "commit": "422cac668d2753cda4e76e07d5a1f26bf4b1007e",
+    "published": "2026-10-25T03:20:41Z",
+    "prerelease": false,
+    "version": "2.0.1",
+    "release": "https://github.com/styvesgoupil/frasil/releases/tag/v2.0.1",
+    "assets": [
+      "frasil-2.0.1.fwsc"
     ]
   }
 }

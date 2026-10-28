@@ -165,7 +165,7 @@ static void fl_plain_window_init(void) {}
 #include "firmware/src/project.c"
 #include "firmware/src/splash.c"
 
-/* The power-on defaults from SLOOP 2.7.1 main.c (Leo Kuroshita / isod89, GPL-3.0).
+/* The power-on defaults from SLOOP 2.8.3 main.c (Leo Kuroshita / isod89, GPL-3.0).
  * Its host harness executes render jobs serially (CORES=1); no second CPU is emulated. */
 static uint32_t web_master_adc = 700;
 enum { FM1_ADC_BATT = 3, FM1_ADC_MASTER = 4 };
@@ -201,6 +201,7 @@ UI_SMALL static void felucca_init(void)
     song.g[G_DRMAP] = midi_set[7];                   /* (2.7) GLO > MIDI 3: DR MAP */
     song.g[G_CLKOUT] = midi_set[9];                  /* (2.7) GLO > MIDI 3: CLK OUT */
     song.g[G_RMCH] = midi_set[8];                    /* (2.7) GLO > MIDI 3: REMOTE */                    /* (2.7) GLO > MIDI 3: FX CH */   /* settings of the FM-1) */
+    song.g[G_FXFADE] = fxfade;
     layers_init();                            /* the panel's layer buttons for the keys (ui_layers.c) */
     go_home();
     ui.force = 1;

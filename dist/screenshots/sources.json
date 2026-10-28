@@ -90,5 +90,17 @@
     "url": "https://thefirmwarehub.com/img/kawa.png",
     "sha256": "2cece740201074483e4efbe8241c637989d31758f86af8d9267c36e978d428ef",
     "bytes": 196987
+  },
+  {
+    "id": "caravel",
+    "url": "https://thefirmwarehub.com/img/caravel.png",
+    "sha256": "e4079c5ae8043f5182ddd1da3bc5fdc0430e50aaedcf33dcf05523646d697ce5",
+    "bytes": 8511
+  },
+  {
+    "id": "frasil",
+    "url": "https://thefirmwarehub.com/img/frasil.png",
+    "sha256": "3b4c46fa2aa55acaf833d8cb9779ac95b13305e8e0da39ce9a0760e6ce2ae25a",
+    "bytes": 55671
   }
 ]
